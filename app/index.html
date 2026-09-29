@@ -80,7 +80,7 @@ svg.i.s{width:16px;height:16px}
 /* elementos */
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:12px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}@media (min-width:1260px){.kpis{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media (max-width:1100px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){.g2,.g3{grid-template-columns:minmax(0,1fr)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);min-width:0}
@@ -447,7 +447,7 @@ const FCE = { nome: 'FCE Advogados', razao: 'Fabio de Castro Emerim Sociedade In
 const blocosFCE = () => '<div class="rb"><b>' + FCE.nome + '</b><span>' + FCE.razao + '</span><span>' + FCE.oab + ' · CNPJ ' + FCE.cnpj + '</span></div>' +
   '<div class="rb"><b>Endereço</b><span>' + FCE.end1 + '</span><span>' + FCE.end2 + '</span></div>' +
   '<div class="rb"><b>Contato</b><span><a href="' + FCE.waLink + '" target="_blank" rel="noopener">WhatsApp ' + FCE.wa + '</a></span><span><a href="mailto:' + FCE.email + '">' + FCE.email + '</a></span></div>';
-const RODAPE = '<footer class="rod"><button type="button" class="rod-lin" aria-label="Dados do escritório"><b>FCE Advogados</b><span> · ' + FCE.oab + ' · WhatsApp ' + FCE.wa + '</span><i class="rod-seta">›</i></button><div class="rod-det">' + blocosFCE() + '</div></footer>';
+const RODAPE = '<footer class="rod"><button type="button" class="rod-lin" aria-label="Dados do escritório"><b>FCE Advogados</b><span>&nbsp;· ' + FCE.oab + ' · WhatsApp ' + FCE.wa + '</span><i class="rod-seta">›</i></button><div class="rod-det">' + blocosFCE() + '</div></footer>';
 const RODAPE_LOGIN = '<footer class="rod-login">' + blocosFCE() + '</footer>';
 
 // ---------- login ----------
