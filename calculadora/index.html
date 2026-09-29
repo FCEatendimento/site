@@ -259,6 +259,16 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .fase-txt{margin-top:1.5rem;border-left:4px solid var(--accent);padding:.9rem 1.1rem;background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:.95rem}
 .calc-nota{font-size:.82rem;color:var(--muted);margin-top:1.25rem;line-height:1.5}
 .cta-final{margin-top:1.75rem;display:grid;gap:.75rem}
+.duplo{display:grid;grid-template-columns:1.3fr 1fr;gap:.5rem}
+.fin{margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}
+.fin h2{margin-bottom:.35rem}
+.fin-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin-top:1rem}
+.fin-grid div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.75rem .85rem;display:grid;gap:.2rem;min-width:0}
+.fin-grid span{font-size:.8rem;color:var(--muted);line-height:1.3}.fin-grid b{font:700 1.15rem/1.2 var(--display)}
+.fin-grid .jur b{color:var(--prazo)}
+.b-ent{background:var(--ink);color:var(--bg)}.b-amo{background:var(--accent);color:var(--accent-ink)}.b-jur{background:var(--prazo);color:#fff}
+.fin-futuro{margin-top:1rem;font-size:.95rem}
+@media (max-width:620px){.fin-grid{grid-template-columns:1fr 1fr}.fin-grid div:first-child{grid-column:1/-1}}
 .aluguel{margin-top:1.5rem;border:1px solid var(--prazo);border-radius:8px;padding:1.1rem;background:var(--surface)}
 .al-cab{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:start}
 .al-cab h3{font-size:1.02rem;margin-bottom:.3rem}.al-cab p{color:var(--muted);font-size:.9rem;line-height:1.5}
@@ -346,11 +356,15 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
               <option value="leilao_marcado">Já tem data de leilão marcada</option>
               <option value="leilao_realizado">O leilão já aconteceu</option>
             </select></div>
-          <div class="campo"><label for="valor_imovel">Quanto vale o imóvel hoje?</label><div class="moeda"><span>R$</span><input id="valor_imovel" inputmode="numeric" data-moeda required></div><small>Valor aproximado de venda no mercado.</small></div>
-          <div class="campo"><label for="saldo_devedor">Quanto ainda deve do financiamento?</label><div class="moeda"><span>R$</span><input id="saldo_devedor" inputmode="numeric" data-moeda required></div><small>Saldo devedor total, com as parcelas atrasadas.</small></div>
-          <div class="campo"><label for="valor_parcela">Valor da parcela</label><div class="moeda"><span>R$</span><input id="valor_parcela" inputmode="numeric" data-moeda></div></div>
+          <div class="campo largo"><label for="valor_imovel">Quanto vale o imóvel hoje?</label><div class="moeda"><span>R$</span><input id="valor_imovel" inputmode="numeric" data-moeda required></div><small>Valor aproximado de venda no mercado.</small></div>
+          <div class="campo"><label for="mes_compra">Quando assinou o financiamento?</label><div class="duplo"><select id="mes_compra" aria-label="Mês"><option value="1">janeiro</option><option value="2">fevereiro</option><option value="3">março</option><option value="4">abril</option><option value="5">maio</option><option value="6">junho</option><option value="7">julho</option><option value="8">agosto</option><option value="9">setembro</option><option value="10">outubro</option><option value="11">novembro</option><option value="12">dezembro</option></select><select id="ano_compra" aria-label="Ano"><option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option><option value="2020">2020</option><option value="2019">2019</option><option value="2018" selected>2018</option><option value="2017">2017</option><option value="2016">2016</option><option value="2015">2015</option><option value="2014">2014</option><option value="2013">2013</option><option value="2012">2012</option><option value="2011">2011</option><option value="2010">2010</option><option value="2009">2009</option><option value="2008">2008</option><option value="2007">2007</option><option value="2006">2006</option><option value="2005">2005</option><option value="2004">2004</option><option value="2003">2003</option><option value="2002">2002</option><option value="2001">2001</option><option value="2000">2000</option><option value="1999">1999</option><option value="1998">1998</option><option value="1997">1997</option><option value="1996">1996</option><option value="1995">1995</option></select></div></div>
+          <div class="campo"><label for="preco_compra">Valor do imóvel na compra</label><div class="moeda"><span>R$</span><input id="preco_compra" inputmode="numeric" data-moeda required></div></div>
+          <div class="campo"><label for="entrada">Entrada que você pagou</label><div class="moeda"><span>R$</span><input id="entrada" inputmode="numeric" data-moeda></div><small>Inclua o FGTS usado na compra.</small></div>
+          <div class="campo"><label for="prazo">Prazo do financiamento</label><select id="prazo"><option value="10">10 anos</option><option value="15">15 anos</option><option value="20">20 anos</option><option value="25">25 anos</option><option value="30" selected>30 anos</option><option value="35">35 anos</option></select></div>
+          <div class="campo"><label for="sistema">Tipo de parcela</label><select id="sistema"><option value="SAC">Diminui com o tempo (SAC)</option><option value="PRICE">Fixa (Tabela Price)</option><option value="SAC">Não sei</option></select><small>A maioria dos financiamentos da Caixa usa SAC.</small></div>
+          <div class="campo"><label for="valor_parcela">Valor da parcela hoje</label><div class="moeda"><span>R$</span><input id="valor_parcela" inputmode="numeric" data-moeda></div></div>
           <div class="campo"><label for="parcelas_atraso">Parcelas em atraso</label><input id="parcelas_atraso" inputmode="numeric" maxlength="3"></div>
-          <div class="campo largo"><label for="ja_pago">Quanto você já pagou pelo imóvel, contando a entrada?</label><div class="moeda"><span>R$</span><input id="ja_pago" inputmode="numeric" data-moeda></div><small>Uma estimativa já ajuda.</small></div>
+          <div class="campo"><label for="saldo_devedor">Saldo devedor, se souber</label><div class="moeda"><span>R$</span><input id="saldo_devedor" inputmode="numeric" data-moeda></div><small>Está no extrato do banco. Se deixar em branco, estimamos.</small></div>
         </div>
         <div class="acoes-form"><button class="btn btn-primary" type="submit">Ver o resultado</button><span class="erro" id="e-sim" role="alert"></span></div>
       </form>
@@ -358,6 +372,18 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <!-- Resultado -->
       <section class="card oculto" id="resultado" aria-live="polite">
         <p class="passo">Resultado da simulação</p>
+        <div class="fin">
+          <h2>Seu financiamento em números</h2>
+          <p class="sub" id="f-txt" style="margin:0"></p>
+          <div class="fin-grid">
+            <div><span>Você já pagou, ao todo</span><b id="f-total">R$ 0</b></div>
+            <div><span>Virou patrimônio seu (entrada + amortização)</span><b id="f-seu">R$ 0</b></div>
+            <div class="jur"><span>Foi para os juros do banco</span><b id="f-juros">R$ 0</b></div>
+          </div>
+          <div class="barra" id="f-barra" style="margin-top:1rem"></div>
+          <div class="leg"><span><i style="background:var(--ink)"></i>Entrada</span><span><i style="background:var(--accent)"></i>Amortização (reduziu a dívida)</span><span><i style="background:var(--prazo)"></i>Juros pagos</span></div>
+          <p class="fin-futuro" id="f-futuro"></p>
+        </div>
         <div class="res-topo">
           <h2>Seu patrimônio no imóvel hoje</h2>
           <div class="res-valor" id="r-pat">R$ 0</div>
@@ -382,7 +408,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
           <a class="btn btn-primary" id="b-wa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>Entender minha situação pelo WhatsApp</a>
           <button class="btn btn-ghost" type="button" id="b-refazer">Refazer a simulação</button>
         </div>
-        <p class="calc-nota">Simulação informativa, com base apenas nos valores informados e em regras gerais da Lei 9.514/1997, alterada pelo Marco Legal das Garantias (Lei 14.711/2023). As despesas foram estimadas em 5% do valor do imóvel. A taxa de ocupação segue a regra geral da lei (1% ao mês sobre o valor do imóvel, desde a consolidação até a desocupação) e foi calculada sobre o valor informado; o valor de referência exato é o do contrato ou da avaliação. O resultado real depende do contrato, das datas, do valor de avaliação e do andamento de cada caso, e não representa promessa de resultado.</p>
+        <p class="calc-nota">Simulação informativa, com base apenas nos valores informados e em regras gerais da Lei 9.514/1997, alterada pelo Marco Legal das Garantias (Lei 14.711/2023). Juros, amortização e saldo foram estimados com a taxa média anual do Banco Central para o financiamento imobiliário no ano da assinatura (série 20774 do SGS), sem correção pela TR, seguros e tarifas, que variam em cada contrato. As despesas foram estimadas em 5% do valor do imóvel. A taxa de ocupação segue a regra geral da lei (1% ao mês sobre o valor do imóvel, desde a consolidação até a desocupação) e foi calculada sobre o valor informado; o valor de referência exato é o do contrato ou da avaliação. O resultado real depende do contrato, das datas, do valor de avaliação e do andamento de cada caso, e não representa promessa de resultado.</p>
       </section>
     </div>
   </div>
@@ -443,26 +469,52 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     leilao_marcado:"Com o leilão marcado, o tempo pesa. Vale conferir o edital, as datas do 1º e do 2º leilão e se o procedimento seguiu as regras.",
     leilao_realizado:"Se o leilão já aconteceu, importa saber por quanto o imóvel foi vendido. Quando o valor passa da dívida e das despesas, a diferença pertence ao antigo dono, e muita gente não sabe disso."
   };
+  // Taxa média anual do financiamento imobiliário (Banco Central, SGS 20774, % a.a.; média dos meses de cada ano)
+  var TAXA={2011:10.39,2012:8.49,2013:8.12,2014:9.37,2015:10.11,2016:10.86,2017:9.10,2018:8.02,2019:7.74,2020:7.17,2021:7.16,2022:9.87,2023:10.41,2024:9.43,2025:10.57,2026:11.17};
+  function taxaAno(y){if(TAXA[y])return TAXA[y]; return y<2011?TAXA[2011]:TAXA[2026];}
+  function simular(F,n,aa,sis,pagas){
+    var i=Math.pow(1+aa/100,1/12)-1, saldo=F, jur=0, amo=0, pago=0, A=F/n, P=i>0?F*i/(1-Math.pow(1+i,-n)):F/n, prox=0, futJ=0, futT=0;
+    for(var k=1;k<=n;k++){
+      var j=saldo*i, am=sis==="PRICE"?P-j:A, parc=j+am;
+      if(k<=pagas){jur+=j; amo+=am; pago+=parc;}
+      else{ if(k===pagas+1) prox=parc; futJ+=j; futT+=parc; }
+      saldo-=am;
+    }
+    return {i:i,juros:jur,amort:amo,pago:pago,saldo:Math.max(0,F-amo),prox:prox,futJ:futJ,futT:futT};
+  }
   var ultimo={};
   $("f-sim").addEventListener("submit",function(e){
     e.preventDefault(); var err=$("e-sim"); err.textContent="";
-    var fase=$("fase").value, v=val("valor_imovel"), s=val("saldo_devedor"), parc=val("valor_parcela"), atr=val("parcelas_atraso"), pago=val("ja_pago");
+    var fase=$("fase").value, v=val("valor_imovel"), preco=val("preco_compra"), ent=val("entrada"), parc=val("valor_parcela"), atr=val("parcelas_atraso"), sInf=val("saldo_devedor");
+    var mes=Number($("mes_compra").value), ano=Number($("ano_compra").value), anos=Number($("prazo").value), sis=$("sistema").value;
     if(!fase){err.textContent="Escolha a situação.";$("fase").focus();return}
-    if(!v){err.textContent="Informe o valor aproximado do imóvel.";$("valor_imovel").focus();return}
-    if(!s){err.textContent="Informe quanto ainda deve (aproximado).";$("saldo_devedor").focus();return}
+    if(!v){err.textContent="Informe o valor aproximado do imóvel hoje.";$("valor_imovel").focus();return}
+    if(!preco){err.textContent="Informe o valor do imóvel na compra.";$("preco_compra").focus();return}
+    if(ent>=preco){err.textContent="A entrada precisa ser menor que o valor da compra.";$("entrada").focus();return}
+    var hoje=new Date(), dec=(hoje.getFullYear()-ano)*12+(hoje.getMonth()+1-mes);
+    if(dec<1){err.textContent="Confira a data do financiamento.";return}
+    var F=preco-ent, n=anos*12, pagas=Math.max(0,Math.min(n,dec-atr)), aa=taxaAno(ano);
+    var r=simular(F,n,aa,sis,pagas);
+    var s=sInf||Math.round(r.saldo), totalPago=ent+r.pago, seu=ent+r.amort, faltam=n-pagas;
+    $("f-txt").textContent="Estimativa para um financiamento de "+brl(F)+" em "+anos+" anos, assinado em "+String(mes).padStart(2,"0")+"/"+ano+", com a taxa média do Banco Central para o financiamento imobiliário naquele ano ("+aa.toFixed(2).replace(".",",")+"% ao ano). Consideramos cerca de "+pagas+" parcela(s) paga(s).";
+    $("f-total").textContent=brl(totalPago); $("f-seu").textContent=brl(seu); $("f-juros").textContent=brl(r.juros);
+    var tp=Math.max(1,totalPago), pe=ent/tp*100, pa=r.amort/tp*100, pj=Math.max(0,100-pe-pa);
+    $("f-barra").innerHTML='<div class="b-ent" style="width:'+pe+'%">'+(pe>16?brl(ent):"")+'</div><div class="b-amo" style="width:'+pa+'%">'+(pa>16?brl(r.amort):"")+'</div><div class="b-jur" style="width:'+pj+'%">'+(pj>16?brl(r.juros):"")+'</div>';
+    $("f-futuro").innerHTML=faltam>0?"Ainda faltariam <b>"+faltam+" parcelas</b>, somando cerca de <b>"+brl(r.futT)+"</b>, dos quais <b>"+brl(r.futJ)+"</b> seriam juros. O saldo devedor estimado hoje é de <b>"+brl(r.saldo)+"</b>"+(sInf?" (você informou "+brl(sInf)+"; usamos o seu valor no restante da simulação)":"")+"."+(parc&&r.prox?" Pelo modelo, a parcela estaria em torno de "+brl(r.prox)+" sem seguros e taxas; você informou "+brl(parc)+".":""):"Pelos dados informados, o prazo do financiamento já teria terminado.";
     var desp=Math.round(v*0.05), pat=Math.max(0,v-s), c1=Math.max(0,v-s-desp), c2=Math.max(0,0.5*v-s-desp);
     $("r-pat").innerHTML=brl(pat);
-    $("r-pat-txt").textContent=(pat>0?"É a diferença entre o valor do imóvel ("+brl(v)+") e o que ainda falta pagar ("+brl(s)+").":"Pelos valores informados, a dívida já está perto ou acima do valor do imóvel.")+(pago?" Até aqui, você já pagou cerca de "+brl(pago)+" por ele.":"")+(parc&&atr?" As parcelas em atraso somam cerca de "+brl(parc*atr)+".":"");
+    $("r-pat-txt").textContent=(pat>0?"É a diferença entre o valor do imóvel hoje ("+brl(v)+") e o saldo devedor ("+brl(s)+").":"Pelos valores informados, a dívida já está perto ou acima do valor do imóvel.")+(parc&&atr?" As parcelas em atraso somam cerca de "+brl(parc*atr)+".":"");
     var tot=Math.max(v,s+desp), pD=Math.min(100,s/tot*100), pE=Math.min(100-pD,desp/tot*100), pP=Math.max(0,100-pD-pE);
     $("r-barra").innerHTML='<div class="b-divida" style="width:'+pD+'%">'+(pD>18?brl(s):"")+'</div><div class="b-desp" style="width:'+pE+'%"></div><div class="b-pat" style="width:'+pP+'%">'+(pP>18?brl(pat):"")+'</div>';
     $("r-c1").textContent=brl(c1); $("r-c2").textContent=brl(c2);
     var al=Math.round(v*0.01); $("r-al").textContent=brl(al); $("r-al6").textContent=brl(al*6); $("r-al12").textContent=brl(al*12); $("r-al24").textContent=brl(al*24);
     $("r-fase").textContent=FASE[fase]||"";
     var faseTxt=$("fase").options[$("fase").selectedIndex].text;
-    var msg="Olá! Vim pelo site da FCE e fiz a simulação da calculadora. Situação: "+faseTxt+". Imóvel de cerca de "+brl(v)+" e dívida de cerca de "+brl(s)+(atr?", "+atr+" parcela(s) em atraso":"")+". Gostaria de entender minha situação.";
+    var msg="Olá! Vim pelo site da FCE e fiz a simulação da calculadora. Situação: "+faseTxt+". Imóvel de cerca de "+brl(v)+", financiado em "+String(mes).padStart(2,"0")+"/"+ano+", saldo devedor de cerca de "+brl(s)+(atr?", "+atr+" parcela(s) em atraso":"")+". Gostaria de entender minha situação.";
     $("b-wa").href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
     mostrar("resultado");
-    ultimo={acao:"simulacao",id:leadId||"",fase:fase,valor_imovel:v,saldo_devedor:s,valor_parcela:parc,parcelas_atraso:atr,ja_pago:pago,patrimonio:pat,risco_max:pat,despesas:desp,taxa_ocupacao:al};
+    ultimo={acao:"simulacao",id:leadId||"",fase:fase,valor_imovel:v,saldo_devedor:s,valor_parcela:parc,parcelas_atraso:atr,ja_pago:Math.round(totalPago),patrimonio:pat,risco_max:pat,despesas:desp,taxa_ocupacao:al,
+      data_compra:ano+"-"+String(mes).padStart(2,"0"),preco_compra:preco,entrada:ent,prazo_anos:anos,sistema:sis,taxa_aa:aa,juros_pagos:Math.round(r.juros),amortizado:Math.round(r.amort),saldo_estimado:Math.round(r.saldo),juros_futuros:Math.round(r.futJ)};
     if(leadId) enviar(ultimo).catch(function(){});
   });
   $("b-refazer").addEventListener("click",function(){mostrar("f-sim")});
