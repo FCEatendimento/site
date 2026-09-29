@@ -311,6 +311,10 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .post-modal .prev{max-width:360px;margin:0 auto}
 
 @media (min-width:641px){.kpis.kpis3{grid-template-columns:repeat(3,minmax(0,220px))}}
+
+.rede{width:16px;height:16px;flex:none;vertical-align:-3px;display:inline-block}.rede+.rede{margin-left:3px}.chip .rede{margin-right:5px}.chip .rede+.rede{margin-left:-2px}
+.rede.g{width:22px;height:22px}.rede.gg{width:46px;height:46px}.ic-circ.rd{background:transparent}.sec-tit .rede{margin-right:4px}.sec-tit .rede+.rede{margin-left:0}
+.cal-cols span{display:flex;align-items:center;gap:5px}
 </style>
 </head>
 <body>
@@ -366,6 +370,12 @@ const IC = {
   estrela: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"/>',
   filtro: '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>'
 };
+const REDE = {
+  linkedin: '<rect width="24" height="24" rx="5" fill="#0A66C2"/><path fill="#fff" d="M6.9 9.5h2.5V17.4H6.9zM8.15 5.6a1.45 1.45 0 1 1 0 2.9 1.45 1.45 0 0 1 0-2.9zM11 9.5h2.4v1.08h.03c.34-.64 1.15-1.3 2.37-1.3 2.53 0 3 1.67 3 3.83v4.3h-2.5v-3.8c0-.9-.02-2.07-1.26-2.07-1.26 0-1.45.98-1.45 2V17.4H11z"/>',
+  insta: '<defs><linearGradient id="gIG" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FEDA75"/><stop offset=".3" stop-color="#FA7E1E"/><stop offset=".58" stop-color="#D62976"/><stop offset=".82" stop-color="#962FBF"/><stop offset="1" stop-color="#4F5BD5"/></linearGradient></defs><rect width="24" height="24" rx="6" fill="url(#gIG)"/><rect x="5.4" y="5.4" width="13.2" height="13.2" rx="4" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="12" cy="12" r="3.1" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="16.15" cy="7.85" r="1" fill="#fff"/>',
+  facebook: '<rect width="24" height="24" rx="5" fill="#1877F2"/><path fill="#fff" d="M15.7 24v-8.7h2.9l.45-3.4H15.7V9.8c0-.98.28-1.65 1.7-1.65h1.8V5.1a24 24 0 0 0-2.63-.14c-2.6 0-4.38 1.6-4.38 4.5V11.9H9.25v3.4h2.94V24z"/>'
+};
+const rede = (n, cls) => '<svg class="rede' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" role="img" aria-label="' + ({ linkedin: 'LinkedIn', insta: 'Instagram', facebook: 'Facebook' }[n] || n) + '">' + (REDE[n] || '') + '</svg>';
 const ic = (n, c) => '<svg class="i' + (c ? ' ' + c : '') + '" viewBox="0 0 24 24">' + (IC[n] || '') + '</svg>';
 // ---------- utilidades ----------
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -614,7 +624,7 @@ VIEWS.inicio = async (_, forcar) => {
   if (!pr.length) h += '<div class="vazio">' + ic('cal') + '<div>Nenhuma consulta ou publicação marcada.</div></div>';
   pr.forEach((p) => {
     const cor = p.tipo === 'consulta' ? 'info' : 'ouro';
-    h += '<div class="item' + (p.caso_id ? ' clic" data-href="#/caso/' + p.caso_id : '') + '"><div class="ic-circ ' + cor + '">' + ic(p.tipo === 'consulta' ? 'video' : 'linkedin', 's') + '</div><div class="mid"><div class="t">' + esc(p.titulo) + '</div><div class="d">' + esc(quando(p.quando)) + '</div></div>' +
+    h += '<div class="item' + (p.caso_id ? ' clic" data-href="#/caso/' + p.caso_id : '') + '">' + (p.tipo === 'consulta' ? '<div class="ic-circ ' + cor + '">' + ic('video', 's') + '</div>' : '<div class="ic-circ rd">' + rede(/instagram/i.test(p.titulo) ? 'insta' : 'linkedin', 'g') + '</div>') + '<div class="mid"><div class="t">' + esc(p.titulo) + '</div><div class="d">' + esc(quando(p.quando)) + '</div></div>' +
       (p.link ? '<a class="btn sm" href="' + esc(p.link) + '" target="_blank" rel="noopener">' + ic('video', 's') + ' Meet</a>' : '') + '</div>';
   });
   h += '</div></div></div>';
@@ -628,7 +638,7 @@ VIEWS.inicio = async (_, forcar) => {
   h += '<div class="card"><div class="cab"><h2>Equipe de agentes</h2></div><div class="lista" style="margin-top:6px">' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('google', 's') + '</div><div class="mid"><div class="t">Gabriel · Google Ads</div><div class="d">' + esc(String(ag.gabriel || 'Ainda sem relatório.').replace(/: https?:\S+/, '')) + '</div></div></a>' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('meta', 's') + '</div><div class="mid"><div class="t">Marina · Meta Ads</div><div class="d">' + esc(String(ag.marina || 'Ainda sem relatório.').replace(/: https?:\S+/, '')) + '</div></div></a>' +
-    '<a class="item" href="#/aprovacoes"><div class="ic-circ ouro">' + ic('linkedin', 's') + '</div><div class="mid"><div class="t">Beatriz · LinkedIn</div><div class="d">' + (ag.beatriz ? 'Próximo post ' + esc(ag.beatriz.dia) + ': ' + esc(ag.beatriz.tema || '') : 'Nenhum post agendado.') + '</div></div></a></div></div>';
+    '<a class="item" href="#/aprovacoes"><div class="ic-circ rd">' + rede('linkedin', 'g') + '</div><div class="mid"><div class="t">Beatriz · LinkedIn</div><div class="d">' + (ag.beatriz ? 'Próximo post ' + esc(ag.beatriz.dia) + ': ' + esc(ag.beatriz.tema || '') : 'Nenhum post agendado.') + '</div></div></a></div></div>';
   h += '</div>';
   const nv = d.novos || [];
   if (nv.length) h += '<div class="sec-tit">Últimos atendimentos</div><div class="card lista">' + nv.map(linhaCaso).join('') + '</div>';
@@ -850,7 +860,7 @@ window.addEventListener('resize', () => { clearTimeout(window.__rz); window.__rz
 // ---------- posts do Instagram (Marina) ----------
 function cartaoInsta(p, i) {
   return '<div class="card" style="margin-top:12px"><div class="ad-post"><div>' + prevHtml(p.html, 'g' + i) + '</div><div style="min-width:0">' +
-    '<div class="chips" style="margin:0 0 8px"><span class="chip ouro">' + ic('insta', 's') + 'Marina</span><span class="chip">' + (p.formato === 'IMAGEM' ? 'Imagem' : 'Carrossel') + '</span>' + (p.data_publicacao ? '<span class="chip">publicar ' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + ' às 12h</span>' : '') + (p.versao > 1 ? '<span class="chip">versão ' + p.versao + '</span>' : '') + '</div>' +
+    '<div class="chips" style="margin:0 0 8px"><span class="chip">' + rede('insta') + rede('facebook') + 'Marina</span><span class="chip">' + (p.formato === 'IMAGEM' ? 'Imagem' : 'Carrossel') + '</span>' + (p.data_publicacao ? '<span class="chip">publicar ' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + ' às 12h</span>' : '') + (p.versao > 1 ? '<span class="chip">versão ' + p.versao + '</span>' : '') + '</div>' +
     '<div style="font-weight:700;font-size:16px">' + esc(p.tema || 'Post') + '</div>' + (p.noticia_url ? '<a class="pp" href="' + esc(p.noticia_url) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px">' + ic('jornal', 's') + ' Notícia usada como gancho</a>' : '') +
     '<div class="texto pq" style="margin-top:10px;padding:12px;border-radius:10px;background:var(--surface-2);max-height:260px;overflow:auto;white-space:pre-wrap">' + esc(p.legenda || p.texto || '') + '</div>' +
     '<div class="acts"><button class="btn pri" data-ig="aprovar" data-t="' + p.token + '">' + ic('check', 's') + ' Aprovar</button><button class="btn" data-ig="editar" data-t="' + p.token + '" data-i="' + i + '">' + ic('caneta', 's') + ' Editar legenda</button><button class="btn" data-ig="ajustar" data-t="' + p.token + '">Pedir ajuste</button><button class="btn fant" data-ig="outro" data-t="' + p.token + '">Outro tema</button><button class="btn fant" data-ig="descartar" data-t="' + p.token + '">Descartar</button></div>' +
@@ -896,16 +906,16 @@ VIEWS.aprovacoes = async (_, forcar) => {
     h += '</div>';
   }
   if (po.length) {
-    h += '<div class="sec-tit">Posts do LinkedIn <span class="bdg">' + po.length + '</span></div>';
+    h += '<div class="sec-tit">' + rede('linkedin', 'g') + 'Posts do LinkedIn <span class="bdg">' + po.length + '</span></div>';
     po.forEach((p, i) => {
-      h += '<div class="card" style="margin-top:12px"><div class="ad-post"><div>' + (p.html ? prevHtml(p.html, 'p' + i) : '<div class="prev" style="aspect-ratio:1/1;display:grid;place-items:center;color:#C9901C">' + ic('linkedin') + '</div>') + '</div><div style="min-width:0">' +
-        '<div class="chips" style="margin:0 0 8px"><span class="chip ouro">' + ic('linkedin', 's') + 'Beatriz</span>' + (p.data_publicacao ? '<span class="chip">publicar ' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + '</span>' : '') + (p.publico ? '<span class="chip">' + esc(p.publico) + '</span>' : '') + '</div>' +
+      h += '<div class="card" style="margin-top:12px"><div class="ad-post"><div>' + (p.html ? prevHtml(p.html, 'p' + i) : '<div class="prev" style="aspect-ratio:1/1;display:grid;place-items:center;color:#C9901C">' + rede('linkedin', 'gg') + '</div>') + '</div><div style="min-width:0">' +
+        '<div class="chips" style="margin:0 0 8px"><span class="chip">' + rede('linkedin') + 'Beatriz</span>' + (p.data_publicacao ? '<span class="chip">publicar ' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + '</span>' : '') + (p.publico ? '<span class="chip">' + esc(p.publico) + '</span>' : '') + '</div>' +
         '<div style="font-weight:700;font-size:16px">' + esc(p.tema || 'Post') + '</div><div class="texto pq" data-txt style="margin-top:10px;padding:12px;border-radius:10px;background:var(--surface-2);max-height:260px;overflow:auto">' + esc(p.texto || '') + '</div>' +
         '<div class="acts"><button class="btn pri" data-po="aprovar" data-t="' + p.token + '">' + ic('check', 's') + ' Aprovar</button><button class="btn" data-po="editar" data-t="' + p.token + '" data-i="' + i + '">' + ic('caneta', 's') + ' Editar texto</button><button class="btn" data-po="ajustar" data-t="' + p.token + '">Pedir ajuste</button><button class="btn fant" data-po="outro" data-t="' + p.token + '">Outro tema</button><button class="btn fant" data-po="descartar" data-t="' + p.token + '">Descartar</button></div></div></div></div>';
     });
   }
   if (ig.length) {
-    h += '<div class="sec-tit">Posts do Instagram e Facebook <span class="bdg">' + ig.length + '</span></div>';
+    h += '<div class="sec-tit">' + rede('insta', 'g') + rede('facebook', 'g') + 'Posts do Instagram e Facebook <span class="bdg">' + ig.length + '</span></div>';
     ig.forEach((p, i) => { h += cartaoInsta(p, i); });
   }
   h += '<div class="sec-tit">Avisos recentes' + (pendAv.length ? ' <button class="btn sm fant" id="bCiente" style="margin-left:auto">' + ic('checks', 's') + ' Marcar todos como vistos</button>' : '') + '</div><div class="card lista">';
@@ -962,7 +972,7 @@ VIEWS.agenda = async (_, forcar) => {
   const linha = (e) => {
     const [n, i, c] = TIPO_AG[e.tipo] || ['', 'cal', ''];
     const pass = new Date(e.quando) < new Date();
-    return '<div class="item' + (e.caso_id ? ' clic" data-href="#/caso/' + e.caso_id : '') + '" style="' + (pass ? 'opacity:.6' : '') + '"><div class="hora" style="width:48px;font-weight:700;font-variant-numeric:tabular-nums">' + esc(hora(e.quando)) + '</div><div class="ic-circ ' + c + '">' + ic(i, 's') + '</div><div class="mid"><div class="t">' + esc(e.titulo) + '</div><div class="d">' + esc(n) + (e.status ? ' · ' + esc(String(e.status).toLowerCase()) : '') + (e.tipo === 'prazo' ? ' · ' + esc(faltam(e.quando).t) : '') + '</div></div>' +
+    return '<div class="item' + (e.caso_id ? ' clic" data-href="#/caso/' + e.caso_id : '') + '" style="' + (pass ? 'opacity:.6' : '') + '"><div class="hora" style="width:48px;font-weight:700;font-variant-numeric:tabular-nums">' + esc(hora(e.quando)) + '</div>' + (e.tipo === 'post' || e.tipo === 'insta' ? '<div class="ic-circ rd">' + rede(e.tipo === 'insta' ? 'insta' : 'linkedin', 'g') + '</div>' : '<div class="ic-circ ' + c + '">' + ic(i, 's') + '</div>') + '<div class="mid"><div class="t">' + esc(e.titulo) + '</div><div class="d">' + esc(n) + (e.status ? ' · ' + esc(String(e.status).toLowerCase()) : '') + (e.tipo === 'prazo' ? ' · ' + esc(faltam(e.quando).t) : '') + '</div></div>' +
       (e.link && e.status === 'CONFIRMADO' ? '<a class="btn sm pri" href="' + esc(e.link) + '" target="_blank" rel="noopener">' + ic('video', 's') + ' Meet</a>' : '') + '</div>';
   };
   let h = leg;
@@ -1063,9 +1073,9 @@ VIEWS.marketing = async (_, forcar) => {
   h += '<div class="grid g2" style="margin-top:16px">' + agente('Gabriel · Google Ads', 'google', 'conversões', d.google || {}, 'conversoes', LINKS.gabriel) + agente('Marina · Meta Ads', 'meta', 'conversas', d.meta || {}, 'conversas', LINKS.marina) + '</div>';
   if (Object.keys(cr).length) h += '<div class="chips" style="margin-top:10px">' + Object.entries(cr).map(([k, v]) => '<span class="chip">' + esc({ AGUARDANDO: 'aguardando você', APROVADO: 'aprovados', PRONTO: 'prontos (pausados)', NO_AR: 'no ar', PAUSADO: 'pausados', REPROVADO_META: 'reprovados pela Meta', FALHOU: 'com falha' }[k] || k.toLowerCase()) + ': ' + v + '</span>').join('') + ' <span class="pp mut" style="align-self:center">anúncios da Marina</span></div>';
   const bz = d.beatriz || [];
-  h += '<div class="sec-tit">Beatriz · LinkedIn</div><div class="card lista">' + (bz.length ? bz.map((b) => '<div class="item"><div class="ic-circ ouro">' + ic('linkedin', 's') + '</div><div class="mid"><div class="t">' + esc(b.tema || 'Post') + '</div><div class="d">' + esc(b.data_publicacao ? dataCurta(b.data_publicacao + 'T12:00:00') : '') + '</div></div><div class="dir" style="flex-direction:row;gap:6px"><span class="chip ' + (b.status === 'PUBLICADO' ? 'ok' : b.status === 'AGUARDANDO' ? 'warn' : '') + '">' + esc(String(b.status).toLowerCase()) + '</span>' + (b.linkedin_url ? '<a class="btn sm fant" href="' + esc(b.linkedin_url) + '" target="_blank" rel="noopener">Ver</a>' : '') + '</div></div>').join('') : '<div class="vazio">Nenhum post ainda.</div>') + '</div>';
+  h += '<div class="sec-tit">' + rede('linkedin', 'g') + 'Beatriz · LinkedIn</div><div class="card lista">' + (bz.length ? bz.map((b) => '<div class="item"><div class="ic-circ rd">' + rede('linkedin', 'g') + '</div><div class="mid"><div class="t">' + esc(b.tema || 'Post') + '</div><div class="d">' + esc(b.data_publicacao ? dataCurta(b.data_publicacao + 'T12:00:00') : '') + '</div></div><div class="dir" style="flex-direction:row;gap:6px"><span class="chip ' + (b.status === 'PUBLICADO' ? 'ok' : b.status === 'AGUARDANDO' ? 'warn' : '') + '">' + esc(String(b.status).toLowerCase()) + '</span>' + (b.linkedin_url ? '<a class="btn sm fant" href="' + esc(b.linkedin_url) + '" target="_blank" rel="noopener">Ver</a>' : '') + '</div></div>').join('') : '<div class="vazio">Nenhum post ainda.</div>') + '</div>';
   const ig = d.insta || [], nt = d.noticias || [];
-  h += '<div class="sec-tit">Marina · Instagram e Facebook <a class="btn sm fant" href="#/conteudo" style="margin-left:auto">' + ic('cal', 's') + ' Calendário</a></div><div class="card lista">' + (ig.length ? ig.map((b) => '<div class="item"><div class="ic-circ ouro">' + ic('insta', 's') + '</div><div class="mid"><div class="t">' + esc(b.tema || 'Post') + '</div><div class="d">' + esc(b.data_publicacao ? dataCurta(b.data_publicacao + 'T12:00:00') : '') + ' · ' + (b.formato === 'IMAGEM' ? 'imagem' : 'carrossel') + (b.erro ? ' · ' + esc(String(b.erro).slice(0, 80)) : '') + '</div></div><div class="dir" style="flex-direction:row;gap:6px"><span class="st ' + esc(b.status) + '">' + esc(STATUS_POST[b.status] || b.status) + '</span>' + (b.ig_url ? '<a class="btn sm fant" href="' + esc(b.ig_url) + '" target="_blank" rel="noopener">Ver</a>' : '') + '</div></div>').join('') : '<div class="vazio">Nenhum post ainda.</div>') + '</div>';
+  h += '<div class="sec-tit">' + rede('insta', 'g') + rede('facebook', 'g') + 'Marina · Instagram e Facebook <a class="btn sm fant" href="#/conteudo" style="margin-left:auto">' + ic('cal', 's') + ' Calendário</a></div><div class="card lista">' + (ig.length ? ig.map((b) => '<div class="item"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">' + esc(b.tema || 'Post') + '</div><div class="d">' + esc(b.data_publicacao ? dataCurta(b.data_publicacao + 'T12:00:00') : '') + ' · ' + (b.formato === 'IMAGEM' ? 'imagem' : 'carrossel') + (b.erro ? ' · ' + esc(String(b.erro).slice(0, 80)) : '') + '</div></div><div class="dir" style="flex-direction:row;gap:6px"><span class="st ' + esc(b.status) + '">' + esc(STATUS_POST[b.status] || b.status) + '</span>' + (b.ig_url ? '<a class="btn sm fant" href="' + esc(b.ig_url) + '" target="_blank" rel="noopener">Ver</a>' : '') + '</div></div>').join('') : '<div class="vazio">Nenhum post ainda.</div>') + '</div>';
   h += '<div class="sec-tit">Pautas da semana</div><div class="card lista">' + (nt.length ? nt.map(itemPauta).join('') : '<div class="vazio">As notícias do tema aparecem aqui todo dia às 6h.</div>') + '</div>';
   $('#cont').innerHTML = h;
 };
@@ -1140,7 +1150,7 @@ VIEWS.mais = async () => {
   $('#cont').innerHTML = '<div class="card cab-caso" style="margin-top:12px"><div class="av">' + '<img src="fabio.jpg" alt="Dr. Fábio">' + '</div><div><h2>' + esc(eu.nome || 'Fábio') + '</h2><div class="mut pq">' + esc(eu.email || '') + '</div></div></div>' +
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="#/conteudo"><div class="ic-circ ouro">' + ic('insta', 's') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário do LinkedIn e do Instagram, aprovações e pautas</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/conteudo"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário do LinkedIn e do Instagram, aprovações e pautas</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a></div>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
@@ -1174,14 +1184,14 @@ VIEWS.conteudo = async (_, forcar) => {
   const k0 = (() => { const x = dt(hoje); x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7)); return x; })();
   const slot = (p, canal, k, dia) => {
     const prev = canal === 'linkedin' ? [1, 3, 5].includes(dia) : dia <= 5;
-    if (!p) return '<div class="slot vazio"><div class="sl-top">' + ic(canal, 's') + (prev ? (k <= hoje ? 'sem post' : 'preparado na véspera') : 'sem post neste dia') + '</div></div>';
-    return '<button class="slot" data-post="' + canal + '|' + p.token + '"><div class="sl-top">' + ic(canal, 's') + '<span class="fmt">' + (canal === 'insta' ? (p.formato === 'IMAGEM' ? 'imagem' : 'carrossel') : 'carrossel') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div><div class="sl-t">' + esc(p.tema || 'Post') + '</div></button>';
+    if (!p) return '<div class="slot vazio"><div class="sl-top">' + rede(canal) + (prev ? (k <= hoje ? 'sem post' : 'preparado na véspera') : 'sem post neste dia') + '</div></div>';
+    return '<button class="slot" data-post="' + canal + '|' + p.token + '"><div class="sl-top">' + rede(canal) + '<span class="fmt">' + (canal === 'insta' ? (p.formato === 'IMAGEM' ? 'imagem' : 'carrossel') : 'carrossel') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div><div class="sl-t">' + esc(p.tema || 'Post') + '</div></button>';
   };
   for (let w = 0; w < 4; w++) {
     const ini = new Date(k0.getTime() + w * 7 * 864e5);
     const fim = new Date(ini.getTime() + 4 * 864e5);
     h += '<div class="card cal-sem"><div class="cab"><h2 style="flex:1">' + (w === 0 ? 'Esta semana' : w === 1 ? 'Próxima semana' : 'Semana de ' + esc(ini.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', timeZone: 'UTC' }))) + '</h2><span class="pp mut">' + esc(ini.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + ' a ' + esc(fim.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + '</span></div>' +
-      '<div class="cal-cols"><span></span><span>' + ic('linkedin', 's') + ' LinkedIn</span><span>' + ic('insta', 's') + ' Instagram e Facebook</span></div>';
+      '<div class="cal-cols"><span></span><span>' + rede('linkedin') + ' LinkedIn</span><span>' + rede('insta') + rede('facebook') + ' Instagram e Facebook</span></div>';
     for (let i = 0; i < 5; i++) {
       const x = new Date(ini.getTime() + i * 864e5), k = x.toISOString().slice(0, 10);
       h += '<div class="cal-dia' + (k === hoje ? ' hoje' : '') + '" style="' + (k < hoje ? 'opacity:.62' : '') + '"><div class="dn">' + esc(x.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' }).replace('.', '')) + '<small>' + esc(x.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + '</small></div>' +
@@ -1196,7 +1206,7 @@ VIEWS.conteudo = async (_, forcar) => {
     const [canal, tk] = b.dataset.post.split('|');
     const p = (canal === 'insta' ? ig : li).find((x) => x.token === tk); if (!p) return;
     const pend = ['AGUARDANDO', 'FALHOU'].includes(p.status);
-    const corpo = '<div class="post-modal">' + (p.html ? prevHtml(p.html, 'm0') : '') + '<div class="chips" style="margin:12px 0 6px"><span class="chip ouro">' + ic(canal, 's') + (canal === 'insta' ? 'Marina' : 'Beatriz') + '</span><span class="chip">' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + (canal === 'insta' ? ' às 12h' : ' às 8h') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div>' +
+    const corpo = '<div class="post-modal">' + (p.html ? prevHtml(p.html, 'm0') : '') + '<div class="chips" style="margin:12px 0 6px"><span class="chip">' + rede(canal) + (canal === 'insta' ? rede('facebook') + 'Marina' : 'Beatriz') + '</span><span class="chip">' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + (canal === 'insta' ? ' às 12h' : ' às 8h') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div>' +
       '<div style="font-weight:700">' + esc(p.tema || '') + '</div>' + (p.erro ? '<p class="pp" style="color:var(--bad)">' + esc(p.erro) + '</p>' : '') +
       '<div class="texto pq" style="margin-top:8px;padding:12px;border-radius:10px;background:var(--surface-2);max-height:220px;overflow:auto;white-space:pre-wrap">' + esc(p.texto || '') + '</div>' +
       (p.link ? '<p class="pq" style="margin-top:10px"><a href="' + esc(p.link) + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Ver publicação</a></p>' : '') + '</div>';
