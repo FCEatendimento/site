@@ -200,7 +200,7 @@ ul.lim{margin:6px 0 0;padding-left:18px}ul.lim li{margin:3px 0}
 @media (max-width:760px){.mes .dia{min-height:54px}.mes .dia .ev{display:none}.mes .dia .pts{display:flex;gap:3px}}
 .mes .dia .pts{display:none}
 .mes .dia .pts i{width:6px;height:6px;border-radius:50%}
-.t-consulta{background:var(--info-soft);color:var(--info)}.t-prazo{background:var(--bad-soft);color:var(--bad)}.t-leilao{background:var(--warn-soft);color:var(--warn)}.t-post{background:var(--gold-soft);color:var(--gold)}
+.t-consulta{background:var(--info-soft);color:var(--info)}.t-prazo{background:var(--bad-soft);color:var(--bad)}.t-leilao{background:var(--warn-soft);color:var(--warn)}.t-post{background:var(--gold-soft);color:var(--gold)}.t-insta{background:var(--gold-soft);color:var(--gold)}
 /* tabelas e gráficos */
 .tab-wrap{overflow-x:auto}
 table.tb{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
@@ -294,6 +294,23 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .lg-mais{width:220px;height:auto;color:var(--txt)}
 .rod-mais{display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--mut)}.rod-mais .rb b{font-size:13px}
 [data-bdg][hidden]{display:none!important}
+
+/* calendário de conteúdo */
+.cal-sem{margin-top:12px}.cal-sem .cab h2{font-size:15px}
+.cal-dia{display:grid;grid-template-columns:78px 1fr 1fr;gap:10px;padding:10px 16px;border-top:1px solid var(--line);align-items:stretch}
+.cal-dia .dn{font-weight:700;font-size:13px;line-height:1.25}.cal-dia .dn small{display:block;font-weight:500;color:var(--mut)}
+.cal-dia.hoje .dn{color:var(--gold)}
+.slot{border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:54px;display:flex;flex-direction:column;gap:4px;background:var(--surface);text-align:left;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.slot:hover{border-color:var(--gold)}.slot.vazio{border-style:dashed;cursor:default;color:var(--mut);background:transparent}.slot.vazio:hover{border-color:var(--line)}
+.slot .sl-top{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut)}.slot .sl-top .i{width:14px;height:14px}
+.slot .sl-t{font-size:13px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.st{font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:20px;margin-left:auto;white-space:nowrap}
+.st.AGUARDANDO{background:var(--warn-soft);color:var(--warn)}.st.APROVADO{background:var(--info-soft);color:var(--info)}.st.PUBLICADO{background:var(--ok-soft);color:var(--ok)}.st.FALHOU{background:var(--bad-soft);color:var(--bad)}.st.PUBLICANDO,.st.RASCUNHO{background:var(--surface-2);color:var(--mut)}
+.cal-cols{display:grid;grid-template-columns:78px 1fr 1fr;gap:10px;padding:10px 16px 4px;font-size:11.5px;color:var(--mut);font-weight:600}
+@media (max-width:640px){.slot .fmt{display:none}.slot .st{margin-left:auto;font-size:9.5px;padding:2px 6px}.kpis.kpis3{grid-template-columns:repeat(3,1fr);gap:8px}.kpis.kpis3 .kpi{padding:12px}.kpis.kpis3 .kpi .ico{display:none}.kpis.kpis3 .kpi .sub{font-size:11px}.cal-dia,.cal-cols{grid-template-columns:52px 1fr 1fr;gap:6px;padding-left:10px;padding-right:10px}.slot{padding:7px 8px}.slot .sl-t{font-size:12px}}
+.post-modal .prev{max-width:360px;margin:0 auto}
+
+@media (min-width:641px){.kpis.kpis3{grid-template-columns:repeat(3,minmax(0,220px))}}
 </style>
 </head>
 <body>
@@ -335,6 +352,8 @@ const IC = {
   grafico: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
   linkedin: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/>',
   google: '<path d="M20.5 12.2c0-.6-.1-1.2-.2-1.7H12v3.3h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z"/><path d="M12 21c2.4 0 4.5-.8 5.9-2.2l-2.9-2.2c-.8.5-1.8.9-3 .9-2.3 0-4.3-1.6-5-3.7H4v2.3A9 9 0 0 0 12 21z"/><path d="M7 13.8a5.4 5.4 0 0 1 0-3.5V8H4a9 9 0 0 0 0 8.1z"/><path d="M12 6.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 4 8l3 2.3c.7-2.1 2.7-3.7 5-3.7z"/>',
+  insta: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5v.01"/>',
+  jornal: '<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2"/><path d="M7 9h7M7 13h7M7 17h4"/>',
   meta: '<path d="M3 15c0-4 2.2-8 4.8-8 3.4 0 5.6 10 8.6 10 1.7 0 2.6-1.7 2.6-4.2 0-3.3-1.5-5.8-3.5-5.8-2.2 0-3.9 3-5.5 5.6C8.4 15.5 7.1 17 5.6 17 4 17 3 16.2 3 15z"/>',
   mais2: '<path d="M12 5v14M5 12h14"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
@@ -484,7 +503,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Marketing', 'mega']
+  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['conteudo', 'Conteúdo', 'insta'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Marketing', 'mega']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -545,7 +564,7 @@ async function dados(chave, acao, extra, forcar) {
 }
 // depois de abrir, deixa as outras telas prontas em segundo plano
 async function preCarregar() {
-  const lista = [['painel', 'painel'], ['aprov', 'aprovacoes'], ['agenda', 'agenda'], ['fin', 'financeiro'], ['desp', 'despesas'], ['mk30', 'marketing', { dias: 30 }], ['casos:' + JSON.stringify({ q: '', etapa: '', perfil: '' }), 'casos', { q: '', etapa: '', perfil: '' }]];
+  const lista = [['painel', 'painel'], ['aprov', 'aprovacoes'], ['agenda', 'agenda'], ['fin', 'financeiro'], ['desp', 'despesas'], ['mk30', 'marketing', { dias: 30 }], ['conteudo', 'conteudo'], ['casos:' + JSON.stringify({ q: '', etapa: '', perfil: '' }), 'casos', { q: '', etapa: '', perfil: '' }]];
   for (const [k, a, x] of lista) {
     if (!S.token) return;
     const m = S.cache[k]; if (m && Date.now() - m.t < 45000) continue;
@@ -828,16 +847,36 @@ function ajustarPrevs() {
   });
 }
 window.addEventListener('resize', () => { clearTimeout(window.__rz); window.__rz = setTimeout(() => $$('[data-prev]').forEach((p) => p.__escala && p.__escala()), 150); });
+// ---------- posts do Instagram (Marina) ----------
+function cartaoInsta(p, i) {
+  return '<div class="card" style="margin-top:12px"><div class="ad-post"><div>' + prevHtml(p.html, 'g' + i) + '</div><div style="min-width:0">' +
+    '<div class="chips" style="margin:0 0 8px"><span class="chip ouro">' + ic('insta', 's') + 'Marina</span><span class="chip">' + (p.formato === 'IMAGEM' ? 'Imagem' : 'Carrossel') + '</span>' + (p.data_publicacao ? '<span class="chip">publicar ' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + ' às 12h</span>' : '') + (p.versao > 1 ? '<span class="chip">versão ' + p.versao + '</span>' : '') + '</div>' +
+    '<div style="font-weight:700;font-size:16px">' + esc(p.tema || 'Post') + '</div>' + (p.noticia_url ? '<a class="pp" href="' + esc(p.noticia_url) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px">' + ic('jornal', 's') + ' Notícia usada como gancho</a>' : '') +
+    '<div class="texto pq" style="margin-top:10px;padding:12px;border-radius:10px;background:var(--surface-2);max-height:260px;overflow:auto;white-space:pre-wrap">' + esc(p.legenda || p.texto || '') + '</div>' +
+    '<div class="acts"><button class="btn pri" data-ig="aprovar" data-t="' + p.token + '">' + ic('check', 's') + ' Aprovar</button><button class="btn" data-ig="editar" data-t="' + p.token + '" data-i="' + i + '">' + ic('caneta', 's') + ' Editar legenda</button><button class="btn" data-ig="ajustar" data-t="' + p.token + '">Pedir ajuste</button><button class="btn fant" data-ig="outro" data-t="' + p.token + '">Outro tema</button><button class="btn fant" data-ig="descartar" data-t="' + p.token + '">Descartar</button></div>' +
+    '<p class="pp mut" style="margin:10px 0 0">Aprovado, o post vai para o Instagram e para a página do Facebook no dia marcado, às 12h.</p></div></div></div>';
+}
+function ligarInsta(lista, depois) {
+  $$('[data-ig]').forEach((b) => b.onclick = async () => {
+    const a = b.dataset.ig; let obs = '', texto = '', acao = a;
+    if (a === 'editar') { const p = lista[+b.dataset.i] || {}; texto = await pedirTexto('Editar legenda', 'O post é aprovado com a legenda que você deixar aqui.', '', true, p.legenda || p.texto); if (!texto) return; acao = 'aprovar'; }
+    if (a === 'ajustar') { obs = await pedirTexto('Pedir ajuste à Marina', 'O que mudar no post? Ela refaz a arte e a legenda e manda de novo.', 'Ex.: título mais curto, falar só da intimação', true); if (!obs) return; }
+    if (a === 'outro') { obs = await pedirTexto('Outro tema', 'Sugira um tema (opcional).', '', false); if (obs === null) return; }
+    if (a === 'descartar' && !(await confirmar('Descartar post?', 'A Marina não vai publicar este post.', 'Descartar', true))) return;
+    await agir(b, () => api('decidir', { tipo: 'insta', token: b.dataset.t, decisao: acao, obs, texto }), acao === 'aprovar' ? 'Post aprovado' : acao === 'descartar' ? 'Post descartado' : 'Pedido enviado. A nova versão chega em alguns minutos.');
+    depois();
+  });
+}
 // ---------- APROVAÇÕES ----------
 VIEWS.aprovacoes = async (_, forcar) => {
   titulo('Aprovações', '<button class="btn sm" id="bNovoAd">' + ic('mais2', 's') + '<span class="so-desk"> Pedir anúncio novo</span></button>');
   if (!S.cache.aprov) carregando(4);
   const d = await dados('aprov', 'aprovacoes', null, forcar);
-  const dec = d.decisoes || [], an = d.anuncios || [], go = d.google || [], po = d.posts || [], av = d.avisos || [];
-  badge(dec.length + an.length + go.length + po.length);
+  const dec = d.decisoes || [], an = d.anuncios || [], go = d.google || [], po = d.posts || [], ig = d.insta || [], av = d.avisos || [];
+  badge(dec.length + an.length + go.length + po.length + ig.length);
   const pendAv = av.filter((a) => a.status === 'PENDENTE' && !dec.find((x) => x.id === a.id));
   let h = '';
-  if (!dec.length && !an.length && !go.length && !po.length) h += '<div class="card" style="margin-top:14px"><div class="vazio">' + ic('checks') + '<div><b>Tudo em dia.</b><br>Nenhuma decisão ou aprovação esperando por você.</div></div></div>';
+  if (!dec.length && !an.length && !go.length && !po.length && !ig.length) h += '<div class="card" style="margin-top:14px"><div class="vazio">' + ic('checks') + '<div><b>Tudo em dia.</b><br>Nenhuma decisão ou aprovação esperando por você.</div></div></div>';
   if (dec.length) { h += '<div class="sec-tit">Decisões de casos <span class="bdg">' + dec.length + '</span></div>'; dec.forEach((x) => { h += cartaoDecisao(x); }); }
   if (an.length) {
     h += '<div class="sec-tit">Anúncios do Facebook e Instagram <span class="bdg">' + an.length + '</span></div>';
@@ -864,6 +903,10 @@ VIEWS.aprovacoes = async (_, forcar) => {
         '<div style="font-weight:700;font-size:16px">' + esc(p.tema || 'Post') + '</div><div class="texto pq" data-txt style="margin-top:10px;padding:12px;border-radius:10px;background:var(--surface-2);max-height:260px;overflow:auto">' + esc(p.texto || '') + '</div>' +
         '<div class="acts"><button class="btn pri" data-po="aprovar" data-t="' + p.token + '">' + ic('check', 's') + ' Aprovar</button><button class="btn" data-po="editar" data-t="' + p.token + '" data-i="' + i + '">' + ic('caneta', 's') + ' Editar texto</button><button class="btn" data-po="ajustar" data-t="' + p.token + '">Pedir ajuste</button><button class="btn fant" data-po="outro" data-t="' + p.token + '">Outro tema</button><button class="btn fant" data-po="descartar" data-t="' + p.token + '">Descartar</button></div></div></div></div>';
     });
+  }
+  if (ig.length) {
+    h += '<div class="sec-tit">Posts do Instagram e Facebook <span class="bdg">' + ig.length + '</span></div>';
+    ig.forEach((p, i) => { h += cartaoInsta(p, i); });
   }
   h += '<div class="sec-tit">Avisos recentes' + (pendAv.length ? ' <button class="btn sm fant" id="bCiente" style="margin-left:auto">' + ic('checks', 's') + ' Marcar todos como vistos</button>' : '') + '</div><div class="card lista">';
   if (!av.length) h += '<div class="vazio">Nenhum aviso nos últimos 10 dias.</div>';
@@ -894,6 +937,7 @@ VIEWS.aprovacoes = async (_, forcar) => {
     await agir(b, () => api('decidir', { tipo: 'post', token: b.dataset.t, decisao: acao, obs, texto }), acao === 'aprovar' ? 'Post aprovado' : acao === 'descartar' ? 'Post descartado' : 'Pedido enviado à Beatriz');
     recarregar();
   });
+  ligarInsta(ig, recarregar);
   const bc = $('#bCiente'); if (bc) bc.onclick = async () => { await agir(bc, () => api('decidir', { tipo: 'ciente_todos' }), 'Avisos marcados como vistos'); recarregar(); };
   $('#bNovoAd').onclick = async () => {
     const r = await modal({ titulo: 'Pedir anúncio novo à Marina', corpo: '<label class="pq mut">Formato</label><div class="seg" id="fmt" style="margin:6px 0 12px;display:flex"><button class="on" data-f="IMAGEM">Imagem</button><button data-f="CARROSSEL">Carrossel</button></div>' +
@@ -907,7 +951,7 @@ VIEWS.aprovacoes = async (_, forcar) => {
 function segClick(e) { const b = e.target.closest('.seg button'); if (!b || b.closest('[data-seg-own]')) return; $$('button', b.parentNode).forEach((x) => x.classList.toggle('on', x === b)); }
 document.addEventListener('click', segClick);
 // ---------- AGENDA ----------
-const TIPO_AG = { consulta: ['Consulta', 'video', 'info'], prazo: ['Prazo', 'alerta', 'bad'], leilao: ['Leilão', 'martelo', 'warn'], post: ['LinkedIn', 'linkedin', 'ouro'] };
+const TIPO_AG = { consulta: ['Consulta', 'video', 'info'], prazo: ['Prazo', 'alerta', 'bad'], leilao: ['Leilão', 'martelo', 'warn'], post: ['LinkedIn', 'linkedin', 'ouro'], insta: ['Instagram', 'insta', 'ouro'] };
 VIEWS.agenda = async (_, forcar) => {
   S.modoAg = S.modoAg || (innerWidth > 900 ? 'mes' : 'lista');
   titulo('Agenda', '<div class="seg" data-seg-own id="modoAg"><button data-m="lista" class="' + (S.modoAg === 'lista' ? 'on' : '') + '">Lista</button><button data-m="mes" class="' + (S.modoAg === 'mes' ? 'on' : '') + '">Mês</button></div>');
@@ -1020,6 +1064,9 @@ VIEWS.marketing = async (_, forcar) => {
   if (Object.keys(cr).length) h += '<div class="chips" style="margin-top:10px">' + Object.entries(cr).map(([k, v]) => '<span class="chip">' + esc({ AGUARDANDO: 'aguardando você', APROVADO: 'aprovados', PRONTO: 'prontos (pausados)', NO_AR: 'no ar', PAUSADO: 'pausados', REPROVADO_META: 'reprovados pela Meta', FALHOU: 'com falha' }[k] || k.toLowerCase()) + ': ' + v + '</span>').join('') + ' <span class="pp mut" style="align-self:center">anúncios da Marina</span></div>';
   const bz = d.beatriz || [];
   h += '<div class="sec-tit">Beatriz · LinkedIn</div><div class="card lista">' + (bz.length ? bz.map((b) => '<div class="item"><div class="ic-circ ouro">' + ic('linkedin', 's') + '</div><div class="mid"><div class="t">' + esc(b.tema || 'Post') + '</div><div class="d">' + esc(b.data_publicacao ? dataCurta(b.data_publicacao + 'T12:00:00') : '') + '</div></div><div class="dir" style="flex-direction:row;gap:6px"><span class="chip ' + (b.status === 'PUBLICADO' ? 'ok' : b.status === 'AGUARDANDO' ? 'warn' : '') + '">' + esc(String(b.status).toLowerCase()) + '</span>' + (b.linkedin_url ? '<a class="btn sm fant" href="' + esc(b.linkedin_url) + '" target="_blank" rel="noopener">Ver</a>' : '') + '</div></div>').join('') : '<div class="vazio">Nenhum post ainda.</div>') + '</div>';
+  const ig = d.insta || [], nt = d.noticias || [];
+  h += '<div class="sec-tit">Marina · Instagram e Facebook <a class="btn sm fant" href="#/conteudo" style="margin-left:auto">' + ic('cal', 's') + ' Calendário</a></div><div class="card lista">' + (ig.length ? ig.map((b) => '<div class="item"><div class="ic-circ ouro">' + ic('insta', 's') + '</div><div class="mid"><div class="t">' + esc(b.tema || 'Post') + '</div><div class="d">' + esc(b.data_publicacao ? dataCurta(b.data_publicacao + 'T12:00:00') : '') + ' · ' + (b.formato === 'IMAGEM' ? 'imagem' : 'carrossel') + (b.erro ? ' · ' + esc(String(b.erro).slice(0, 80)) : '') + '</div></div><div class="dir" style="flex-direction:row;gap:6px"><span class="st ' + esc(b.status) + '">' + esc(STATUS_POST[b.status] || b.status) + '</span>' + (b.ig_url ? '<a class="btn sm fant" href="' + esc(b.ig_url) + '" target="_blank" rel="noopener">Ver</a>' : '') + '</div></div>').join('') : '<div class="vazio">Nenhum post ainda.</div>') + '</div>';
+  h += '<div class="sec-tit">Pautas da semana</div><div class="card lista">' + (nt.length ? nt.map(itemPauta).join('') : '<div class="vazio">As notícias do tema aparecem aqui todo dia às 6h.</div>') + '</div>';
   $('#cont').innerHTML = h;
 };
 // ---------- DESPESAS ----------
@@ -1093,6 +1140,7 @@ VIEWS.mais = async () => {
   $('#cont').innerHTML = '<div class="card cab-caso" style="margin-top:12px"><div class="av">' + '<img src="fabio.jpg" alt="Dr. Fábio">' + '</div><div><h2>' + esc(eu.nome || 'Fábio') + '</h2><div class="mut pq">' + esc(eu.email || '') + '</div></div></div>' +
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/conteudo"><div class="ic-circ ouro">' + ic('insta', 's') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário do LinkedIn e do Instagram, aprovações e pautas</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a></div>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
@@ -1100,6 +1148,71 @@ VIEWS.mais = async () => {
     '<div class="card" style="margin-top:14px"><div class="corpo" style="display:flex;flex-direction:column;gap:14px">' + logo('lg-mais') + '<div class="rod-mais">' + blocosFCE() + '</div></div></div><p class="pp mut" style="text-align:center;margin-top:18px">Dica: no iPhone, toque em Compartilhar › "Adicionar à Tela de Início".</p>';
   $('#mTema').onclick = () => $('#btnTema').click();
   $('#mSair').onclick = () => $('[data-sair]').click();
+};
+// ---------- CONTEÚDO (calendário) ----------
+const STATUS_POST = { AGUARDANDO: 'para aprovar', APROVADO: 'aprovado', PUBLICANDO: 'publicando', PUBLICADO: 'publicado', FALHOU: 'falhou', RASCUNHO: 'rascunho' };
+const PUB_POST = { DEVEDOR: 'devedor', ARREMATANTE: 'arrematante', GERAL: 'geral' };
+function itemPauta(n) {
+  const us = (n.usada_por || []).map((x) => x === 'MARINA' ? 'Instagram' : x === 'BEATRIZ' ? 'LinkedIn' : x);
+  return '<a class="item" href="' + esc(n.url) + '" target="_blank" rel="noopener"><div class="ic-circ info">' + ic('jornal', 's') + '</div><div class="mid"><div class="t">' + esc(n.titulo) + '</div><div class="d">' + esc(String(n.fonte || '').replace(/^www\./, '')) + (n.publicada_em ? ' · ' + esc(dataCurta(n.publicada_em)) : '') + ' · ' + esc(PUB_POST[n.publico] || 'geral') + (us.length ? ' · usada no ' + esc(us.join(' e ')) : '') + '</div>' + (n.resumo ? '<div class="d" style="white-space:normal;margin-top:2px">' + esc(n.resumo) + '</div>' : '') + '</div>' + ic('link', 's') + '</a>';
+}
+VIEWS.conteudo = async (_, forcar) => {
+  titulo('Conteúdo');
+  if (!S.cache.conteudo) carregando(4);
+  const d = await dados('conteudo', 'conteudo', null, forcar);
+  const li = d.linkedin || [], ig = d.insta || [], nt = d.noticias || [];
+  const hoje = d.hoje || hojeChave();
+  const porData = (arr) => { const m = {}; arr.forEach((p) => { m[String(p.data_publicacao).slice(0, 10)] = p; }); return m; };
+  const mL = porData(li), mI = porData(ig);
+  const todos = li.map((p) => Object.assign({ canal: 'linkedin' }, p)).concat(ig.map((p) => Object.assign({ canal: 'insta' }, p)));
+  const cont = (st) => todos.filter((p) => p.status === st && String(p.data_publicacao) >= hoje).length;
+  const kpi = (rot, val, sub, i) => '<div class="card kpi"><div class="ico">' + ic(i, 's') + '</div><div class="rot">' + rot + '</div><div class="val">' + val + '</div><div class="sub">' + sub + '</div></div>';
+  let h = '<div class="kpis kpis3" style="margin-top:12px">' + kpi('Para aprovar', cont('AGUARDANDO'), 'posts esperando você', 'checks') + kpi('Aprovados', cont('APROVADO'), 'publicam no dia marcado', 'cal') +
+    kpi('Publicados', todos.filter((p) => p.status === 'PUBLICADO').length, 'nos últimos 7 dias', 'check') + '</div>';
+  h += '<p class="pp mut" style="margin:10px 2px 0">LinkedIn (Beatriz): segunda, quarta e sexta às 8h · Instagram e Facebook (Marina): segunda a sexta às 12h. Cada post é preparado na véspera e só é publicado depois da sua aprovação.</p>';
+  const dt = (k) => new Date(k + 'T12:00:00Z');
+  const k0 = (() => { const x = dt(hoje); x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7)); return x; })();
+  const slot = (p, canal, k, dia) => {
+    const prev = canal === 'linkedin' ? [1, 3, 5].includes(dia) : dia <= 5;
+    if (!p) return '<div class="slot vazio"><div class="sl-top">' + ic(canal, 's') + (prev ? (k <= hoje ? 'sem post' : 'preparado na véspera') : 'sem post neste dia') + '</div></div>';
+    return '<button class="slot" data-post="' + canal + '|' + p.token + '"><div class="sl-top">' + ic(canal, 's') + '<span class="fmt">' + (canal === 'insta' ? (p.formato === 'IMAGEM' ? 'imagem' : 'carrossel') : 'carrossel') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div><div class="sl-t">' + esc(p.tema || 'Post') + '</div></button>';
+  };
+  for (let w = 0; w < 4; w++) {
+    const ini = new Date(k0.getTime() + w * 7 * 864e5);
+    const fim = new Date(ini.getTime() + 4 * 864e5);
+    h += '<div class="card cal-sem"><div class="cab"><h2 style="flex:1">' + (w === 0 ? 'Esta semana' : w === 1 ? 'Próxima semana' : 'Semana de ' + esc(ini.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', timeZone: 'UTC' }))) + '</h2><span class="pp mut">' + esc(ini.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + ' a ' + esc(fim.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + '</span></div>' +
+      '<div class="cal-cols"><span></span><span>' + ic('linkedin', 's') + ' LinkedIn</span><span>' + ic('insta', 's') + ' Instagram e Facebook</span></div>';
+    for (let i = 0; i < 5; i++) {
+      const x = new Date(ini.getTime() + i * 864e5), k = x.toISOString().slice(0, 10);
+      h += '<div class="cal-dia' + (k === hoje ? ' hoje' : '') + '" style="' + (k < hoje ? 'opacity:.62' : '') + '"><div class="dn">' + esc(x.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' }).replace('.', '')) + '<small>' + esc(x.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + '</small></div>' +
+        slot(mL[k], 'linkedin', k, i + 1) + slot(mI[k], 'insta', k, i + 1) + '</div>';
+    }
+    h += '</div>';
+  }
+  h += '<div class="sec-tit">Pautas da semana <span class="pp mut" style="font-weight:500;margin-left:6px">notícias que a Beatriz e a Marina podem usar como gancho</span></div><div class="card lista">' + (nt.length ? nt.map(itemPauta).join('') : '<div class="vazio">As notícias do tema aparecem aqui todo dia às 6h.</div>') + '</div>';
+  $('#cont').innerHTML = h;
+  const recarregar = () => { S.cache = {}; VIEWS.conteudo(null, true); };
+  $$('[data-post]').forEach((b) => b.onclick = async () => {
+    const [canal, tk] = b.dataset.post.split('|');
+    const p = (canal === 'insta' ? ig : li).find((x) => x.token === tk); if (!p) return;
+    const pend = ['AGUARDANDO', 'FALHOU'].includes(p.status);
+    const corpo = '<div class="post-modal">' + (p.html ? prevHtml(p.html, 'm0') : '') + '<div class="chips" style="margin:12px 0 6px"><span class="chip ouro">' + ic(canal, 's') + (canal === 'insta' ? 'Marina' : 'Beatriz') + '</span><span class="chip">' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + (canal === 'insta' ? ' às 12h' : ' às 8h') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div>' +
+      '<div style="font-weight:700">' + esc(p.tema || '') + '</div>' + (p.erro ? '<p class="pp" style="color:var(--bad)">' + esc(p.erro) + '</p>' : '') +
+      '<div class="texto pq" style="margin-top:8px;padding:12px;border-radius:10px;background:var(--surface-2);max-height:220px;overflow:auto;white-space:pre-wrap">' + esc(p.texto || '') + '</div>' +
+      (p.link ? '<p class="pq" style="margin-top:10px"><a href="' + esc(p.link) + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Ver publicação</a></p>' : '') + '</div>';
+    const botoes = pend ? [{ t: 'Descartar', c: 'fant', v: 'descartar' }, { t: 'Pedir ajuste', c: 'fant', v: 'ajustar' }, { t: 'Editar texto', c: '', v: 'editar' }, { t: 'Aprovar', c: 'pri', v: 'aprovar' }] : [{ t: 'Fechar', c: 'pri', v: null }];
+    const pr = modal({ titulo: canal === 'insta' ? 'Post do Instagram' : 'Post do LinkedIn', corpo, botoes });
+    setTimeout(ajustarPrevs, 50);
+    let a = await pr; if (!a) return;
+    let obs = '', texto = '';
+    if (a === 'editar') { texto = await pedirTexto(canal === 'insta' ? 'Editar legenda' : 'Editar texto do post', 'O post é aprovado com o texto que você deixar aqui.', '', true, p.texto); if (!texto) return; a = 'aprovar'; }
+    if (a === 'ajustar') { obs = await pedirTexto('Pedir ajuste', 'O que mudar no post?', '', true); if (!obs) return; }
+    if (a === 'descartar' && !(await confirmar('Descartar post?', 'Este post não será publicado.', 'Descartar', true))) return;
+    try {
+      await agir(null, () => api('decidir', { tipo: canal === 'insta' ? 'insta' : 'post', token: tk, decisao: a, obs, texto }), a === 'aprovar' ? 'Post aprovado' : a === 'descartar' ? 'Post descartado' : 'Pedido enviado. A nova versão chega em alguns minutos.');
+    } catch (e) { return; }
+    recarregar();
+  });
 };
 // ---------- início ----------
 if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
