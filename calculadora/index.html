@@ -16,8 +16,8 @@
 <style>
 /* Marca FCE: preto, cinza e amarelo do logotipo. Layout: registro de cartório — coluna de leitura estreita, linha do tempo das fases como espinha da página */
 :root{
-  --bg:#F6F6F4; --surface:#FFFFFF; --ink:#141414; --muted:#5A5A56; --line:#DCDCD7;
-  --accent:#F2C200; --accent-ink:#141414; --accent-text:#7A5E00; --accent-soft:#FBF4D9; --grey:#8C8C8C; --prazo:#A3372A; --prazo-soft:#F7E4E0;
+  --bg:#F6F6F4; --surface:#FFFFFF; --ink:#0E1A2B; --muted:#5A5A56; --line:#DCDCD7;
+  --accent:#F2C200; --accent-ink:#0E1A2B; --accent-text:#7A5E00; --accent-soft:#FBF4D9; --grey:#8C8C8C; --prazo:#A3372A; --prazo-soft:#F7E4E0;
   --display:"Red Hat Display","Segoe UI",system-ui,sans-serif;
   --body:"Red Hat Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"Red Hat Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -25,11 +25,11 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#121211; --surface:#1B1B19; --ink:#ECECE8; --muted:#A6A6A0; --line:#2E2E2B;
-  --accent:#F2C200; --accent-ink:#141414; --accent-text:#F2C200; --accent-soft:#28240F; --grey:#9A9A96; --prazo:#EE8C78; --prazo-soft:#33201C; color-scheme:dark}}
+  --bg:#0A111D; --surface:#111B2B; --ink:#ECECE8; --muted:#A6A6A0; --line:#22304A;
+  --accent:#F2C200; --accent-ink:#0E1A2B; --accent-text:#F2C200; --accent-soft:#28240F; --grey:#9A9A96; --prazo:#EE8C78; --prazo-soft:#33201C; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#121211; --surface:#1B1B19; --ink:#ECECE8; --muted:#A6A6A0; --line:#2E2E2B;
-  --accent:#F2C200; --accent-ink:#141414; --accent-text:#F2C200; --accent-soft:#28240F; --grey:#9A9A96; --prazo:#EE8C78; --prazo-soft:#33201C; color-scheme:dark}
+  --bg:#0A111D; --surface:#111B2B; --ink:#ECECE8; --muted:#A6A6A0; --line:#22304A;
+  --accent:#F2C200; --accent-ink:#0E1A2B; --accent-text:#F2C200; --accent-soft:#28240F; --grey:#9A9A96; --prazo:#EE8C78; --prazo-soft:#33201C; color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
@@ -278,6 +278,8 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .al-meses span{font-size:.8rem;color:var(--muted)}.al-meses b{font:700 1.02rem/1.2 var(--display);color:var(--prazo)}
 @media (max-width:520px){.al-cab{grid-template-columns:1fr}.al-cab .v{text-align:left}.al-meses{gap:.4rem}.al-meses div{padding:.5rem .55rem}.al-meses b{font-size:.92rem;white-space:nowrap}.al-meses span{font-size:.74rem}}
 .cta-final .btn{justify-content:center}
+.top nav a{white-space:nowrap}.brand-tag{white-space:nowrap}
+@media (min-width:761px) and (max-width:1180px){.top nav a[href$="#localizacao"],.top nav a[href$="#perguntas"]{display:none}}
 </style>
 </head>
 <body>
