@@ -259,6 +259,40 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .item.clic{cursor:pointer}
 .pag-nav{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(8,14,24,.72);color:#fff;border-radius:99px;padding:4px 6px;font-size:12px;font-weight:600;backdrop-filter:blur(4px)}
 .pag-nav button{border:0;background:rgba(255,255,255,.14);color:#fff;width:26px;height:26px;border-radius:50%;font-size:17px;line-height:1;cursor:pointer}
+/* logotipo */
+.marca{flex-direction:column;align-items:flex-start;gap:8px;padding:8px 10px 24px}
+.marca .lg{width:188px;height:auto;display:block}
+.marca span{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:#8C98AB}
+.topo-marca{display:none}
+.lm{height:17px;width:auto;display:block;color:var(--txt)}
+.lg-login{width:250px;max-width:80%;height:auto;display:block;margin:4px auto 14px}
+/* rodapé institucional fixo */
+.rod{position:fixed;left:var(--side);right:0;bottom:0;z-index:25;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);font-size:11.5px;line-height:1.45;color:var(--mut)}
+.rod-lin{display:none}
+.rod-det{display:flex;gap:36px;padding:9px 28px 10px;flex-wrap:wrap}
+.rb{display:flex;flex-direction:column;min-width:0}
+.rb b{color:var(--txt);font-size:11.5px;font-weight:700}
+.rb a{color:inherit;text-decoration:none}.rb a:hover{color:var(--gold)}
+.main{padding-bottom:84px}
+@media (max-width:900px){
+  .topo-marca{display:flex;align-items:center;padding-right:10px;margin-right:2px;border-right:1px solid var(--line-2);height:22px}
+  .rod{left:0;bottom:calc(var(--tab) + env(safe-area-inset-bottom));font-size:11.5px}
+  .rod-lin{display:flex;align-items:center;width:100%;border:0;background:none;color:var(--mut);font:inherit;padding:7px 16px;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden}
+  .rod-lin b{color:var(--txt)}
+  .rod-lin span{overflow:hidden;text-overflow:ellipsis}
+  .rod-seta{margin-left:auto;font-style:normal;font-size:16px;line-height:1;transform:rotate(-90deg);transition:transform .2s;padding-left:8px}
+  .rod.aberto .rod-seta{transform:rotate(90deg)}
+  .rod-det{display:none;flex-direction:column;gap:10px;padding:2px 16px 12px}
+  .rod.aberto .rod-det{display:flex}
+  .main{padding-bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 40px)}
+}
+.rod-login{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;text-align:center;margin-top:26px;font-size:11.5px;line-height:1.5;color:#8C98AB;max-width:720px}
+.rod-login .rb b{color:#DDE3EC}
+.rod-login .rb{align-items:center}
+.login{grid-template-rows:1fr auto;align-content:center}
+@media print{.rod{display:none}}
+.lg-mais{width:220px;height:auto;color:var(--txt)}
+.rod-mais{display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--mut)}.rod-mais .rb b{font-size:13px}
 </style>
 </head>
 <body>
@@ -404,10 +438,22 @@ async function agir(btn, fn, okMsg) {
   finally { if (btn && document.body.contains(btn)) { btn.disabled = false; btn.innerHTML = orig; } }
 }
 
+// ---------- logotipo FCE (svg) ----------
+const LOGO_P = ["M8.28 100.0V0.0H87.71V21.28H32.85V40.0H69.42V60.57H32.85V100.0ZM145.14 101.42Q133.71 101.42 123.92 97.5Q114.14 93.57 106.85 86.57Q99.57 79.57 95.5 70.21Q91.42 60.85 91.42 50.0Q91.42 39.0 95.5 29.64Q99.57 20.28 106.92 13.28Q114.28 6.28 124.07 2.35Q133.85 -1.57 145.14 -1.57Q153.42 -1.57 161.42 0.85Q169.42 3.28 176.21 7.64Q183.0 12.0 187.57 18.0L171.0 34.28Q160.57 21.0 145.14 21.0Q137.14 21.0 130.64 24.78Q124.14 28.57 120.42 35.14Q116.71 41.71 116.71 50.0Q116.71 58.14 120.57 64.64Q124.42 71.14 131.07 74.92Q137.71 78.71 146.0 78.71Q160.71 78.71 170.71 66.28L186.85 82.14Q182.28 88.0 175.57 92.35Q168.85 96.71 161.0 99.07Q153.14 101.42 145.14 101.42ZM190.85 100.0V0.0H269.71V21.28H215.42V39.28H251.28V59.85H215.42V78.71H270.28V100.0Z", "M288.4,100 L309.4,100 L349.4,0 L328.4,0 Z", "M319.4,100 L340.4,100 L380.4,0 L359.4,0 Z", "M410.47 65.0 422.85 35.0H428.12L440.42 65.0H435.54L432.07 56.21H418.65L415.14 65.0ZM420.11 52.48H430.61L425.38 39.28ZM453.8 65.0V35.0H464.38Q467.77 35.0 470.66 36.11Q473.55 37.22 475.67 39.26Q477.8 41.3 479.0 44.04Q480.2 46.78 480.2 50.04Q480.2 53.25 479.02 55.97Q477.84 58.7 475.70 60.73Q473.55 62.77 470.66 63.88Q467.77 65.0 464.38 65.0ZM458.3 60.97H464.47Q467.6 60.97 470.12 59.51Q472.65 58.05 474.11 55.59Q475.57 53.12 475.57 50.04Q475.57 46.91 474.11 44.42Q472.65 41.94 470.12 40.48Q467.6 39.02 464.47 39.02H458.3ZM504.50 65.0 492.24 35.0H497.08L507.24 60.58L517.57 35.0H522.2L509.77 65.0ZM549.92 65.47Q546.62 65.47 543.77 64.29Q540.92 63.11 538.80 60.99Q536.68 58.87 535.48 56.06Q534.28 53.25 534.28 50.0Q534.28 46.74 535.48 43.93Q536.68 41.12 538.80 39.00Q540.92 36.88 543.77 35.70Q546.62 34.52 549.92 34.52Q553.18 34.52 556.01 35.70Q558.84 36.88 560.98 39.00Q563.12 41.12 564.32 43.93Q565.52 46.74 565.52 50.0Q565.52 53.25 564.32 56.06Q563.12 58.87 560.98 60.99Q558.84 63.11 556.01 64.29Q553.18 65.47 549.92 65.47ZM549.92 61.31Q553.01 61.31 555.52 59.81Q558.02 58.31 559.48 55.76Q560.94 53.21 560.94 50.0Q560.94 46.78 559.48 44.21Q558.02 41.64 555.52 40.16Q553.01 38.68 549.92 38.68Q546.80 38.68 544.29 40.16Q541.78 41.64 540.32 44.21Q538.87 46.78 538.87 50.0Q538.87 53.21 540.32 55.76Q541.78 58.31 544.29 59.81Q546.80 61.31 549.92 61.31ZM594.97 65.47Q591.67 65.47 588.82 64.27Q585.97 63.07 583.82 60.97Q581.68 58.87 580.48 56.06Q579.28 53.25 579.28 50.0Q579.28 46.74 580.48 43.93Q581.68 41.12 583.80 39.02Q585.92 36.92 588.75 35.72Q591.58 34.52 594.88 34.52Q598.44 34.52 601.61 35.89Q604.78 37.27 606.97 39.71L603.88 42.71Q602.21 40.78 599.85 39.73Q597.5 38.68 594.88 38.68Q591.75 38.68 589.27 40.16Q586.78 41.64 585.32 44.21Q583.87 46.78 583.87 50.0Q583.87 53.21 585.32 55.78Q586.78 58.35 589.29 59.85Q591.80 61.35 594.97 61.35Q597.62 61.35 599.79 60.24Q601.95 59.12 603.32 57.2Q604.7 55.27 605.0 52.78H595.01V48.84H609.71V50.38Q609.71 53.59 608.60 56.34Q607.48 59.08 605.47 61.14Q603.45 63.2 600.77 64.33Q598.1 65.47 594.97 65.47ZM621.71 65.0 634.1 35.0H639.37L651.67 65.0H646.78L643.31 56.21H629.9L626.38 65.0ZM631.35 52.48H641.85L636.62 39.28ZM665.04 65.0V35.0H675.62Q679.01 35.0 681.90 36.11Q684.8 37.22 686.92 39.26Q689.04 41.3 690.24 44.04Q691.44 46.78 691.44 50.04Q691.44 53.25 690.26 55.97Q689.08 58.7 686.94 60.73Q684.8 62.77 681.90 63.88Q679.01 65.0 675.62 65.0ZM669.54 60.97H675.71Q678.84 60.97 681.37 59.51Q683.9 58.05 685.35 55.59Q686.81 53.12 686.81 50.04Q686.81 46.91 685.35 44.42Q683.9 41.94 681.37 40.48Q678.84 39.02 675.71 39.02H669.54ZM720.84 65.47Q717.54 65.47 714.69 64.29Q711.84 63.11 709.72 60.99Q707.6 58.87 706.40 56.06Q705.2 53.25 705.2 50.0Q705.2 46.74 706.40 43.93Q707.6 41.12 709.72 39.00Q711.84 36.88 714.69 35.70Q717.54 34.52 720.84 34.52Q724.1 34.52 726.92 35.70Q729.75 36.88 731.90 39.00Q734.04 41.12 735.24 43.93Q736.44 46.74 736.44 50.0Q736.44 53.25 735.24 56.06Q734.04 58.87 731.90 60.99Q729.75 63.11 726.92 64.29Q724.1 65.47 720.84 65.47ZM720.84 61.31Q723.92 61.31 726.43 59.81Q728.94 58.31 730.40 55.76Q731.85 53.21 731.85 50.0Q731.85 46.78 730.40 44.21Q728.94 41.64 726.43 40.16Q723.92 38.68 720.84 38.68Q717.71 38.68 715.20 40.16Q712.7 41.64 711.24 44.21Q709.78 46.78 709.78 50.0Q709.78 53.21 711.24 55.76Q712.7 58.31 715.20 59.81Q717.71 61.31 720.84 61.31ZM761.64 65.42Q758.04 65.42 754.7 64.03Q751.35 62.64 748.78 60.02L751.52 56.85Q756.32 61.57 761.85 61.57Q765.11 61.57 767.12 60.17Q769.14 58.78 769.14 56.55Q769.14 54.54 767.72 53.47Q766.31 52.4 763.05 51.84L758.04 51.02Q749.85 49.65 749.85 43.22Q749.85 40.65 751.22 38.70Q752.6 36.75 755.08 35.68Q757.57 34.61 760.91 34.61Q764.12 34.61 767.30 35.66Q770.47 36.71 773.0 38.68L770.51 42.07Q765.67 38.42 760.7 38.42Q757.74 38.42 755.96 39.64Q754.18 40.87 754.18 42.88Q754.18 44.72 755.42 45.69Q756.67 46.65 759.54 47.08L764.38 47.9Q769.14 48.67 771.37 50.68Q773.6 52.69 773.6 56.21Q773.6 58.95 772.1 61.03Q770.6 63.11 767.90 64.27Q765.2 65.42 761.64 65.42Z"];
+const logo = (cls, txt) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 781 104" role="img" aria-label="FCE Advogados" class="' + (cls || '') + '"><path fill="' + (txt || 'currentColor') + '" d="' + LOGO_P[0] + '"/><path fill="#8C8C8C" d="' + LOGO_P[1] + '"/><path fill="#F2C200" d="' + LOGO_P[2] + '"/><path fill="' + (txt || 'currentColor') + '" d="' + LOGO_P[3] + '"/></svg>';
+const logoMarca = (cls) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 -4 386 108" role="img" aria-label="FCE" class="' + (cls || '') + '"><path fill="currentColor" d="' + LOGO_P[0] + '"/><path fill="#8C8C8C" d="' + LOGO_P[1] + '"/><path fill="#F2C200" d="' + LOGO_P[2] + '"/></svg>';
+// ---------- rodapé institucional ----------
+const FCE = { nome: 'FCE Advogados', razao: 'Fabio de Castro Emerim Sociedade Individual de Advocacia', oab: 'OAB/RS 15.656', cnpj: '57.727.037/0001-33', end1: 'Rua Araguaia, 509, Jardim Mauá', end2: 'Novo Hamburgo/RS · CEP 93548-350', wa: '(51) 99206-8037', waLink: 'https://wa.me/5551992068037', email: 'atendimento@fceadvogados.com.br' };
+const blocosFCE = () => '<div class="rb"><b>' + FCE.nome + '</b><span>' + FCE.razao + '</span><span>' + FCE.oab + ' · CNPJ ' + FCE.cnpj + '</span></div>' +
+  '<div class="rb"><b>Endereço</b><span>' + FCE.end1 + '</span><span>' + FCE.end2 + '</span></div>' +
+  '<div class="rb"><b>Contato</b><span><a href="' + FCE.waLink + '" target="_blank" rel="noopener">WhatsApp ' + FCE.wa + '</a></span><span><a href="mailto:' + FCE.email + '">' + FCE.email + '</a></span></div>';
+const RODAPE = '<footer class="rod"><button type="button" class="rod-lin" aria-label="Dados do escritório"><b>FCE Advogados</b><span> · ' + FCE.oab + ' · WhatsApp ' + FCE.wa + '</span><i class="rod-seta">›</i></button><div class="rod-det">' + blocosFCE() + '</div></footer>';
+const RODAPE_LOGIN = '<footer class="rod-login">' + blocosFCE() + '</footer>';
+
 // ---------- login ----------
 function telaLogin(erro) {
-  document.body.innerHTML = '<div class="login"><div class="caixa"><div class="logo">F</div><h1>FCE Advogados</h1><p>Gestão do escritório</p><div class="gbtn" id="gbtn"><span class="mut pq">Carregando o login do Google…</span></div>' +
-    (erro ? '<div class="erro">' + esc(erro) + '</div>' : '') + '<div class="obs">Entre com a conta do escritório (atendimento@fceadvogados.com.br).</div></div></div>';
+  document.body.innerHTML = '<div class="login"><div class="caixa">' + logo('lg-login', '#ECECE8') + '<p>Gestão do escritório</p><div class="gbtn" id="gbtn"><span class="mut pq">Carregando o login do Google…</span></div>' +
+    (erro ? '<div class="erro">' + esc(erro) + '</div>' : '') + '<div class="obs">Entre com a conta do escritório (atendimento@fceadvogados.com.br).</div></div>' + RODAPE_LOGIN + '</div>';
   const iniciar = () => {
     if (!window.google || !google.accounts || !google.accounts.id) return setTimeout(iniciar, 200);
     google.accounts.id.initialize({ client_id: CLIENT_ID, callback: aoLogar, auto_select: true, ux_mode: 'popup', hd: 'fceadvogados.com.br' });
@@ -441,12 +487,13 @@ const MENU = [
 function montar() {
   const eu = S.eu || {};
   const av = eu.foto ? '<img src="' + esc(eu.foto) + '" alt="" referrerpolicy="no-referrer">' : esc(iniciais(eu.nome));
-  document.body.innerHTML = '<div class="app"><aside class="side"><div class="marca"><div class="logo">F</div><div><b>FCE Advogados</b><span>Gestão do escritório</span></div></div><nav class="nav">' +
+  document.body.innerHTML = '<div class="app"><aside class="side"><div class="marca">' + logo('lg', '#ECECE8') + '<span>Gestão do escritório</span></div><nav class="nav">' +
     MENU.map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + '</a>').join('') +
     '</nav><div class="rodape"><div class="av">' + av + '</div><div style="min-width:0"><div class="n">' + esc((eu.nome || '').split(' ')[0] || 'Fábio') + '</div><div class="e">' + esc(eu.email || '') + '</div></div><button title="Sair" data-sair>' + ic('sair') + '</button></div></aside>' +
-    '<div class="main"><header class="topo"><h1 id="tit">Início</h1><div class="acoes" id="topoAcoes"></div><button class="btn fant ico" id="btnTema" title="Tema">' + ic('lua') + '</button><button class="btn fant ico" id="btnAtt" title="Atualizar">' + ic('att') + '</button></header><div class="conteudo" id="cont"></div></div>' +
+    '<div class="main"><header class="topo"><span class="topo-marca">' + logoMarca('lm') + '</span><h1 id="tit">Início</h1><div class="acoes" id="topoAcoes"></div><button class="btn fant ico" id="btnTema" title="Tema">' + ic('lua') + '</button><button class="btn fant ico" id="btnAtt" title="Atualizar">' + ic('att') + '</button></header><div class="conteudo" id="cont"></div>' + RODAPE + '</div>' +
     '<nav class="tabbar">' + [['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovar', 'checks'], ['agenda', 'Agenda', 'cal'], ['mais', 'Mais', 'mais']].map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + '</a>').join('') + '</nav></div>';
   $('[data-sair]').onclick = async () => { if (await confirmar('Sair do app?', 'Você vai precisar entrar de novo com o Google.', 'Sair')) sair(); };
+  const rb = $('.rod-lin'); if (rb) rb.onclick = () => $('.rod').classList.toggle('aberto');
   $('#btnAtt').onclick = () => { S.cache = {}; rota(true); };
   $('#btnTema').onclick = () => { const r = document.documentElement; const atual = r.dataset.tema || (matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro'); r.dataset.tema = atual === 'escuro' ? 'claro' : 'escuro'; try { localStorage.setItem('fce_tema', r.dataset.tema); } catch (e) {} };
   window.addEventListener('scroll', () => { const t = $('.topo'); if (t) t.classList.toggle('sombra', scrollY > 4); }, { passive: true });
@@ -954,7 +1001,7 @@ VIEWS.mais = async () => {
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a></div>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
     '<button class="item" id="mSair" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:var(--bad);cursor:pointer"><div class="ic-circ bad">' + ic('sair', 's') + '</div><div class="mid"><div class="t">Sair</div></div></button></div>' +
-    '<p class="pp mut" style="text-align:center;margin-top:18px">FCE Advogados · app de gestão<br>Dica: no iPhone, toque em Compartilhar › "Adicionar à Tela de Início".</p>';
+    '<div class="card" style="margin-top:14px"><div class="corpo" style="display:flex;flex-direction:column;gap:14px">' + logo('lg-mais') + '<div class="rod-mais">' + blocosFCE() + '</div></div></div><p class="pp mut" style="text-align:center;margin-top:18px">Dica: no iPhone, toque em Compartilhar › "Adicionar à Tela de Início".</p>';
   $('#mTema').onclick = () => $('#btnTema').click();
   $('#mSair').onclick = () => $('[data-sair]').click();
 };
