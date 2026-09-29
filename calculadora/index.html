@@ -259,6 +259,14 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .fase-txt{margin-top:1.5rem;border-left:4px solid var(--accent);padding:.9rem 1.1rem;background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:.95rem}
 .calc-nota{font-size:.82rem;color:var(--muted);margin-top:1.25rem;line-height:1.5}
 .cta-final{margin-top:1.75rem;display:grid;gap:.75rem}
+.aluguel{margin-top:1.5rem;border:1px solid var(--prazo);border-radius:8px;padding:1.1rem;background:var(--surface)}
+.al-cab{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:start}
+.al-cab h3{font-size:1.02rem;margin-bottom:.3rem}.al-cab p{color:var(--muted);font-size:.9rem;line-height:1.5}
+.al-cab .v{text-align:right;font:700 1.5rem/1 var(--display);color:var(--prazo);white-space:nowrap}.al-cab .v small{display:block;font:500 .78rem/1.4 var(--body);color:var(--muted);margin-top:.2rem}
+.al-meses{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin-top:1rem}
+.al-meses div{background:var(--prazo-soft);border-radius:6px;padding:.6rem .7rem;display:grid;gap:.15rem}
+.al-meses span{font-size:.8rem;color:var(--muted)}.al-meses b{font:700 1.02rem/1.2 var(--display);color:var(--prazo)}
+@media (max-width:520px){.al-cab{grid-template-columns:1fr}.al-cab .v{text-align:left}.al-meses{gap:.4rem}.al-meses div{padding:.5rem .55rem}.al-meses b{font-size:.92rem;white-space:nowrap}.al-meses span{font-size:.74rem}}
 .cta-final .btn{justify-content:center}
 </style>
 </head>
@@ -364,12 +372,17 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
           <div class="cen pior"><h3>Se não houver lance no 2º leilão</h3><div class="v" id="r-c3">R$ 0</div><p>O banco pode ficar com o imóvel e, em regra, você não recebe nada do patrimônio construído.</p></div>
         </div>
 
+        <div class="aluguel">
+          <div class="al-cab"><div><h3>Se continuar morando no imóvel depois de perdê-lo</h3><p>A lei prevê que quem permanece no imóvel após a consolidação ou o leilão paga ao banco ou ao arrematante uma taxa de ocupação, uma espécie de aluguel, de 1% do valor do imóvel por mês, até a desocupação.</p></div><div class="v"><span id="r-al">R$ 0</span><small>por mês</small></div></div>
+          <div class="al-meses"><div><span>Em 6 meses</span><b id="r-al6">R$ 0</b></div><div><span>Em 12 meses</span><b id="r-al12">R$ 0</b></div><div><span>Em 24 meses</span><b id="r-al24">R$ 0</b></div></div>
+        </div>
+
         <div class="fase-txt" id="r-fase"></div>
         <div class="cta-final">
           <a class="btn btn-primary" id="b-wa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>Entender minha situação pelo WhatsApp</a>
           <button class="btn btn-ghost" type="button" id="b-refazer">Refazer a simulação</button>
         </div>
-        <p class="calc-nota">Simulação informativa, com base apenas nos valores informados e em regras gerais da Lei 9.514/1997, alterada pelo Marco Legal das Garantias (Lei 14.711/2023). As despesas foram estimadas em 5% do valor do imóvel. O resultado real depende do contrato, das datas, do valor de avaliação e do andamento de cada caso, e não representa promessa de resultado.</p>
+        <p class="calc-nota">Simulação informativa, com base apenas nos valores informados e em regras gerais da Lei 9.514/1997, alterada pelo Marco Legal das Garantias (Lei 14.711/2023). As despesas foram estimadas em 5% do valor do imóvel. A taxa de ocupação segue a regra geral da lei (1% ao mês sobre o valor do imóvel, desde a consolidação até a desocupação) e foi calculada sobre o valor informado; o valor de referência exato é o do contrato ou da avaliação. O resultado real depende do contrato, das datas, do valor de avaliação e do andamento de cada caso, e não representa promessa de resultado.</p>
       </section>
     </div>
   </div>
@@ -443,12 +456,13 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     var tot=Math.max(v,s+desp), pD=Math.min(100,s/tot*100), pE=Math.min(100-pD,desp/tot*100), pP=Math.max(0,100-pD-pE);
     $("r-barra").innerHTML='<div class="b-divida" style="width:'+pD+'%">'+(pD>18?brl(s):"")+'</div><div class="b-desp" style="width:'+pE+'%"></div><div class="b-pat" style="width:'+pP+'%">'+(pP>18?brl(pat):"")+'</div>';
     $("r-c1").textContent=brl(c1); $("r-c2").textContent=brl(c2);
+    var al=Math.round(v*0.01); $("r-al").textContent=brl(al); $("r-al6").textContent=brl(al*6); $("r-al12").textContent=brl(al*12); $("r-al24").textContent=brl(al*24);
     $("r-fase").textContent=FASE[fase]||"";
     var faseTxt=$("fase").options[$("fase").selectedIndex].text;
     var msg="Olá! Vim pelo site da FCE e fiz a simulação da calculadora. Situação: "+faseTxt+". Imóvel de cerca de "+brl(v)+" e dívida de cerca de "+brl(s)+(atr?", "+atr+" parcela(s) em atraso":"")+". Gostaria de entender minha situação.";
     $("b-wa").href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
     mostrar("resultado");
-    ultimo={acao:"simulacao",id:leadId||"",fase:fase,valor_imovel:v,saldo_devedor:s,valor_parcela:parc,parcelas_atraso:atr,ja_pago:pago,patrimonio:pat,risco_max:pat,despesas:desp};
+    ultimo={acao:"simulacao",id:leadId||"",fase:fase,valor_imovel:v,saldo_devedor:s,valor_parcela:parc,parcelas_atraso:atr,ja_pago:pago,patrimonio:pat,risco_max:pat,despesas:desp,taxa_ocupacao:al};
     if(leadId) enviar(ultimo).catch(function(){});
   });
   $("b-refazer").addEventListener("click",function(){mostrar("f-sim")});
