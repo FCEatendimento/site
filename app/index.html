@@ -178,7 +178,7 @@ ul.lim{margin:6px 0 0;padding-left:18px}ul.lim li{margin:3px 0}
 .dia-sep{align-self:center;font-size:11.5px;font-weight:600;color:var(--mut);background:var(--surface);border:1px solid var(--line);padding:2px 10px;border-radius:99px;margin:8px 0}
 /* aprovações */
 .prev{border-radius:12px;overflow:hidden;background:#0E1A2B;position:relative}
-.prev iframe{border:0;transform-origin:0 0;display:block;pointer-events:none}
+.prev iframe{border:0;transform-origin:0 0;display:block;pointer-events:none;position:absolute;top:0;left:0}
 .ad-post{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:16px;padding:16px}
 @media (max-width:760px){.ad-post{grid-template-columns:1fr}}
 .ad-post .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
@@ -729,27 +729,27 @@ function prevHtml(html, i) { return '<div class="prev" data-prev="' + i + '" sty
 function ajustarPrevs() {
   $$('[data-prev]').forEach((p) => {
     const f = $('iframe', p); if (!f) return;
+    const escala = () => { const i = +(p.dataset.i || 0), w = +f.width, ph = +(p.dataset.ph || w); f.style.transform = 'scale(' + (p.clientWidth / w) + ') translateY(' + (-i * ph) + 'px)'; };
+    p.__escala = escala;
     const ajustar = () => {
-      let w = 1080, h = 1080;
-      try { const d = f.contentDocument; if (d && d.body) { w = Math.max(d.documentElement.scrollWidth, 320); h = d.documentElement.scrollHeight; } } catch (e) {}
-      const pag = p.dataset.pag ? h > w * 1.2 : false; // carrossel: peças empilhadas
-      const alt = pag ? w : h;
-      const k = p.clientWidth / w; f.width = w; f.height = h; f.style.transform = 'scale(' + k + ')';
-      p.style.aspectRatio = w + '/' + alt; p.style.height = 'auto';
-      const n = Math.max(1, Math.round(h / w));
-      if (pag && n > 1 && !p.dataset.n) {
+      let w = 1080, h = 1080, ph = 1080;
+      try { const d = f.contentDocument; if (d && d.body) { w = Math.max(d.documentElement.scrollWidth, 320); h = d.documentElement.scrollHeight; const pr = d.body.firstElementChild; ph = pr && pr.offsetHeight > 200 ? pr.offsetHeight : h; } } catch (e) {}
+      const n = Math.max(1, Math.round(h / ph));
+      f.width = w; f.height = h; p.dataset.ph = ph; p.style.aspectRatio = w + '/' + ph;
+      if (n > 1 && !p.dataset.n) {
         p.dataset.n = n; p.dataset.i = 0;
         const nav = document.createElement('div'); nav.className = 'pag-nav';
         nav.innerHTML = '<button type="button" data-d="-1">‹</button><span>1/' + n + '</span><button type="button" data-d="1">›</button>';
         p.appendChild(nav);
-        $$('button', nav).forEach((b) => b.onclick = () => { let i = (+p.dataset.i + +b.dataset.d + n) % n; p.dataset.i = i; $('span', nav).textContent = (i + 1) + '/' + n; f.style.transform = 'scale(' + (p.clientWidth / w) + ') translateY(' + (-i * w) + 'px)'; });
+        $$('button', nav).forEach((b) => b.onclick = () => { const i = (+p.dataset.i + +b.dataset.d + n) % n; p.dataset.i = i; $('span', nav).textContent = (i + 1) + '/' + n; escala(); });
       }
+      escala();
     };
-    if (f.contentDocument && f.contentDocument.readyState === 'complete' && f.contentDocument.body && f.contentDocument.body.childElementCount) ajustar(); else f.onload = () => setTimeout(ajustar, 250);
+    f.onload = () => setTimeout(ajustar, 200);
     setTimeout(ajustar, 1500);
   });
 }
-window.addEventListener('resize', () => { clearTimeout(window.__rz); window.__rz = setTimeout(() => $$('[data-prev]').forEach((p) => { const f = $('iframe', p); if (f) f.style.transform = 'scale(' + (p.clientWidth / f.width) + ')' + (p.dataset.i ? ' translateY(' + (-p.dataset.i * f.width) + 'px)' : ''); }), 150); });
+window.addEventListener('resize', () => { clearTimeout(window.__rz); window.__rz = setTimeout(() => $$('[data-prev]').forEach((p) => p.__escala && p.__escala()), 150); });
 // ---------- APROVAÇÕES ----------
 VIEWS.aprovacoes = async (_, forcar) => {
   titulo('Aprovações', '<button class="btn sm" id="bNovoAd">' + ic('mais2', 's') + '<span class="so-desk"> Pedir anúncio novo</span></button>');
@@ -764,7 +764,7 @@ VIEWS.aprovacoes = async (_, forcar) => {
   if (an.length) {
     h += '<div class="sec-tit">Anúncios do Facebook e Instagram <span class="bdg">' + an.length + '</span></div>';
     an.forEach((a, i) => {
-      h += '<div class="card" style="margin-top:12px"><div class="ad-post"><div>' + prevHtml(a.html, 'a' + i).replace('data-prev=', (a.formato === 'CARROSSEL' ? 'data-pag="1" ' : '') + 'data-prev=') + '</div><div style="min-width:0">' +
+      h += '<div class="card" style="margin-top:12px"><div class="ad-post"><div>' + prevHtml(a.html, 'a' + i) + '</div><div style="min-width:0">' +
         '<div class="chips" style="margin:0 0 8px"><span class="chip ouro">' + ic('meta', 's') + 'Marina</span><span class="chip">' + (a.formato === 'CARROSSEL' ? 'Carrossel' : 'Imagem') + '</span>' + (a.versao > 1 ? '<span class="chip">versão ' + a.versao + '</span>' : '') + '</div>' +
         '<div style="font-weight:700;font-size:16px">' + esc(a.titulo || a.tema || 'Anúncio') + '</div>' + (a.angulo ? '<div class="pp mut" style="margin-top:2px">Ângulo: ' + esc(a.angulo) + '</div>' : '') +
         '<div class="texto pq" style="margin-top:10px;padding:12px;border-radius:10px;background:var(--surface-2)">' + esc(a.texto_principal || '') + '</div>' + (a.descricao ? '<div class="pp mut" style="margin-top:6px">' + esc(a.descricao) + '</div>' : '') +
