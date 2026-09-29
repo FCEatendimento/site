@@ -729,13 +729,13 @@ function prevHtml(html, i) { return '<div class="prev" data-prev="' + i + '" sty
 function ajustarPrevs() {
   $$('[data-prev]').forEach((p) => {
     const f = $('iframe', p); if (!f) return;
-    const escala = () => { const i = +(p.dataset.i || 0), w = +f.width, ph = +(p.dataset.ph || w); f.style.transform = 'scale(' + (p.clientWidth / w) + ') translateY(' + (-i * ph) + 'px)'; };
+    const escala = () => { const i = +(p.dataset.i || 0), w = +f.width, ph = +(p.dataset.ph || w); f.style.transform = 'scale(' + (p.clientWidth / w) + ')'; try { f.contentWindow.scrollTo(0, i * ph); } catch (e) {} };
     p.__escala = escala;
     const ajustar = () => {
       let w = 1080, h = 1080, ph = 1080;
       try { const d = f.contentDocument; if (d && d.body) { w = Math.max(d.documentElement.scrollWidth, 320); h = d.documentElement.scrollHeight; const pr = d.body.firstElementChild; ph = pr && pr.offsetHeight > 200 ? pr.offsetHeight : h; } } catch (e) {}
       const n = Math.max(1, Math.round(h / ph));
-      f.width = w; f.height = h; p.dataset.ph = ph; p.style.aspectRatio = w + '/' + ph;
+      f.width = w; f.height = ph; p.dataset.ph = ph; try { f.contentDocument.documentElement.style.overflow = 'hidden'; } catch (e) {} p.style.aspectRatio = w + '/' + ph;
       if (n > 1 && !p.dataset.n) {
         p.dataset.n = n; p.dataset.i = 0;
         const nav = document.createElement('div'); nav.className = 'pag-nav';
