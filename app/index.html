@@ -1102,6 +1102,7 @@ VIEWS.mais = async () => {
   $('#mSair').onclick = () => $('[data-sair]').click();
 };
 // ---------- início ----------
+if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
 (function boot() {
   try { const t = localStorage.getItem('fce_tema'); if (t) document.documentElement.dataset.tema = t; } catch (e) {}
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;

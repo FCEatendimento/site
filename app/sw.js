@@ -1,0 +1,15 @@
+// Service worker do app FCE: abre a tela na hora a partir do aparelho e atualiza em segundo plano.
+const CACHE = 'fce-app-v1';
+const ARQS = ['./', './index.html', './manifest.json', './icon-192.png', './apple.png', './fabio.jpg'];
+self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQS)).then(() => self.skipWaiting())); });
+self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener('fetch', (e) => {
+  const u = new URL(e.request.url);
+  if (e.request.method !== 'GET' || u.origin !== location.origin || !u.pathname.startsWith('/app/')) return; // API e Google passam direto
+  e.respondWith(caches.open(CACHE).then(async (c) => {
+    const chave = u.pathname.endsWith('/') ? './' : e.request;
+    const salvo = await c.match(chave, { ignoreSearch: true });
+    const rede = fetch(e.request).then((r) => { if (r.ok) c.put(chave, r.clone()); return r; }).catch(() => salvo);
+    return salvo || rede;
+  }));
+});
