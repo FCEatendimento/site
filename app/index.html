@@ -472,11 +472,11 @@ async function aoLogar(resp) {
     if (!j || !j.ok) return telaLogin((j && j.erro) || 'Não foi possível entrar.');
     S.token = j.dados.token; S.eu = { nome: j.dados.nome, email: j.dados.email, foto: j.dados.foto };
     try { localStorage.setItem('fce_token', S.token); localStorage.setItem('fce_eu', JSON.stringify(S.eu)); } catch (e) {}
-    montar(); rota();
+    montar(); rota().then(() => setTimeout(preCarregar, 800));
   } catch (e) { telaLogin('Sem conexão. Tente de novo.'); }
 }
 function sair(expirou) {
-  const t = S.token; S.token = null; S.eu = null; S.cache = {};
+  const t = S.token; S.token = null; S.eu = null; S.cache = {}; limparLS();
   try { localStorage.removeItem('fce_token'); localStorage.removeItem('fce_eu'); } catch (e) {}
   if (t && !expirou) fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-fce-token': t }, body: JSON.stringify({ acao: 'sair', token: t }) }).catch(() => {});
   try { google.accounts.id.disableAutoSelect(); } catch (e) {}
@@ -518,10 +518,39 @@ async function rota(forcar) {
   try { await VIEWS[k](arg, forcar); } catch (e) { erroTela(e, () => rota(true)); }
 }
 window.addEventListener('hashchange', () => rota());
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.token && !$('.veu') && !(document.activeElement && /TEXTAREA|INPUT/.test(document.activeElement.tagName))) { S.cache = {}; rota(true); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.token && !$('.veu') && !(document.activeElement && /TEXTAREA|INPUT/.test(document.activeElement.tagName))) { Object.values(S.cache).forEach((c) => { c.t = 0; }); rota(); } });
+// Cache em duas camadas: memória (45 s) e aparelho (localStorage). Ao abrir, mostra o último dado na hora
+// e busca o novo em segundo plano; se mudou, a tela se redesenha sozinha.
+const LSK = 'fce_c_';
+function lerLS(k) { try { const v = localStorage.getItem(LSK + k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+function gravar(k, d) { S.cache[k] = { d, t: Date.now() }; try { localStorage.setItem(LSK + k, JSON.stringify({ d, t: Date.now() })); } catch (e) { limparLS(); } }
+function limparLS() { try { Object.keys(localStorage).filter((k) => k.startsWith(LSK)).forEach((k) => localStorage.removeItem(k)); } catch (e) {} }
+S.rev = {};
+function revalidar(k, acao, extra) {
+  if (S.rev[k]) return; S.rev[k] = 1;
+  const hash = location.hash, antes = JSON.stringify((S.cache[k] || {}).d);
+  api(acao, extra).then((d) => {
+    gravar(k, d);
+    if (JSON.stringify(d) !== antes && location.hash === hash && !$('.veu') && !(document.activeElement && /TEXTAREA|INPUT|SELECT/.test(document.activeElement.tagName))) rota();
+  }).catch(() => {}).finally(() => { delete S.rev[k]; });
+}
 async function dados(chave, acao, extra, forcar) {
-  if (!forcar && S.cache[chave] && Date.now() - S.cache[chave].t < 45000) return S.cache[chave].d;
-  const d = await api(acao, extra); S.cache[chave] = { d, t: Date.now() }; return d;
+  const mem = S.cache[chave];
+  if (!forcar && mem && Date.now() - mem.t < 45000) return mem.d;
+  if (!forcar) {
+    const velho = mem || lerLS(chave);
+    if (velho) { if (!mem) S.cache[chave] = { d: velho.d, t: 0 }; revalidar(chave, acao, extra); return velho.d; }
+  }
+  const d = await api(acao, extra); gravar(chave, d); return d;
+}
+// depois de abrir, deixa as outras telas prontas em segundo plano
+async function preCarregar() {
+  const lista = [['painel', 'painel'], ['aprov', 'aprovacoes'], ['agenda', 'agenda'], ['fin', 'financeiro'], ['desp', 'despesas'], ['mk30', 'marketing', { dias: 30 }], ['casos:' + JSON.stringify({ q: '', etapa: '', perfil: '' }), 'casos', { q: '', etapa: '', perfil: '' }]];
+  for (const [k, a, x] of lista) {
+    if (!S.token) return;
+    const m = S.cache[k]; if (m && Date.now() - m.t < 45000) continue;
+    try { gravar(k, await api(a, x)); } catch (e) { return; }
+  }
 }
 function atualizaBadge(ap) { if (!ap) return; badge(Number(ap.anuncios || 0) + Number(ap.google || 0) + Number(ap.posts || 0) + Number(ap.decisoes || 0)); }
 // ---------- INÍCIO ----------
@@ -1078,7 +1107,7 @@ VIEWS.mais = async () => {
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;
 
   document.head.appendChild(g);
-  if (S.token) { montar(); rota(); } else telaLogin();
+  if (S.token) { montar(); rota().then(() => setTimeout(preCarregar, 800)); } else telaLogin();
 })();
 </script>
 </body>
