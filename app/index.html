@@ -486,7 +486,7 @@ const MENU = [
 ];
 function montar() {
   const eu = S.eu || {};
-  const av = eu.foto ? '<img src="' + esc(eu.foto) + '" alt="" referrerpolicy="no-referrer">' : esc(iniciais(eu.nome));
+  const av = '<img src="fabio.jpg" alt="Dr. Fábio">';
   document.body.innerHTML = '<div class="app"><aside class="side"><div class="marca">' + logo('lg', '#ECECE8') + '<span>Gestão do escritório</span></div><nav class="nav">' +
     MENU.map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + '</a>').join('') +
     '</nav><div class="rodape"><div class="av">' + av + '</div><div style="min-width:0"><div class="n">' + esc((eu.nome || '').split(' ')[0] || 'Fábio') + '</div><div class="e">' + esc(eu.email || '') + '</div></div><button title="Sair" data-sair>' + ic('sair') + '</button></div></aside>' +
@@ -995,7 +995,7 @@ VIEWS.marketing = async (_, forcar) => {
 VIEWS.mais = async () => {
   titulo('Mais');
   const eu = S.eu || {};
-  $('#cont').innerHTML = '<div class="card cab-caso" style="margin-top:12px"><div class="av">' + (eu.foto ? '<img src="' + esc(eu.foto) + '" alt="" referrerpolicy="no-referrer">' : esc(iniciais(eu.nome))) + '</div><div><h2>' + esc(eu.nome || 'Fábio') + '</h2><div class="mut pq">' + esc(eu.email || '') + '</div></div></div>' +
+  $('#cont').innerHTML = '<div class="card cab-caso" style="margin-top:12px"><div class="av">' + '<img src="fabio.jpg" alt="Dr. Fábio">' + '</div><div><h2>' + esc(eu.nome || 'Fábio') + '</h2><div class="mut pq">' + esc(eu.email || '') + '</div></div></div>' +
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a></div>' +
