@@ -308,6 +308,7 @@ const LINKS = {
 };
 // ---------- ícones (traços no estilo Lucide) ----------
 const IC = {
+  recibo: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
   casos: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',
@@ -482,7 +483,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['financeiro', 'Financeiro', 'din'], ['marketing', 'Marketing', 'mega']
+  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Marketing', 'mega']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -510,7 +511,7 @@ async function rota(forcar) {
   const h = location.hash.replace(/^#\/?/, '') || 'inicio';
   const [nome, arg] = h.split('?')[0].split('/');
   const k = VIEWS[nome] ? nome : 'inicio';
-  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || (k === 'caso' && a.dataset.k === 'casos') || (a.dataset.k === 'mais' && ['financeiro', 'marketing'].includes(k))));
+  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || (k === 'caso' && a.dataset.k === 'casos') || (a.dataset.k === 'mais' && ['financeiro', 'marketing', 'despesas'].includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
   rotaAtual = h;
   try { await VIEWS[k](arg, forcar); } catch (e) { erroTela(e, () => rota(true)); }
@@ -991,12 +992,77 @@ VIEWS.marketing = async (_, forcar) => {
   h += '<div class="sec-tit">Beatriz · LinkedIn</div><div class="card lista">' + (bz.length ? bz.map((b) => '<div class="item"><div class="ic-circ ouro">' + ic('linkedin', 's') + '</div><div class="mid"><div class="t">' + esc(b.tema || 'Post') + '</div><div class="d">' + esc(b.data_publicacao ? dataCurta(b.data_publicacao + 'T12:00:00') : '') + '</div></div><div class="dir" style="flex-direction:row;gap:6px"><span class="chip ' + (b.status === 'PUBLICADO' ? 'ok' : b.status === 'AGUARDANDO' ? 'warn' : '') + '">' + esc(String(b.status).toLowerCase()) + '</span>' + (b.linkedin_url ? '<a class="btn sm fant" href="' + esc(b.linkedin_url) + '" target="_blank" rel="noopener">Ver</a>' : '') + '</div></div>').join('') : '<div class="vazio">Nenhum post ainda.</div>') + '</div>';
   $('#cont').innerHTML = h;
 };
+// ---------- DESPESAS ----------
+const CAT_DESP = { FERRAMENTAS: 'Ferramentas e sistemas', MARKETING: 'Marketing e anúncios', IMPOSTOS: 'Impostos e taxas', PROFISSIONAIS: 'Profissionais', TELEFONIA: 'Telefonia e WhatsApp', SITE: 'Site e domínio', FINANCEIRO: 'Tarifas financeiras', ESCRITORIO: 'Escritório', OUTROS: 'Outros' };
+const PER_DESP = { MENSAL: ['por mês', 1], TRIMESTRAL: ['por trimestre', 3], SEMESTRAL: ['por semestre', 6], ANUAL: ['por ano', 12], UNICA: ['pagamento único', 0], VARIAVEL: ['variável', 0] };
+const mensalDe = (d) => { const p = PER_DESP[d.periodicidade] || PER_DESP.MENSAL; return d.valor == null || !p[1] ? null : Number(d.valor) / p[1]; };
+VIEWS.despesas = async (_, forcar) => {
+  titulo('Despesas', '<button class="btn sm pri" id="bNovaDesp">' + ic('mais2', 's') + '<span class="so-desk"> Nova despesa</span></button>');
+  if (!S.cache.desp) carregando(4);
+  const d = await dados('desp', 'despesas', null, forcar);
+  const itens = d.itens || [], ads = d.ads_mes || {};
+  const fixo = itens.reduce((s, x) => s + (mensalDe(x) || 0), 0);
+  const semValor = itens.filter((x) => x.valor == null && x.periodicidade !== 'VARIAVEL');
+  const variaveis = itens.filter((x) => x.periodicidade === 'VARIAVEL');
+  const adsReal = Number(ads.google || 0) + Number(ads.meta || 0);
+  const verbaAds = itens.filter((x) => x.categoria === 'MARKETING' && /ads/i.test(x.nome)).reduce((s, x) => s + (mensalDe(x) || 0), 0);
+  const fixoSemAds = fixo - verbaAds;
+  const totalMes = fixoSemAds + adsReal;
+  const receb = Number(d.recebido_mes || 0);
+  const kpi = (rot, val, sub, i) => '<div class="card kpi"><div class="ico">' + ic(i, 's') + '</div><div class="rot">' + rot + '</div><div class="val">' + val + '</div><div class="sub">' + sub + '</div></div>';
+  let h = '<div class="kpis" style="margin-top:12px">' +
+    kpi('Custos fixos', brlc(fixoSemAds), 'por mês, sem anúncios', 'recibo') +
+    kpi('Anúncios no mês', brlc(adsReal), 'gasto real · verba ' + brlc(verbaAds), 'mega') +
+    kpi('Total do mês', brlc(totalMes), 'fixos + anúncios', 'din') +
+    kpi('Recebido no mês', brlc(receb), 'líquido das taxas', 'check') +
+    kpi('Resultado', '<span style="color:var(--' + (receb - totalMes >= 0 ? 'ok' : 'bad') + ')">' + brlc(receb - totalMes) + '</span>', 'recebido − despesas', 'grafico') +
+    kpi('Sem valor', num(semValor.length), semValor.length ? 'toque para preencher' : 'tudo preenchido', 'alerta') + '</div>';
+  if (semValor.length) h += '<div class="card" style="margin-top:14px;border-color:var(--warn)"><div class="corpo pq">' + ic('alerta', 's') + ' Falta o valor de: ' + semValor.map((x) => '<a href="#" data-ed="' + x.id + '" style="color:var(--gold);font-weight:600">' + esc(x.nome) + '</a>').join(', ') + '. Assim o total do mês fica completo.</div></div>';
+  const grupos = {};
+  itens.forEach((x) => { (grupos[x.categoria] = grupos[x.categoria] || []).push(x); });
+  Object.keys(CAT_DESP).filter((k) => grupos[k]).forEach((k) => {
+    const g = grupos[k], sub = g.reduce((s, x) => s + (mensalDe(x) || 0), 0);
+    h += '<div class="sec-tit">' + esc(CAT_DESP[k]) + '<span class="mut pp" style="margin-left:auto;text-transform:none;letter-spacing:0">' + (sub ? brl(sub) + '/mês' : '') + '</span></div><div class="card lista">';
+    g.forEach((x) => {
+      const p = PER_DESP[x.periodicidade] || PER_DESP.MENSAL, m = mensalDe(x);
+      const val = x.valor == null ? '<span class="chip warn">sem valor</span>' : '<b>' + brl(x.valor) + '</b> <span class="mut pp">' + p[0] + '</span>';
+      h += '<div class="item clic" data-ed="' + x.id + '"><div class="mid"><div class="t">' + esc(x.nome) + '</div><div class="d">' + [x.obs ? esc(x.obs) : '', x.vencimento_dia ? 'vence dia ' + x.vencimento_dia : '', x.periodicidade === 'VARIAVEL' ? 'valor variável' : ''].filter(Boolean).join(' · ') + '</div></div><div class="dir">' + (x.periodicidade === 'VARIAVEL' && x.valor == null ? '<span class="chip">variável</span>' : val) + (m != null && p[1] > 1 ? '<span class="pp mut">≈ ' + brl(m) + '/mês</span>' : '') + '</div></div>';
+    });
+    h += '</div>';
+  });
+  if (variaveis.length) h += '<p class="pp mut" style="margin:10px 2px 0">Despesas variáveis (como o Simples Nacional e as taxas do Asaas) não entram nos custos fixos. Se quiser, cadastre um valor médio nelas.</p>';
+  $('#cont').innerHTML = h;
+  const abrir = (x) => editarDespesa(x || {});
+  $$('[data-ed]').forEach((el) => el.onclick = (e) => { e.preventDefault(); abrir(itens.find((i) => i.id === el.dataset.ed)); });
+  $('#bNovaDesp').onclick = () => abrir({});
+};
+async function editarDespesa(x) {
+  const opt = (obj, sel) => Object.entries(obj).map(([k, v]) => '<option value="' + k + '"' + (k === sel ? ' selected' : '') + '>' + (Array.isArray(v) ? v[0].replace(/^por /, '').replace(/^\w/, (c) => c.toUpperCase()) : v) + '</option>').join('');
+  const r = await modal({ titulo: x.id ? 'Editar despesa' : 'Nova despesa', corpo:
+    '<label class="pq mut">Nome</label><input class="inp" id="dn" style="margin:6px 0 12px" value="' + esc(x.nome || '') + '" placeholder="Ex.: Contador">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label class="pq mut">Valor (R$)</label><input class="inp" id="dv" inputmode="decimal" style="margin-top:6px" value="' + (x.valor != null ? String(x.valor).replace('.', ',') : '') + '" placeholder="0,00"></div>' +
+    '<div><label class="pq mut">Frequência</label><select class="sel" id="dp" style="margin-top:6px">' + opt(PER_DESP, x.periodicidade || 'MENSAL') + '</select></div></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div><label class="pq mut">Categoria</label><select class="sel" id="dc" style="margin-top:6px">' + opt(CAT_DESP, x.categoria || 'FERRAMENTAS') + '</select></div>' +
+    '<div><label class="pq mut">Dia do vencimento</label><input class="inp" id="dd" inputmode="numeric" style="margin-top:6px" value="' + (x.vencimento_dia || '') + '" placeholder="opcional"></div></div>' +
+    '<label class="pq mut" style="display:block;margin-top:12px">Observação</label><input class="inp" id="do" style="margin-top:6px" value="' + esc(x.obs || '') + '" placeholder="opcional">',
+    botoes: (x.id ? [{ t: 'Excluir', c: 'fant', v: 'excluir' }] : []).concat([{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Salvar', c: 'pri', v: (m) => {
+      const nome = $('#dn', m).value.trim(); if (nome.length < 2) { $('#dn', m).focus(); return false; }
+      return { id: x.id || '', nome, valor: $('#dv', m).value.trim(), periodicidade: $('#dp', m).value, categoria: $('#dc', m).value, vencimento_dia: $('#dd', m).value.trim(), obs: $('#do', m).value.trim() };
+    } }]) });
+  if (!r) return;
+  try {
+    if (r === 'excluir') { if (!(await confirmar('Excluir despesa?', 'A despesa "' + x.nome + '" sai da lista.', 'Excluir', true))) return; await api('despesa_excluir', { id: x.id }); toast('Despesa excluída'); }
+    else { await api('despesa_salvar', r); toast('Despesa salva'); }
+  } catch (e) { toast(e.message, true); return; }
+  delete S.cache.desp; VIEWS.despesas(null, true);
+}
 // ---------- MAIS (celular) ----------
 VIEWS.mais = async () => {
   titulo('Mais');
   const eu = S.eu || {};
   $('#cont').innerHTML = '<div class="card cab-caso" style="margin-top:12px"><div class="av">' + '<img src="fabio.jpg" alt="Dr. Fábio">' + '</div><div><h2>' + esc(eu.nome || 'Fábio') + '</h2><div class="mut pq">' + esc(eu.email || '') + '</div></div></div>' +
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a></div>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
