@@ -315,6 +315,14 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .rede{width:16px;height:16px;flex:none;vertical-align:-3px;display:inline-block}.rede+.rede{margin-left:3px}.chip .rede{margin-right:5px}.chip .rede+.rede{margin-left:-2px}
 .rede.g{width:22px;height:22px}.rede.gg{width:46px;height:46px}.ic-circ.rd{background:transparent}.sec-tit .rede{margin-right:4px}.sec-tit .rede+.rede{margin-left:0}
 .cal-cols span{display:flex;align-items:center;gap:5px}
+
+.bolha.out.eu{background:color-mix(in srgb,var(--info) 14%,var(--surface))}
+.bolha .quem{display:block;font-size:11.5px;font-weight:700;color:var(--gold);margin-bottom:2px}
+.resp-box{margin-top:12px;padding:12px}
+.resp-st{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;margin-bottom:10px}
+.resp-st span{flex:1;min-width:200px}
+.resp-st.warn svg{color:var(--warn)}
+.resp-rod{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -687,7 +695,7 @@ VIEWS.caso = async (id, forcar) => {
   let h = '<div class="card cab-caso" style="margin-top:10px"><div class="av">' + esc(iniciais(c.nome)) + '</div><div style="flex:1;min-width:0"><h2>' + esc(c.nome) + '</h2>' +
     '<div class="mut pq" style="margin-top:2px">' + (tel ? '+' + esc(tel) + ' · ' : '') + 'desde ' + esc(fmtD(c.created_at, { day: '2-digit', month: 'short', year: 'numeric' })) + (c.last_message_at ? ' · última mensagem ' + esc(quando(c.last_message_at)) : '') + '</div>' +
     '<div class="chips">' + chipEtapa(c.etapa) + (c.perfil ? '<span class="chip nav">' + esc(PERFIL[c.perfil] || c.perfil) + '</span>' : '') + (u && c.urgencia !== 'NORMAL' ? '<span class="chip ' + u[1] + '">Urgência ' + u[0].toLowerCase() + '</span>' : '') +
-    (c.origem_canal ? '<span class="chip">' + ic('link', 's') + esc(CANAL[c.origem_canal] || c.origem_canal) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">' + ic('pessoa', 's') + 'quer falar com você</span>' : '') + '</div></div>' +
+    (c.origem_canal ? '<span class="chip">' + ic('link', 's') + esc(CANAL[c.origem_canal] || c.origem_canal) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">' + ic('pessoa', 's') + 'com você (Helena pausada)</span>' : '') + '</div></div>' +
     '<div class="acoes">' + (tel ? '<a class="btn" href="https://wa.me/' + tel + '" target="_blank" rel="noopener">' + ic('zap', 's') + ' WhatsApp</a>' : '') +
     '<button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
   const abas = [['resumo', 'Resumo', 'doc'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
@@ -737,16 +745,31 @@ const ABAS = {
   },
   conversa(c) {
     const m = c.mensagens || [];
-    if (!m.length) return '<div class="card"><div class="vazio">' + ic('chat') + '<div>Sem mensagens registradas.</div></div></div>';
-    let h = '<div class="chat" id="chat">', ult = '';
-    m.forEach((x) => {
-      const k = diaChave(x.t);
-      if (k !== ult) { ult = k; h += '<div class="dia-sep">' + esc(fmtD(x.t, { weekday: 'short', day: '2-digit', month: 'short' })) + '</div>'; }
-      const out = String(x.dir).toUpperCase() === 'OUTBOUND';
-      const corpo = x.tipo && x.tipo !== 'text' ? '<span class="doc">' + ic('doc', 's') + esc(x.tipo) + '</span>' + (x.texto ? esc(x.texto) : '') : esc(x.texto || '');
-      h += '<div class="bolha ' + (out ? 'out' : 'in') + '">' + corpo + '<span class="h">' + esc(hora(x.t)) + (out && x.origem === 'CHAT_TESTE' ? ' · teste' : '') + '</span></div>';
-    });
-    return h + '</div><p class="pp mut" style="margin:8px 2px">Mensagens da Helena e do cliente no WhatsApp. Para responder pessoalmente, use o botão WhatsApp acima.</p>';
+    const humano = c.conv_status === 'ENCAMINHADA_HUMANO';
+    const ultIn = m.filter((x) => String(x.dir).toUpperCase() === 'INBOUND').map((x) => new Date(x.t).getTime()).sort((a, b) => b - a)[0];
+    const janela = ultIn && Date.now() - ultIn < 24 * 3600e3;
+    let h = '';
+    if (!m.length) h += '<div class="card"><div class="vazio">' + ic('chat') + '<div>Sem mensagens registradas.</div></div></div>';
+    else {
+      h += '<div class="chat" id="chat">'; let ult = '';
+      m.forEach((x) => {
+        const k = diaChave(x.t);
+        if (k !== ult) { ult = k; h += '<div class="dia-sep">' + esc(fmtD(x.t, { weekday: 'short', day: '2-digit', month: 'short' })) + '</div>'; }
+        const out = String(x.dir).toUpperCase() === 'OUTBOUND', eu = out && x.autor === 'fabio';
+        const corpo = x.tipo && x.tipo !== 'text' ? '<span class="doc">' + ic('doc', 's') + esc(x.tipo) + '</span>' + (x.texto ? esc(x.texto) : '') : esc(x.texto || '');
+        h += '<div class="bolha ' + (out ? 'out' : 'in') + (eu ? ' eu' : '') + '">' + (eu ? '<span class="quem">Você</span>' : '') + corpo + '<span class="h">' + esc(hora(x.t)) + (out && x.origem === 'CHAT_TESTE' ? ' · teste' : '') + (out && !eu ? ' · Helena' : '') + '</span></div>';
+      });
+      h += '</div>';
+    }
+    if (!c.conversa_id) return h;
+    h += '<div class="card resp-box"><div class="resp-st ' + (humano ? 'warn' : 'ok') + '">' + ic(humano ? 'pessoa' : 'chat', 's') + '<span>' +
+      (humano ? '<b>Você está atendendo.</b> A Helena está pausada nesta conversa.' : '<b>A Helena está atendendo.</b> Se você enviar uma mensagem, ela pausa e você assume a conversa.') + '</span>' +
+      (humano ? '<button class="btn sm pri" id="bDevolver">' + ic('voltar', 's') + ' Devolver para a Helena</button>' : '') + '</div>' +
+      (janela ? '<textarea class="inp" id="msgTxt" rows="3" placeholder="Escreva para o cliente. A mensagem sai pelo WhatsApp do escritório."></textarea>' +
+        '<div class="resp-rod"><span class="pp mut">Janela do WhatsApp aberta até ' + esc(fmtD(new Date(ultIn + 24 * 3600e3), { weekday: 'short', hour: '2-digit', minute: '2-digit' })) + '</span><button class="btn pri" id="bEnviarMsg">' + ic('zap', 's') + ' Enviar</button></div>'
+        : '<p class="pq mut" style="margin:10px 2px 2px">' + ic('alerta', 's') + ' O WhatsApp só permite mensagem livre até 24 horas depois da última mensagem do cliente, e essa janela está fechada. Quando o cliente escrever de novo, o campo para responder aparece aqui' + (humano ? '; ou devolva a conversa para a Helena.' : '.') + '</p>') +
+      '</div>';
+    return h;
   },
   docs(c) {
     const d = c.documentos || [], p = c.pendencias || [];
@@ -807,7 +830,22 @@ const STATUS_PROP = { AGUARDANDO_DADOS: 'aguardando dados do cliente', DADOS_REC
 const EVT = { CRIACAO_CASO: 'Caso criado', ANALISE_JURIDICA: 'Análise jurídica feita', DOCUMENTO_RECEBIDO: 'Documento recebido', AVISO_FABIO: 'Aviso enviado a você', DECISAO_FABIO: 'Sua decisão', COBRANCA_CRIADA: 'Cobrança criada', COBRANCA_ENVIADA: 'Cobrança enviada', PAGAMENTO_RECEBIDO: 'Pagamento recebido', PROPOSTA_CRIADA: 'Proposta registrada', CONTRATO_GERADO: 'Contrato gerado', CONTRATO_ASSINADO: 'Contrato assinado', LEMBRETE_ENVIADO: 'Lembrete enviado ao cliente', ALERTA_PRAZO: 'Alerta de prazo', AGENDA_OFERECIDA: 'Horários oferecidos', AGENDA_CONFIRMADA: 'Consulta confirmada', AGENDA_CANCELADA: 'Consulta cancelada', ENCAMINHAMENTO_HUMANO: 'Pediu atendimento humano', CLASSIFICACAO: 'Classificação', EXTRACAO: 'Dados extraídos', KOMMO_SYNC: 'Sincronizado com o Kommo' };
 function lista(t, arr) { arr = Array.isArray(arr) ? arr.filter(Boolean) : []; return arr.length ? '<div class="pq" style="margin-top:12px;font-weight:650">' + esc(t) + '</div><ul class="lim pq">' + arr.map((x) => '<li>' + esc(typeof x === 'string' ? x : (x.descricao || x.texto || JSON.stringify(x))) + '</li>').join('') + '</ul>' : ''; }
 function ligarAba(k, c) {
-  if (k === 'conversa') { const ch = $('#chat'); if (ch) ch.scrollTop = ch.scrollHeight; }
+  if (k === 'conversa') {
+    const ch = $('#chat'); if (ch) ch.scrollTop = ch.scrollHeight;
+    const be = $('#bEnviarMsg');
+    if (be) be.onclick = async () => {
+      const t = $('#msgTxt').value.trim(); if (!t) return $('#msgTxt').focus();
+      await agir(be, () => api('responder', { id: c.id, texto: t }), 'Mensagem enviada ao cliente');
+      S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
+    };
+    const bd = $('#bDevolver');
+    if (bd) bd.onclick = async () => {
+      const inst = await pedirTexto('Devolver para a Helena', 'A Helena volta a responder este cliente a partir da próxima mensagem dele, já sabendo tudo o que foi conversado. Se quiser, deixe uma orientação para ela (opcional).', 'Ex.: já expliquei o prazo do leilão; siga com a consulta.', false);
+      if (inst === null) return;
+      await agir(bd, () => api('devolver', { id: c.id, texto: inst }), 'A Helena voltou a atender este cliente');
+      S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
+    };
+  }
   if (k === 'docs') $$('[data-doc]').forEach((el) => el.onclick = () => { const d = $('.det', el); d.hidden = !d.hidden; });
   if (k === 'prazos') {
     $$('[data-prazo]').forEach((b) => b.onclick = async () => { await agir(b, () => api('prazo', { id: b.dataset.prazo, status: b.dataset.st }), 'Prazo atualizado'); S.cache = {}; VIEWS.caso(c.id, true); });
