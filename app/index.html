@@ -497,6 +497,13 @@ function toast(msg, erro) {
   t.innerHTML = ic(erro ? 'alerta' : 'check', 's') + '<span>' + esc(msg) + '</span>';
   document.body.appendChild(t); setTimeout(() => t.remove(), erro ? 5200 : Math.min(9000, Math.max(2800, String(msg || '').length * 55)));
 }
+const MOTIVOS_PERDA = ['Sem caso', 'Sem verba', 'Escolheu outro escritório', 'Sumiu (sem resposta)', 'Fora do perfil', 'Prazo perdido', 'Resolveu sozinho', 'Outro'];
+const ETAPAS_PERDA = ['ENCERRADO_SEM_CONTRATO', 'FORA_DO_PERFIL'];
+async function pedirMotivoPerda(nome) {
+  const r = await modal({ titulo: 'Motivo da perda', corpo: '<p class="pp mut" style="margin:0 0 10px">' + (nome ? esc(nome) + ': ' : '') + 'todo caso perdido precisa de um motivo. É com ele que o Eduardo mostra onde o funil está furado.</p><label class="pq mut">Motivo</label><select class="sel" id="mp" style="margin:6px 0 12px">' + MOTIVOS_PERDA.map((m) => '<option>' + m + '</option>').join('') + '</select><label class="pq mut">Detalhe (opcional)</label><input class="inp" id="md" style="margin-top:6px" placeholder="Ex.: fechou com outro escritório por preço">',
+    botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Salvar', c: 'pri', v: (m) => { const d = $('#md', m).value.trim(); return 'Perdido: ' + $('#mp', m).value + (d ? ' - ' + d : ''); } }] });
+  return r || null;
+}
 function modal({ titulo, corpo, botoes }) {
   return new Promise((res) => {
     const v = document.createElement('div'); v.className = 'veu';
@@ -742,7 +749,9 @@ function ligarQuadro(recarregar) {
       const de = k.closest('.kcol').dataset.etapa, para = col.dataset.etapa; if (de === para) return;
       const ok = await confirmar('Mudar fase', 'Mover ' + k.dataset.nome + ' de "' + ETAPA[de] + '" para "' + ETAPA[para] + '"? A mudança fica no histórico e aciona o agente da nova fase.', 'Mover');
       if (!ok) return;
-      try { await agir(null, () => api('etapa', { id: k.dataset.id, etapa: para, motivo: 'Movido no quadro do app' }), 'Caso movido para ' + ETAPA[para]); } catch (e) { return; }
+      let motivo = 'Movido no quadro do app';
+      if (ETAPAS_PERDA.includes(para)) { const mp = await pedirMotivoPerda(k.dataset.nome); if (!mp) return; motivo = mp; }
+      try { await agir(null, () => api('etapa', { id: k.dataset.id, etapa: para, motivo }), 'Caso movido para ' + ETAPA[para]); } catch (e) { return; }
       S.cache = {}; recarregar();
     };
   });
@@ -836,6 +845,7 @@ VIEWS.caso = async (id, forcar) => {
       '<p class="pp mut" style="margin:10px 0 0">A mudança fica registrada no histórico e aciona o agente responsável pela nova etapa (por exemplo, a análise jurídica em "Em análise").</p>',
       botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Salvar', c: 'pri', v: (m) => ({ etapa: $('#me', m).value, motivo: $('#mm', m).value.trim() }) }] });
     if (!r || r.etapa === c.etapa) return;
+    if (ETAPAS_PERDA.includes(r.etapa)) { const mp = await pedirMotivoPerda(c.nome); if (!mp) return; r.motivo = mp + (r.motivo ? ' (' + r.motivo + ')' : ''); }
     await agir($('#bEtapa'), () => api('etapa', { id: c.id, etapa: r.etapa, motivo: r.motivo }), 'Etapa alterada para ' + ETAPA[r.etapa]);
     delete S.cache['caso:' + id]; S.cache = {}; VIEWS.caso(id, true);
   };
