@@ -338,11 +338,21 @@ const API = 'https://emerim.app.n8n.cloud/webhook/fce-app-api';
 const CLIENT_ID = '407324250092-bdlt0qv9gu6uhlu5uo2nondcv3qktunu.apps.googleusercontent.com';
 const LINKS = {
   proposta: 'https://emerim.app.n8n.cloud/form/fce-proposta',
-  gabriel: 'https://emerim.app.n8n.cloud/webhook/fce-gabriel?c=J9EEVEVA',
-  marina: 'https://emerim.app.n8n.cloud/webhook/fce-marina?c=J9EEVEVA',
+  gabriel: 'https://emerim.app.n8n.cloud/webhook/fce-gabriel',
+  marina: 'https://emerim.app.n8n.cloud/webhook/fce-marina',
   beatriz: 'https://emerim.app.n8n.cloud/webhook/fce-beatriz?t=',
-  painel: 'https://emerim.app.n8n.cloud/webhook/fce-painel?c=J9EEVEVA'
+  painel: 'https://emerim.app.n8n.cloud/webhook/fce-painel'
 };
+// Os links já liberados (com o código de acesso) vêm da API, só depois do login; ficam guardados neste aparelho.
+try { Object.assign(LINKS, JSON.parse(localStorage.getItem('fce_links') || '{}')); } catch (e) {}
+async function carregarLinks() {
+  try {
+    const d = await api('links'); if (!d || !d.proposta) return;
+    const mudou = JSON.stringify(d) !== localStorage.getItem('fce_links');
+    Object.assign(LINKS, d); try { localStorage.setItem('fce_links', JSON.stringify(d)); } catch (e) {}
+    if (mudou && typeof rota === 'function' && !document.querySelector('.veu')) rota();
+  } catch (e) {}
+}
 // ---------- ícones (traços no estilo Lucide) ----------
 const IC = {
   recibo: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
@@ -516,12 +526,13 @@ async function aoLogar(resp) {
     if (!j || !j.ok) return telaLogin((j && j.erro) || 'Não foi possível entrar.');
     S.token = j.dados.token; S.eu = { nome: j.dados.nome, email: j.dados.email, foto: j.dados.foto };
     try { localStorage.setItem('fce_token', S.token); localStorage.setItem('fce_eu', JSON.stringify(S.eu)); } catch (e) {}
-    montar(); rota().then(() => setTimeout(preCarregar, 800));
+    montar(); rota().then(() => { carregarLinks(); setTimeout(preCarregar, 800); });
   } catch (e) { telaLogin('Sem conexão. Tente de novo.'); }
 }
 function sair(expirou) {
   const t = S.token; S.token = null; S.eu = null; S.cache = {}; limparLS();
-  try { localStorage.removeItem('fce_token'); localStorage.removeItem('fce_eu'); } catch (e) {}
+  try { localStorage.removeItem('fce_token'); localStorage.removeItem('fce_eu'); localStorage.removeItem('fce_links'); } catch (e) {}
+  LINKS.proposta = LINKS.proposta.split('?')[0]; LINKS.gabriel = LINKS.gabriel.split('?')[0]; LINKS.marina = LINKS.marina.split('?')[0]; LINKS.painel = LINKS.painel.split('?')[0];
   if (t && !expirou) fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-fce-token': t }, body: JSON.stringify({ acao: 'sair', token: t }) }).catch(() => {});
   try { google.accounts.id.disableAutoSelect(); } catch (e) {}
   telaLogin(expirou ? 'Sua sessão expirou. Entre de novo.' : '');
@@ -1369,7 +1380,7 @@ if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.j
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;
 
   document.head.appendChild(g);
-  if (S.token) { montar(); rota().then(() => setTimeout(preCarregar, 800)); } else telaLogin();
+  if (S.token) { montar(); rota().then(() => { carregarLinks(); setTimeout(preCarregar, 800); }); } else telaLogin();
 })();
 </script>
 </body>
