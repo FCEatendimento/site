@@ -495,7 +495,7 @@ function toast(msg, erro) {
   $$('.toast').forEach((t) => t.remove());
   const t = document.createElement('div'); t.className = 'toast' + (erro ? ' erro' : '');
   t.innerHTML = ic(erro ? 'alerta' : 'check', 's') + '<span>' + esc(msg) + '</span>';
-  document.body.appendChild(t); setTimeout(() => t.remove(), erro ? 5200 : 2800);
+  document.body.appendChild(t); setTimeout(() => t.remove(), erro ? 5200 : Math.min(9000, Math.max(2800, String(msg || '').length * 55)));
 }
 function modal({ titulo, corpo, botoes }) {
   return new Promise((res) => {
@@ -982,9 +982,11 @@ function ligarAba(k, c) {
     };
     const bd = $('#bDevolver');
     if (bd) bd.onclick = async () => {
-      const inst = await pedirTexto('Devolver para a Helena', 'A Helena volta a responder este cliente a partir da próxima mensagem dele, já sabendo tudo o que foi conversado. Se quiser, deixe uma orientação para ela (opcional).', 'Ex.: já expliquei o prazo do leilão; siga com a consulta.', false);
+      const inst = await pedirTexto('Devolver para a Helena', 'A Helena volta a atender este cliente já sabendo tudo o que foi conversado. Ela lê a sua orientação e, se for o caso, já manda uma mensagem ao cliente seguindo o que você pediu (por exemplo, oferecer os horários ou pedir documentos). Sem orientação, ela só responde se houver mensagem do cliente sem resposta.', 'Ex.: já expliquei o prazo do leilão; ofereça os horários da consulta.', false);
       if (inst === null) return;
-      await agir(bd, () => api('devolver', { id: c.id, texto: inst }), 'A Helena voltou a atender este cliente');
+      bd.dataset.lento = '1';
+      let r; try { r = await agir(bd, () => api('devolver', { id: c.id, texto: inst })); } catch (e) { return; }
+      toast((r && r.mensagem) || 'A Helena voltou a atender este cliente');
       S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
     };
   }
