@@ -323,6 +323,10 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .resp-st span{flex:1;min-width:200px}
 .resp-st.warn svg{color:var(--warn)}
 .resp-rod{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;flex-wrap:wrap}
+
+.toast.msg{text-decoration:none;color:#fff;font-weight:500;cursor:pointer;max-width:min(92vw,440px)}
+.lista-rica li{margin-bottom:8px}
+.lista-rica li .mut{margin-top:2px}
 </style>
 </head>
 <body>
@@ -527,10 +531,10 @@ function montar() {
   const eu = S.eu || {};
   const av = '<img src="fabio.jpg" alt="Dr. Fábio">';
   document.body.innerHTML = '<div class="app"><aside class="side"><div class="marca">' + logo('lg', '#ECECE8') + '<span>Gestão do escritório</span></div><nav class="nav">' +
-    MENU.map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + '</a>').join('') +
+    MENU.map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + (k === 'casos' ? '<span class="bdg" data-bdg-msg hidden></span>' : '') + '</a>').join('') +
     '</nav><div class="rodape"><div class="av">' + av + '</div><div style="min-width:0"><div class="n">' + esc((eu.nome || '').split(' ')[0] || 'Fábio') + '</div><div class="e">' + esc(eu.email || '') + '</div></div><button title="Sair" data-sair>' + ic('sair') + '</button></div></aside>' +
     '<div class="main"><header class="topo"><span class="topo-marca">' + logoMarca('lm') + '</span><h1 id="tit">Início</h1><div class="acoes" id="topoAcoes"></div><button class="btn fant ico" id="btnTema" title="Tema">' + ic('lua') + '</button><button class="btn fant ico" id="btnAtt" title="Atualizar">' + ic('att') + '</button></header><div class="conteudo" id="cont"></div>' + RODAPE + '</div>' +
-    '<nav class="tabbar">' + [['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovar', 'checks'], ['agenda', 'Agenda', 'cal'], ['mais', 'Mais', 'mais']].map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + '</a>').join('') + '</nav></div>';
+    '<nav class="tabbar">' + [['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovar', 'checks'], ['agenda', 'Agenda', 'cal'], ['mais', 'Mais', 'mais']].map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + (k === 'casos' ? '<span class="bdg" data-bdg-msg hidden></span>' : '') + '</a>').join('') + '</nav></div>';
   $('[data-sair]').onclick = async () => { if (await confirmar('Sair do app?', 'Você vai precisar entrar de novo com o Google.', 'Sair')) sair(); };
   const rb = $('.rod-lin'); if (rb) rb.onclick = () => $('.rod').classList.toggle('aberto');
   $('#btnAtt').onclick = () => { S.cache = {}; rota(true); };
@@ -606,6 +610,7 @@ VIEWS.inicio = async (_, forcar) => {
   const at = d.atencao || [];
   const ICO = { prazo: ['alerta', 'bad'], assinar: ['caneta', 'warn'], humano: ['pessoa', 'warn'], decisao: ['martelo', 'ouro'], consulta_paga: ['din', 'ok'] };
   let h = '<div class="ola"><h2>' + saud + ', ' + esc(nome) + '</h2><p>' + esc(fmtD(new Date(), { weekday: 'long', day: 'numeric', month: 'long' })) + '</p></div>';
+  h += cartaoMsgs();
   h += '<div class="kpis">' +
     kpi('Novos atendimentos', num(k.novos_7d), 'últimos 7 dias' + (delta ? ' · <b style="color:var(--' + (delta > 0 ? 'ok' : 'bad') + ')">' + (delta > 0 ? '+' : '') + delta + '</b>' : ''), 'pessoa', '#/casos') +
     kpi('Casos ativos', num(k.ativos), 'em andamento', 'casos', '#/casos') +
@@ -651,6 +656,7 @@ VIEWS.inicio = async (_, forcar) => {
   const nv = d.novos || [];
   if (nv.length) h += '<div class="sec-tit">Últimos atendimentos</div><div class="card lista">' + nv.map(linhaCaso).join('') + '</div>';
   $('#cont').innerHTML = h;
+  ligarCartaoMsgs();
   $$('[data-href]').forEach((el) => el.onclick = (e) => { if (!e.target.closest('a')) location.hash = el.dataset.href; });
 };
 function linhaCaso(c) {
@@ -685,6 +691,7 @@ VIEWS.casos = async (_, forcar) => {
 
 // ---------- CASO ----------
 VIEWS.caso = async (id, forcar) => {
+  if (/[?&]aba=conversa/.test(location.hash)) S.abaCaso = 'conversa';
   titulo('Caso', '<a class="btn fant sm" href="#/casos">' + ic('voltar', 's') + ' Casos</a>');
   if (!S.cache['caso:' + id]) carregando(4);
   const c = await dados('caso:' + id, 'caso', { id }, forcar);
@@ -828,10 +835,25 @@ const ABAS = {
 };
 const STATUS_PROP = { AGUARDANDO_DADOS: 'aguardando dados do cliente', DADOS_RECEBIDOS: 'gerando contrato', CONTRATO_ENVIADO: 'aguardando assinatura do cliente', ASSINADO_CLIENTE: 'falta sua assinatura', ASSINADO: 'assinado', COBRANCA_ENVIADA: 'contratado', CANCELADA: 'cancelada', FALHOU: 'falhou' };
 const EVT = { CRIACAO_CASO: 'Caso criado', ANALISE_JURIDICA: 'Análise jurídica feita', DOCUMENTO_RECEBIDO: 'Documento recebido', AVISO_FABIO: 'Aviso enviado a você', DECISAO_FABIO: 'Sua decisão', COBRANCA_CRIADA: 'Cobrança criada', COBRANCA_ENVIADA: 'Cobrança enviada', PAGAMENTO_RECEBIDO: 'Pagamento recebido', PROPOSTA_CRIADA: 'Proposta registrada', CONTRATO_GERADO: 'Contrato gerado', CONTRATO_ASSINADO: 'Contrato assinado', LEMBRETE_ENVIADO: 'Lembrete enviado ao cliente', ALERTA_PRAZO: 'Alerta de prazo', AGENDA_OFERECIDA: 'Horários oferecidos', AGENDA_CONFIRMADA: 'Consulta confirmada', AGENDA_CANCELADA: 'Consulta cancelada', ENCAMINHAMENTO_HUMANO: 'Pediu atendimento humano', CLASSIFICACAO: 'Classificação', EXTRACAO: 'Dados extraídos', KOMMO_SYNC: 'Sincronizado com o Kommo' };
-function lista(t, arr) { arr = Array.isArray(arr) ? arr.filter(Boolean) : []; return arr.length ? '<div class="pq" style="margin-top:12px;font-weight:650">' + esc(t) + '</div><ul class="lim pq">' + arr.map((x) => '<li>' + esc(typeof x === 'string' ? x : (x.descricao || x.texto || JSON.stringify(x))) + '</li>').join('') + '</ul>' : ''; }
+const FORCA = { FORTE: ['forte', 'ok'], MEDIO: ['médio', 'warn'], MÉDIO: ['médio', 'warn'], FRACO: ['fraco', ''] };
+function itemLista(x) {
+  if (x == null) return '';
+  if (typeof x !== 'object') return esc(String(x));
+  const tit = x.ponto || x.titulo || x.documento || x.pergunta || x.nome || x.tipo || '';
+  const det = x.indicio || x.descricao || x.detalhe || x.motivo || x.texto || x.por_que || x.porque || '';
+  const f = FORCA[String(x.forca || x.nivel || '').toUpperCase()];
+  const base = x.documento_base || x.fonte || '';
+  const resto = Object.entries(x).filter(([k, v]) => v && typeof v !== 'object' && !['ponto', 'titulo', 'documento', 'pergunta', 'nome', 'tipo', 'indicio', 'descricao', 'detalhe', 'motivo', 'texto', 'por_que', 'porque', 'forca', 'nivel', 'documento_base', 'fonte'].includes(k));
+  if (!tit && !det) return resto.map(([k, v]) => '<b>' + esc(k.replace(/_/g, ' ')) + ':</b> ' + esc(String(v))).join(' · ') || esc(JSON.stringify(x));
+  return (tit ? '<b>' + esc(tit) + '</b>' : '') + (f ? ' <span class="chip ' + f[1] + '" style="padding:1px 7px;font-size:11px">' + f[0] + '</span>' : '') +
+    (det ? '<div>' + esc(det) + '</div>' : '') + (base || resto.length ? '<div class="mut pp">' + [base ? 'Base: ' + esc(base) : ''].concat(resto.map(([k, v]) => esc(k.replace(/_/g, ' ')) + ': ' + esc(String(v)))).filter(Boolean).join(' · ') + '</div>' : '');
+}
+function lista(t, arr) { arr = Array.isArray(arr) ? arr.filter(Boolean) : []; return arr.length ? '<div class="pq" style="margin-top:12px;font-weight:650">' + esc(t) + '</div><ul class="lim pq lista-rica">' + arr.map((x) => '<li>' + itemLista(x) + '</li>').join('') + '</ul>' : ''; }
 function ligarAba(k, c) {
   if (k === 'conversa') {
     const ch = $('#chat'); if (ch) ch.scrollTop = ch.scrollHeight;
+    const ultIn = (c.mensagens || []).filter((x) => String(x.dir).toUpperCase() === 'INBOUND').map((x) => x.t).sort().pop();
+    if (ultIn) { marcarVista(c.id, ultIn); S.msgs = (S.msgs || []).filter((x) => x.caso_id !== c.id); badgeMsgs(); }
     const be = $('#bEnviarMsg');
     if (be) be.onclick = async () => {
       const t = $('#msgTxt').value.trim(); if (!t) return $('#msgTxt').focus();
@@ -1262,6 +1284,61 @@ VIEWS.conteudo = async (_, forcar) => {
     recarregar();
   });
 };
+// ---------- mensagens de clientes para você (conversas que estão com o Dr. Fábio) ----------
+const MSGV = 'fce_msg_vistas';
+function vistas() { try { return JSON.parse(localStorage.getItem(MSGV) || '{}'); } catch (e) { return {}; } }
+function marcarVista(casoId, t) { const v = vistas(); if (!v[casoId] || new Date(t) > new Date(v[casoId])) v[casoId] = t; try { localStorage.setItem(MSGV, JSON.stringify(v)); } catch (e) {} }
+function badgeMsgs() { const n = (S.msgs || []).length; $$('[data-bdg-msg]').forEach((b) => { b.hidden = !n; b.textContent = n > 99 ? '99+' : n; }); }
+S.msgs = []; S.avisadas = {};
+function notifSuportada() { return 'Notification' in window && 'serviceWorker' in navigator; }
+async function avisoSistema(m) {
+  if (!notifSuportada() || Notification.permission !== 'granted') return;
+  try { const r = await navigator.serviceWorker.ready; await r.showNotification('Mensagem de ' + (m.nome || 'cliente'), { body: String(m.texto || '').slice(0, 180), tag: 'caso-' + m.caso_id, icon: 'icon-192.png', badge: 'icon-192.png', data: { url: './#/caso/' + m.caso_id + '?aba=conversa' } }); } catch (e) {}
+}
+function toastMsg(m) {
+  $$('.toast').forEach((t) => t.remove());
+  const t = document.createElement('a'); t.className = 'toast msg'; t.href = '#/caso/' + m.caso_id + '?aba=conversa';
+  t.innerHTML = ic('chat', 's') + '<span><b>' + esc(m.nome || 'Cliente') + '</b> escreveu: ' + esc(String(m.texto || '').slice(0, 90)) + '</span>';
+  t.onclick = () => t.remove();
+  document.body.appendChild(t); setTimeout(() => t.remove(), 9000);
+}
+async function checarMensagens() {
+  if (!S.token || !$('.app')) return;
+  let l; try { l = await api('notificacoes'); } catch (e) { return; }
+  const v = vistas();
+  const aqui = (location.hash.match(/#\/caso\/([0-9a-f-]{36})/) || [])[1];
+  (l || []).forEach((x) => { if (aqui === x.caso_id && S.abaCaso === 'conversa') marcarVista(x.caso_id, x.t); });
+  const v2 = vistas();
+  const novas = (l || []).filter((x) => !v2[x.caso_id] || new Date(x.t) > new Date(v2[x.caso_id]));
+  S.msgs = novas; badgeMsgs();
+  const inedita = novas.filter((x) => S.avisadas[x.caso_id] !== x.t);
+  inedita.forEach((x) => { S.avisadas[x.caso_id] = x.t; });
+  if (inedita.length) {
+    if (document.visibilityState === 'visible') toastMsg(inedita[0]); else inedita.forEach(avisoSistema);
+    if (aqui && inedita.some((x) => x.caso_id === aqui)) { S.cache = {}; VIEWS.caso(aqui, true); }
+    else if (document.visibilityState === 'visible' && /^(#\/?(inicio)?)?$/.test(location.hash) && !$('.veu')) { rota(); }
+  }
+}
+function cartaoMsgs() {
+  const m = S.msgs || [];
+  const pedir = notifSuportada() && Notification.permission === 'default';
+  if (!m.length && !pedir) return '';
+  let h = '<div class="card msgs-card" style="margin-top:16px"><div class="cab"><h2>' + ic('chat', 's') + ' Mensagens para você</h2><div class="dir">' + (m.length ? '<span class="bdg r">' + m.length + '</span>' : '') + '</div></div><div class="lista" style="margin-top:6px">';
+  m.forEach((x) => { h += '<a class="item" href="#/caso/' + x.caso_id + '?aba=conversa"><div class="ic-circ warn">' + ic('chat', 's') + '</div><div class="mid"><div class="t">' + esc(x.nome || 'Cliente') + '</div><div class="d">' + esc(String(x.texto || '').slice(0, 120)) + ' · ' + esc(quando(x.t)) + '</div></div>' + ic('seta', 's') + '</a>'; });
+  if (!m.length) h += '<div class="vazio" style="padding:10px">Nenhuma mensagem nova de clientes nas conversas que estão com você.</div>';
+  h += '</div>' + (pedir ? '<div style="padding:4px 16px 14px"><button class="btn sm" id="bNotif">' + ic('sino', 's') + ' Ativar notificações neste aparelho</button></div>' : '') + '</div>';
+  return h;
+}
+function ligarCartaoMsgs() {
+  const b = $('#bNotif');
+  if (b) b.onclick = async () => {
+    try { const r = await Notification.requestPermission(); toast(r === 'granted' ? 'Notificações ativadas neste aparelho' : 'Notificações não permitidas. Dá para mudar nos ajustes do navegador.', r !== 'granted'); } catch (e) { toast('Este navegador não aceita notificações.', true); }
+    rota();
+  };
+}
+setInterval(checarMensagens, 30000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setTimeout(checarMensagens, 1500); });
+setTimeout(checarMensagens, 2500);
 // ---------- início ----------
 if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
 (function boot() {
