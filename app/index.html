@@ -356,6 +356,8 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .so-cel{display:none}
 @media (max-width:900px){.kcol{flex-basis:82vw;max-height:none}}
 @media (max-width:760px){.so-cel{display:inline}}
+
+.doc-acoes{display:flex;gap:6px;flex:none;align-items:center}
 </style>
 </head>
 <body>
@@ -381,6 +383,8 @@ async function carregarLinks() {
 }
 // ---------- ícones (traços no estilo Lucide) ----------
 const IC = {
+  olho: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  baixar: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
   lista: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
   quadro: '<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/>',
   recibo: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
@@ -897,8 +901,10 @@ const ABAS = {
     let h = '<div class="card lista">';
     if (!d.length) h += '<div class="vazio">' + ic('doc') + '<div>Nenhum documento recebido.</div></div>';
     d.forEach((x, i) => {
-      h += '<div class="item clic" data-doc="' + i + '"><div class="ic-circ info">' + ic('doc', 's') + '</div><div class="mid"><div class="t">' + esc(x.tipo_documento || x.nome || 'Documento') + '</div><div class="d">' + esc(x.nome || '') + ' · ' + esc(quando(x.recebido_em, true)) + '</div>' +
-        '<div class="d det" hidden style="margin-top:8px;white-space:pre-wrap">' + esc(x.trecho || 'Sem texto extraído.') + '</div></div>' + ic('seta', 's') + '</div>';
+      const tam = x.tamanho_bytes ? ' · ' + (x.tamanho_bytes > 1048576 ? (x.tamanho_bytes / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(x.tamanho_bytes / 1024)) + ' KB') : '';
+      h += '<div class="item clic" data-doc="' + i + '"><div class="ic-circ info">' + ic('doc', 's') + '</div><div class="mid"><div class="t">' + esc(x.tipo_documento || x.nome || 'Documento') + '</div><div class="d">' + esc(x.nome || '') + ' · ' + esc(quando(x.recebido_em, true)) + esc(tam) + '</div>' +
+        '<div class="d det" hidden style="margin-top:8px;white-space:pre-wrap">' + esc(x.trecho || 'Sem texto extraído.') + '</div></div>' +
+        (x.tem_arquivo ? '<div class="doc-acoes"><button class="btn sm" data-ver="' + x.id + '">' + ic('olho', 's') + '<span> Ver</span></button><button class="btn sm fant" data-baixar="' + x.id + '">' + ic('baixar', 's') + '<span class="so-desk"> Baixar</span></button></div>' : '<span class="pp mut" title="Recebido antes de o sistema guardar os arquivos">sem arquivo</span>') + '</div>';
     });
     h += '</div>';
     if (p.length) h += '<div class="sec-tit">Documentos pedidos ao cliente</div><div class="card lista">' + p.map((x) => '<div class="item"><div class="dot ' + (x.status === 'RECEBIDO' ? 'ok' : x.obrigatoria ? 'warn' : '') + '"></div><div class="mid"><div class="t">' + esc(x.tipo_documento || '') + '</div><div class="d">' + esc(x.descricao || '') + '</div></div><span class="chip">' + esc(String(x.status || '').toLowerCase()) + '</span></div>').join('') + '</div>';
@@ -982,7 +988,20 @@ function ligarAba(k, c) {
       S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
     };
   }
-  if (k === 'docs') $$('[data-doc]').forEach((el) => el.onclick = () => { const d = $('.det', el); d.hidden = !d.hidden; });
+  if (k === 'docs') {
+    $$('[data-doc]').forEach((el) => el.onclick = (e) => { if (e.target.closest('button')) return; const d = $('.det', el); d.hidden = !d.hidden; });
+    const abrir = async (b, id, baixar) => {
+      // abre a aba já no clique (o Safari bloqueia janelas abertas depois de esperar a resposta)
+      const w = baixar ? null : window.open('about:blank', '_blank');
+      try {
+        const d = await agir(b, () => api('doc_link', { id, baixar }));
+        if (!d || !d.url) { if (w) w.close(); return toast('O arquivo original deste documento não está guardado.', true); }
+        if (w) w.location.href = d.url; else { const a = document.createElement('a'); a.href = d.url; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); }
+      } catch (e) { if (w) w.close(); }
+    };
+    $$('[data-ver]').forEach((b) => b.onclick = (e) => { e.stopPropagation(); abrir(b, b.dataset.ver, false); });
+    $$('[data-baixar]').forEach((b) => b.onclick = (e) => { e.stopPropagation(); abrir(b, b.dataset.baixar, true); });
+  }
   if (k === 'prazos') {
     $$('[data-prazo]').forEach((b) => b.onclick = async () => { await agir(b, () => api('prazo', { id: b.dataset.prazo, status: b.dataset.st }), 'Prazo atualizado'); S.cache = {}; VIEWS.caso(c.id, true); });
     $$('[data-cons]').forEach((b) => b.onclick = async () => { await agir(b, () => api('consulta', { id: c.id, status: b.dataset.cons }), 'Consulta marcada como ' + (b.dataset.cons === 'FALTOU' ? 'falta' : 'realizada')); S.cache = {}; VIEWS.caso(c.id, true); });
