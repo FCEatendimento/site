@@ -293,7 +293,7 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 @media print{.rod{display:none}}
 .lg-mais{width:220px;height:auto;color:var(--txt)}
 .rod-mais{display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--mut)}.rod-mais .rb b{font-size:13px}
-[data-bdg][hidden]{display:none!important}
+[data-bdg][hidden],[data-bdg-msg][hidden]{display:none!important}
 
 /* calendário de conteúdo */
 .cal-sem{margin-top:12px}.cal-sem .cab h2{font-size:15px}
@@ -327,6 +327,9 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .toast.msg{text-decoration:none;color:#fff;font-weight:500;cursor:pointer;max-width:min(92vw,440px)}
 .lista-rica li{margin-bottom:8px}
 .lista-rica li .mut{margin-top:2px}
+
+.dica-etapa{margin:-2px 2px 12px;padding:9px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:13.5px;line-height:1.45;color:var(--txt);box-shadow:var(--sh);animation:sobe .15s}
+.dica-etapa b{font-weight:650}
 </style>
 </head>
 <body>
@@ -668,6 +671,20 @@ function linhaCaso(c) {
     '<span class="pp mut">' + esc(quando(c.last_message_at || c.created_at, true)) + '</span></div></a>';
 }
 // ---------- CASOS ----------
+const DICA_ETAPA = {
+  '': 'Mostra todos os casos, em qualquer fase.',
+  NOVO_LEAD: 'Pessoa que acabou de chegar (WhatsApp, site ou calculadora) e ainda não foi atendida pela Helena.',
+  EM_ATENDIMENTO: 'A Helena está conversando com o cliente: entende a situação, reúne os dados do caso e apresenta a consulta.',
+  EM_ANALISE: 'A Helena já reuniu o essencial e o caso passa pela análise jurídica automática (viabilidade, possíveis vícios, documentos que faltam).',
+  DECISAO_FABIO: 'A análise terminou e o caso espera você decidir: aceitar, pedir mais informações ou recusar.',
+  PROPOSTA_ENVIADA: 'Você registrou a proposta de honorários; o Otávio enviou ao cliente e aguarda os dados e a assinatura do contrato.',
+  CONTRATADO: 'Contrato assinado pelas duas partes e cobrança dos honorários emitida. Cliente fechado.',
+  EM_EXECUCAO: 'O trabalho jurídico está em andamento: peças, medidas e prazos sendo acompanhados.',
+  ACOMPANHAMENTO: 'A fase principal terminou; o caso segue acompanhado (andamento do processo, prazos e contato periódico com o cliente).',
+  ENCERRADO: 'Caso concluído depois da contratação.',
+  ENCERRADO_SEM_CONTRATO: 'Atendimento encerrado sem contratação: o cliente desistiu, parou de responder ou não fechou.',
+  FORA_DO_PERFIL: 'Assunto fora da área do escritório (leilão de imóveis). A Helena acolheu, resumiu e encaminhou para você.'
+};
 VIEWS.casos = async (_, forcar) => {
   titulo('Casos');
   const q = new URLSearchParams(location.hash.split('?')[1] || '');
@@ -675,7 +692,7 @@ VIEWS.casos = async (_, forcar) => {
   if (q.get('etapa')) f.etapa = q.get('etapa');
   $('#cont').innerHTML = '<div style="display:flex;gap:8px;margin-top:10px"><label class="busca">' + ic('busca', 's') + '<input id="bq" placeholder="Buscar por nome, telefone ou assunto" value="' + esc(f.q) + '" autocomplete="off"></label>' +
     '<select class="sel" id="bp" style="width:auto"><option value="">Todos os perfis</option>' + Object.entries(PERFIL).map(([k, v]) => '<option value="' + k + '"' + (f.perfil === k ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div>' +
-    '<div class="filtros" id="bf"><button data-e="" class="' + (f.etapa ? '' : 'on') + '">Todas</button>' + ETAPAS.map((e) => '<button data-e="' + e + '" class="' + (f.etapa === e ? 'on' : '') + '">' + ETAPA[e] + '</button>').join('') + '</div><div id="lc"></div>';
+    '<div class="filtros" id="bf"><button data-e="" class="' + (f.etapa ? '' : 'on') + '" data-dica="' + esc(DICA_ETAPA['']) + '">Todas</button>' + ETAPAS.map((e) => '<button data-e="' + e + '" class="' + (f.etapa === e ? 'on' : '') + '" data-dica="' + esc(DICA_ETAPA[e] || '') + '">' + ETAPA[e] + '</button>').join('') + '</div><div class="dica-etapa" id="dicaEtapa" hidden></div><div id="lc"></div>';
   const carregar = async (forc) => {
     $('#lc').innerHTML = '<div class="esq" style="height:240px"></div>';
     try {
@@ -685,7 +702,13 @@ VIEWS.casos = async (_, forcar) => {
   };
   let tmr; $('#bq').oninput = (e) => { clearTimeout(tmr); tmr = setTimeout(() => { f.q = e.target.value.trim(); carregar(); }, 320); };
   $('#bp').onchange = (e) => { f.perfil = e.target.value; carregar(); };
-  $$('#bf button').forEach((b) => b.onclick = () => { f.etapa = b.dataset.e; $$('#bf button').forEach((x) => x.classList.toggle('on', x === b)); carregar(); });
+  let tDica;
+  const mostrarDica = (b, fixa) => { const d = $('#dicaEtapa'); clearTimeout(tDica); d.innerHTML = '<b>' + esc(b.textContent) + ':</b> ' + esc(b.dataset.dica || ''); d.hidden = false; if (fixa) tDica = setTimeout(() => { d.hidden = true; }, 7000); };
+  const esconderDica = () => { clearTimeout(tDica); tDica = setTimeout(() => { $('#dicaEtapa').hidden = true; }, 150); };
+  $$('#bf button').forEach((b) => {
+    b.onclick = () => { f.etapa = b.dataset.e; $$('#bf button').forEach((x) => x.classList.toggle('on', x === b)); mostrarDica(b, true); carregar(); };
+    if (matchMedia('(hover: hover)').matches) { b.onmouseenter = () => mostrarDica(b); b.onmouseleave = esconderDica; }
+  });
   carregar(forcar);
 };
 
