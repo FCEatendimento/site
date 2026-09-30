@@ -330,6 +330,32 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 
 .dica-etapa{margin:-2px 2px 12px;padding:9px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:13.5px;line-height:1.45;color:var(--txt);box-shadow:var(--sh);animation:sobe .15s}
 .dica-etapa b{font-weight:650}
+
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;height:32px;padding:0 10px;display:inline-flex;align-items:center;gap:4px;font:600 13px var(--sans);color:var(--mut);cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff}
+.kanban{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 14px;scroll-snap-type:x mandatory;align-items:flex-start}
+.kcol{flex:0 0 268px;scroll-snap-align:start;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;max-height:calc(100vh - 250px)}
+.kcol.fechada{opacity:.85}
+.kcol.alvo{outline:2px dashed var(--gold);outline-offset:-2px}
+.kcol header{display:flex;align-items:center;gap:8px;padding:11px 12px 9px;font-weight:650;font-size:13.5px;cursor:help}
+.kcol header b{margin-left:auto;font-size:12px;min-width:22px;height:20px;border-radius:99px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;padding:0 6px;color:var(--mut)}
+.kdot{width:9px;height:9px;border-radius:50%;background:var(--mut-2);flex:none}
+.kdot.info{background:var(--info)}.kdot.ouro{background:var(--gold)}.kdot.warn{background:var(--warn)}.kdot.ok{background:var(--ok)}
+.kcards{display:flex;flex-direction:column;gap:8px;padding:0 10px 10px;overflow-y:auto}
+.kvazio{color:var(--mut-2);text-align:center;padding:10px 0;font-size:13px}
+.kcard{display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 11px;box-shadow:var(--sh);text-decoration:none;color:inherit;cursor:pointer}
+.kcard:hover{border-color:var(--gold)}
+.kcard.arrastando{opacity:.45}
+.kcard .kt{display:flex;align-items:center;gap:8px}
+.kcard .kn{font-weight:650;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcard .av.sm{width:26px;height:26px;font-size:11px;flex:none}
+.kcard .kd{font-size:12.5px;color:var(--mut);margin-top:4px}
+.kcard .kchips{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:7px}
+.kcard .kchips .chip{padding:1px 7px;font-size:11px}
+.so-cel{display:none}
+@media (max-width:900px){.kcol{flex-basis:82vw;max-height:none}}
+@media (max-width:760px){.so-cel{display:inline}}
 </style>
 </head>
 <body>
@@ -355,6 +381,8 @@ async function carregarLinks() {
 }
 // ---------- ícones (traços no estilo Lucide) ----------
 const IC = {
+  lista: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
+  quadro: '<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/>',
   recibo: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
   casos: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>',
@@ -673,12 +701,54 @@ VIEWS.inicio = async (_, forcar) => {
   ligarCartaoMsgs();
   $$('[data-href]').forEach((el) => el.onclick = (e) => { if (!e.target.closest('a')) location.hash = el.dataset.href; });
 };
+// ---------- quadro por fase (kanban) ----------
+const COR_ETAPA = { NOVO_LEAD: 'info', EM_ATENDIMENTO: 'info', EM_ANALISE: 'ouro', DECISAO_FABIO: 'warn', PROPOSTA_ENVIADA: 'ouro', CONTRATADO: 'ok', EM_EXECUCAO: 'ok', ACOMPANHAMENTO: 'ok', ENCERRADO: '', ENCERRADO_SEM_CONTRATO: '', FORA_DO_PERFIL: '' };
+function quadroCasos(l) {
+  const por = {}; ETAPAS.forEach((e) => { por[e] = []; }); l.forEach((c) => { (por[c.etapa] || (por[c.etapa] = [])).push(c); });
+  const fechadas = ['ENCERRADO', 'ENCERRADO_SEM_CONTRATO', 'FORA_DO_PERFIL'];
+  let h = '<div class="pq mut" style="margin:0 2px 8px">' + l.length + ' caso' + (l.length === 1 ? '' : 's') + ' · <span class="so-desk">arraste um cartão para outra coluna para mudar a fase</span><span class="so-cel">deslize para o lado para ver as outras fases</span></div><div class="kanban" id="kanban">';
+  ETAPAS.forEach((e) => {
+    const cs = por[e] || [];
+    h += '<section class="kcol ' + (fechadas.includes(e) ? 'fechada' : '') + '" data-etapa="' + e + '"><header title="' + esc(DICA_ETAPA[e] || '') + '"><i class="kdot ' + (COR_ETAPA[e] || '') + '"></i><span>' + esc(ETAPA[e]) + '</span><b>' + cs.length + '</b></header><div class="kcards">';
+    if (!cs.length) h += '<div class="kvazio">—</div>';
+    cs.forEach((c) => {
+      const u = URG[c.urgencia], cr = c.proxima_data_critica ? faltam(c.proxima_data_critica) : null;
+      h += '<a class="kcard" draggable="true" data-id="' + c.id + '" data-nome="' + esc(c.nome) + '" href="#/caso/' + c.id + '"><div class="kt"><span class="av sm">' + esc(iniciais(c.nome)) + '</span><span class="kn">' + esc(c.nome) + '</span></div>' +
+        '<div class="kd">' + [c.perfil ? PERFIL[c.perfil] || c.perfil : '', c.origem_canal ? CANAL[c.origem_canal] || c.origem_canal : ''].filter(Boolean).map(esc).join(' · ') + '</div>' +
+        '<div class="kchips">' + (u && ['CRITICA', 'ALTA'].includes(c.urgencia) ? '<span class="chip ' + u[1] + '">' + esc(u[0]) + '</span>' : '') + (cr && cr.c ? '<span class="chip ' + cr.c + '">' + esc(cr.t) + '</span>' : '') +
+        (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">com você</span>' : '') + '<span class="pp mut" style="margin-left:auto">' + esc(quando(c.last_message_at || c.created_at, true)) + '</span></div></a>';
+    });
+    h += '</div></section>';
+  });
+  return h + '</div>';
+}
+function ligarQuadro(recarregar) {
+  if (!matchMedia('(hover: hover)').matches) return;
+  let arrastando = null;
+  $$('.kcard').forEach((k) => {
+    k.ondragstart = (ev) => { arrastando = k; k.classList.add('arrastando'); ev.dataTransfer.effectAllowed = 'move'; try { ev.dataTransfer.setData('text/plain', k.dataset.id); } catch (e) {} };
+    k.ondragend = () => { k.classList.remove('arrastando'); $$('.kcol').forEach((c) => c.classList.remove('alvo')); };
+  });
+  $$('.kcol').forEach((col) => {
+    col.ondragover = (ev) => { if (!arrastando) return; ev.preventDefault(); col.classList.add('alvo'); };
+    col.ondragleave = (ev) => { if (!col.contains(ev.relatedTarget)) col.classList.remove('alvo'); };
+    col.ondrop = async (ev) => {
+      ev.preventDefault(); col.classList.remove('alvo');
+      const k = arrastando; arrastando = null; if (!k) return;
+      const de = k.closest('.kcol').dataset.etapa, para = col.dataset.etapa; if (de === para) return;
+      const ok = await confirmar('Mudar fase', 'Mover ' + k.dataset.nome + ' de "' + ETAPA[de] + '" para "' + ETAPA[para] + '"? A mudança fica no histórico e aciona o agente da nova fase.', 'Mover');
+      if (!ok) return;
+      try { await agir(null, () => api('etapa', { id: k.dataset.id, etapa: para, motivo: 'Movido no quadro do app' }), 'Caso movido para ' + ETAPA[para]); } catch (e) { return; }
+      S.cache = {}; recarregar();
+    };
+  });
+}
 function linhaCaso(c) {
   const cr = c.proxima_data_critica ? faltam(c.proxima_data_critica) : null;
   return '<a class="item" href="#/caso/' + c.id + '"><div class="av">' + esc(iniciais(c.nome)) + '</div><div class="mid"><div class="t">' + esc(c.nome) + '</div><div class="d">' +
     [c.perfil ? PERFIL[c.perfil] || c.perfil : '', c.origem_canal ? CANAL[c.origem_canal] || c.origem_canal : '', c.titulo || ''].filter(Boolean).map(esc).join(' · ') + '</div>' +
     (c.resumo ? '<div class="d" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(c.resumo) + '</div>' : '') + '</div><div class="dir">' + chipEtapa(c.etapa) +
-    (cr && cr.c ? '<span class="chip ' + cr.c + '">' + ic('alerta', 's') + esc(cr.t) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">quer falar com você</span>' : '') +
+    (cr && cr.c ? '<span class="chip ' + cr.c + '">' + ic('alerta', 's') + esc(cr.t) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">com você</span>' : '') +
     '<span class="pp mut">' + esc(quando(c.last_message_at || c.created_at, true)) + '</span></div></a>';
 }
 // ---------- CASOS ----------
@@ -697,16 +767,26 @@ const DICA_ETAPA = {
   FORA_DO_PERFIL: 'Assunto fora da área do escritório (leilão de imóveis). A Helena acolheu, resumiu e encaminhou para você.'
 };
 VIEWS.casos = async (_, forcar) => {
-  titulo('Casos');
+  try { S.modoCasos = S.modoCasos || localStorage.getItem('fce_modo_casos') || 'lista'; } catch (e) { S.modoCasos = S.modoCasos || 'lista'; }
+  const quadro = S.modoCasos === 'quadro';
+  titulo('Casos', '<div class="seg" id="modoCasos"><button data-m="lista" class="' + (quadro ? '' : 'on') + '" title="Lista">' + ic('lista', 's') + '<span class="so-desk"> Lista</span></button><button data-m="quadro" class="' + (quadro ? 'on' : '') + '" title="Quadro por fase">' + ic('quadro', 's') + '<span class="so-desk"> Quadro</span></button></div>');
+  $$('#modoCasos button').forEach((b) => b.onclick = () => { S.modoCasos = b.dataset.m; try { localStorage.setItem('fce_modo_casos', S.modoCasos); } catch (e) {} VIEWS.casos(_, false); });
   const q = new URLSearchParams(location.hash.split('?')[1] || '');
   const f = S.filtroCasos = S.filtroCasos || { q: '', etapa: '', perfil: '' };
   if (q.get('etapa')) f.etapa = q.get('etapa');
   $('#cont').innerHTML = '<div style="display:flex;gap:8px;margin-top:10px"><label class="busca">' + ic('busca', 's') + '<input id="bq" placeholder="Buscar por nome, telefone ou assunto" value="' + esc(f.q) + '" autocomplete="off"></label>' +
     '<select class="sel" id="bp" style="width:auto"><option value="">Todos os perfis</option>' + Object.entries(PERFIL).map(([k, v]) => '<option value="' + k + '"' + (f.perfil === k ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div>' +
     '<div class="filtros" id="bf"><button data-e="" class="' + (f.etapa ? '' : 'on') + '" data-dica="' + esc(DICA_ETAPA['']) + '">Todas</button>' + ETAPAS.map((e) => '<button data-e="' + e + '" class="' + (f.etapa === e ? 'on' : '') + '" data-dica="' + esc(DICA_ETAPA[e] || '') + '">' + ETAPA[e] + '</button>').join('') + '</div><div class="dica-etapa" id="dicaEtapa" hidden></div><div id="lc"></div>';
+  if (quadro) $('#bf').style.display = 'none';
   const carregar = async (forc) => {
     $('#lc').innerHTML = '<div class="esq" style="height:240px"></div>';
     try {
+      if (quadro) {
+        const fq = { q: f.q, etapa: '', perfil: f.perfil };
+        const lq = await dados('casos:' + JSON.stringify(fq), 'casos', fq, forc);
+        $('#lc').innerHTML = quadroCasos(lq); ligarQuadro(() => carregar(true));
+        return;
+      }
       const l = await dados('casos:' + JSON.stringify(f), 'casos', f, forc);
       $('#lc').innerHTML = l.length ? '<div class="pq mut" style="margin:0 2px 8px">' + l.length + ' caso' + (l.length > 1 ? 's' : '') + '</div><div class="card lista">' + l.map(linhaCaso).join('') + '</div>' : '<div class="card"><div class="vazio">' + ic('casos') + '<div>Nenhum caso ' + (f.q || f.etapa || f.perfil ? 'com esses filtros' : 'ainda') + '.</div></div></div>';
     } catch (e) { $('#lc').innerHTML = '<div class="card"><div class="vazio">' + esc(e.message) + '</div></div>'; }
