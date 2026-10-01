@@ -358,6 +358,12 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
               <option value="leilao_marcado">Já tem data de leilão marcada</option>
               <option value="leilao_realizado">O leilão já aconteceu</option>
             </select></div>
+          <div class="campo largo"><label for="tipo_operacao">Que tipo de contrato é?</label>
+            <select id="tipo_operacao" name="tipo_operacao" required>
+              <option value="residencial">Financiamento para comprar ou construir imóvel residencial</option>
+              <option value="comercial">Financiamento de imóvel comercial (sala, loja, galpão, terreno)</option>
+              <option value="garantia">Empréstimo com o imóvel dado em garantia</option>
+            </select><small>Faz diferença: fora do financiamento residencial, a dívida pode continuar mesmo depois do leilão.</small></div>
           <div class="campo largo"><label for="valor_imovel">Quanto vale o imóvel hoje?</label><div class="moeda"><span>R$</span><input id="valor_imovel" inputmode="numeric" data-moeda required></div><small>Valor aproximado de venda no mercado.</small></div>
           <div class="campo"><label for="mes_compra">Quando assinou o financiamento?</label><div class="duplo"><select id="mes_compra" aria-label="Mês"><option value="1">janeiro</option><option value="2">fevereiro</option><option value="3">março</option><option value="4">abril</option><option value="5">maio</option><option value="6">junho</option><option value="7">julho</option><option value="8">agosto</option><option value="9">setembro</option><option value="10">outubro</option><option value="11">novembro</option><option value="12">dezembro</option></select><select id="ano_compra" aria-label="Ano"><option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option><option value="2020">2020</option><option value="2019">2019</option><option value="2018" selected>2018</option><option value="2017">2017</option><option value="2016">2016</option><option value="2015">2015</option><option value="2014">2014</option><option value="2013">2013</option><option value="2012">2012</option><option value="2011">2011</option><option value="2010">2010</option><option value="2009">2009</option><option value="2008">2008</option><option value="2007">2007</option><option value="2006">2006</option><option value="2005">2005</option><option value="2004">2004</option><option value="2003">2003</option><option value="2002">2002</option><option value="2001">2001</option><option value="2000">2000</option><option value="1999">1999</option><option value="1998">1998</option><option value="1997">1997</option><option value="1996">1996</option><option value="1995">1995</option></select></div></div>
           <div class="campo"><label for="preco_compra">Valor do imóvel na compra</label><div class="moeda"><span>R$</span><input id="preco_compra" inputmode="numeric" data-moeda required></div></div>
@@ -397,7 +403,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
         <div class="cenarios">
           <div class="cen"><h3>Se o imóvel for vendido no 1º leilão</h3><div class="v" id="r-c1"></div><p>O lance mínimo costuma ser o valor do imóvel. O que sobrar depois de pagar a dívida e as despesas volta para você.</p></div>
           <div class="cen"><h3>Se for vendido no 2º leilão</h3><div class="v" id="r-c2"></div><p>No 2º leilão, o imóvel pode ser vendido por bem menos: o suficiente para cobrir a dívida e as despesas, respeitado um valor mínimo em relação à avaliação. O que sobra para você diminui muito.</p></div>
-          <div class="cen pior"><h3>Se não houver lance no 2º leilão</h3><div class="v" id="r-c3">R$ 0</div><p>O banco pode ficar com o imóvel e, em regra, você não recebe nada do patrimônio construído.</p></div>
+          <div class="cen pior"><h3>Se não houver lance no 2º leilão</h3><div class="v" id="r-c3">R$ 0</div><p id="r-c3-txt">O banco pode ficar com o imóvel e, em regra, você não recebe nada do patrimônio construído.</p></div>
         </div>
 
         <div class="aluguel">
@@ -504,6 +510,17 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     $("f-barra").innerHTML='<div class="b-ent" style="width:'+pe+'%">'+(pe>16?brl(ent):"")+'</div><div class="b-amo" style="width:'+pa+'%">'+(pa>16?brl(r.amort):"")+'</div><div class="b-jur" style="width:'+pj+'%">'+(pj>16?brl(r.juros):"")+'</div>';
     $("f-futuro").innerHTML=faltam>0?"Ainda faltariam <b>"+faltam+" parcelas</b>, somando cerca de <b>"+brl(r.futT)+"</b>, dos quais <b>"+brl(r.futJ)+"</b> seriam juros. O saldo devedor estimado hoje é de <b>"+brl(r.saldo)+"</b>"+(sInf?" (você informou "+brl(sInf)+"; usamos o seu valor no restante da simulação)":"")+"."+(parc&&r.prox?" Pelo modelo, a parcela estaria em torno de "+brl(r.prox)+" sem seguros e taxas; você informou "+brl(parc)+".":""):"Pelos dados informados, o prazo do financiamento já teria terminado.";
     var desp=Math.round(v*0.05), pat=Math.max(0,v-s), c1=Math.max(0,v-s-desp), c2=Math.max(0,0.5*v-s-desp);
+    var tipo=$("tipo_operacao").value||"residencial", resid=tipo==="residencial";
+    // Lei 9.514/97, art. 27 (redação da Lei 14.711/2023): fora do financiamento residencial, a dívida não é extinta;
+    // o saldo que o leilão não cobrir continua devido, abatido o valor mínimo de referência (metade da avaliação).
+    var resto=resid?0:Math.max(0,Math.round(s+desp-0.5*v));
+    if(resid){
+      $("r-c3").textContent="R$ 0";
+      $("r-c3-txt").textContent="O banco pode ficar com o imóvel e, em regra, você não recebe nada do patrimônio construído. No financiamento residencial, a dívida é considerada quitada.";
+    } else {
+      $("r-c3").textContent=resto>0?"− "+brl(resto):"R$ 0";
+      $("r-c3-txt").textContent=resto>0?"Você perde o imóvel e o patrimônio construído e, como não é financiamento residencial, a dívida não é extinta: pode continuar devendo cerca de "+brl(resto)+", que o banco pode cobrar na Justiça.":"Você perde o imóvel e o patrimônio construído. Como não é financiamento residencial, se o valor obtido não cobrir a dívida, o saldo continua podendo ser cobrado.";
+    }
     $("r-pat").innerHTML=brl(pat);
     $("r-pat-txt").textContent=(pat>0?"É a diferença entre o valor do imóvel hoje ("+brl(v)+") e o saldo devedor ("+brl(s)+").":"Pelos valores informados, a dívida já está perto ou acima do valor do imóvel.")+(parc&&atr?" As parcelas em atraso somam cerca de "+brl(parc*atr)+".":"");
     var tot=Math.max(v,s+desp), pD=Math.min(100,s/tot*100), pE=Math.min(100-pD,desp/tot*100), pP=Math.max(0,100-pD-pE);
@@ -512,10 +529,10 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     var al=Math.round(v*0.01); $("r-al").textContent=brl(al); $("r-al6").textContent=brl(al*6); $("r-al12").textContent=brl(al*12); $("r-al24").textContent=brl(al*24);
     $("r-fase").textContent=FASE[fase]||"";
     var faseTxt=$("fase").options[$("fase").selectedIndex].text;
-    var msg="Olá! Vim pelo site da FCE e fiz a simulação da calculadora. Situação: "+faseTxt+". Imóvel de cerca de "+brl(v)+", financiado em "+String(mes).padStart(2,"0")+"/"+ano+", saldo devedor de cerca de "+brl(s)+(atr?", "+atr+" parcela(s) em atraso":"")+". Gostaria de entender minha situação.";
+    var msg="Olá! Vim pelo site da FCE e fiz a simulação da calculadora. Situação: "+faseTxt+". Contrato: "+$("tipo_operacao").options[$("tipo_operacao").selectedIndex].text+". Imóvel de cerca de "+brl(v)+", financiado em "+String(mes).padStart(2,"0")+"/"+ano+", saldo devedor de cerca de "+brl(s)+(atr?", "+atr+" parcela(s) em atraso":"")+". Gostaria de entender minha situação.";
     $("b-wa").href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
     mostrar("resultado");
-    ultimo={acao:"simulacao",id:leadId||"",fase:fase,valor_imovel:v,saldo_devedor:s,valor_parcela:parc,parcelas_atraso:atr,ja_pago:Math.round(totalPago),patrimonio:pat,risco_max:pat,despesas:desp,taxa_ocupacao:al,
+    ultimo={acao:"simulacao",id:leadId||"",fase:fase,valor_imovel:v,saldo_devedor:s,valor_parcela:parc,parcelas_atraso:atr,ja_pago:Math.round(totalPago),patrimonio:pat,risco_max:pat+resto,saldo_remanescente:resto,tipo_operacao:tipo,despesas:desp,taxa_ocupacao:al,
       data_compra:ano+"-"+String(mes).padStart(2,"0"),preco_compra:preco,entrada:ent,prazo_anos:anos,sistema:sis,taxa_aa:aa,juros_pagos:Math.round(r.juros),amortizado:Math.round(r.amort),saldo_estimado:Math.round(r.saldo),juros_futuros:Math.round(r.futJ)};
     if(leadId) enviar(ultimo).catch(function(){});
   });
