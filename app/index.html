@@ -437,6 +437,18 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .btns-doc{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .proc-caso{margin-bottom:12px}.proc-caso .and-novo textarea{min-height:38px}
 @media (max-width:560px){.item.exito,.item.com{flex-wrap:wrap}.item.exito .mid,.item.com .mid{flex-basis:calc(100% - 48px)}.item.exito .dir,.item.com .dir{width:100%;flex-direction:row!important;justify-content:flex-end;align-items:center}}
+.tlogo.xs{width:22px;height:16px;padding:1px 2px;border-radius:4px}
+.prz-leg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:12px 16px 0}
+.prz-tag{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line-2);border-radius:99px;padding:3px 9px 3px 4px;font-size:12px}
+.prz-tag i{font-style:normal;font-weight:700;background:var(--surface-2);border-radius:99px;padding:0 6px}
+.prz-tag.zero{opacity:.45}
+.cal-d.prz{cursor:default}.cal-d.prz[data-pd]{cursor:pointer}
+.prz-c{display:flex;align-items:center;gap:4px;font-size:12px}
+.prz-c b{min-width:18px;height:18px;border-radius:99px;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;padding:0 4px}
+.cal-d.perto .prz-c b{background:var(--warn)}.cal-d.atras .prz-c b{background:var(--bad)}
+:root[data-tema="escuro"] .prz-c b{background:#3a4c6b}
+@media (max-width:760px){.cal-d.prz{min-height:64px}.prz-c{gap:2px}.prz-c .tlogo.xs{width:16px;height:12px;padding:0 1px}.prz-c b{min-width:15px;height:15px;font-size:10px}.prz-tag{padding-right:6px}.prz-c em{font-size:9px}.prz-c:not(.trf) em{display:none}.prz-c.trf .tlogo{display:none}}
+.prz-c em{font-style:normal;font-weight:700;font-size:11px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -864,9 +876,10 @@ const DICA_ETAPA = {
 };
 VIEWS.casos = async (_, forcar) => {
   try { S.modoCasos = S.modoCasos || localStorage.getItem('fce_modo_casos') || 'lista'; } catch (e) { S.modoCasos = S.modoCasos || 'lista'; }
-  const quadro = S.modoCasos === 'quadro';
-  titulo('Casos', '<div class="seg" id="modoCasos"><button data-m="lista" class="' + (quadro ? '' : 'on') + '" title="Lista">' + ic('lista', 's') + '<span class="so-desk"> Lista</span></button><button data-m="quadro" class="' + (quadro ? 'on' : '') + '" title="Quadro por fase">' + ic('quadro', 's') + '<span class="so-desk"> Quadro</span></button></div>');
+  const quadro = S.modoCasos === 'quadro', cal = S.modoCasos === 'cal';
+  titulo('Casos', '<div class="seg" id="modoCasos"><button data-m="lista" class="' + (quadro || cal ? '' : 'on') + '" title="Lista">' + ic('lista', 's') + '<span class="so-desk"> Lista</span></button><button data-m="quadro" class="' + (quadro ? 'on' : '') + '" title="Quadro por fase">' + ic('quadro', 's') + '<span class="so-desk"> Quadro</span></button><button data-m="cal" class="' + (cal ? 'on' : '') + '" title="Calendário de prazos">' + ic('cal', 's') + '<span class="so-desk"> Calendário</span></button></div>');
   $$('#modoCasos button').forEach((b) => b.onclick = () => { S.modoCasos = b.dataset.m; try { localStorage.setItem('fce_modo_casos', S.modoCasos); } catch (e) {} VIEWS.casos(_, false); });
+  if (cal) { $('#cont').innerHTML = '<div id="calPrazos" style="margin-top:12px"><div class="esq" style="height:420px"></div></div>'; return calendarioPrazos($('#calPrazos'), forcar); }
   const q = new URLSearchParams(location.hash.split('?')[1] || '');
   const f = S.filtroCasos = S.filtroCasos || { q: '', etapa: '', perfil: '' };
   if (q.get('etapa')) f.etapa = q.get('etapa');
@@ -2021,6 +2034,52 @@ async function carregarProcessosDoCaso(c, forcar) {
     try { await agir(b, () => api('processo_andamento', { id, data: $('[data-andd="' + id + '"]').value, texto: t }), 'Movimentação registrada'); delete S.cache.proc; rec(); } catch (e) {}
   });
   $('#bProcCaso').onclick = async () => { const dp = await dados('proc', 'processos'); editarProcesso({ tribunal: 'TJRS', caso_id: c.id, cliente: c.nome }, dp.casos); };
+}
+
+// ---------- Casos > Calendário: quantos prazos de cada tribunal vencem em cada dia ----------
+function prazosPorDia(d) {
+  const out = [];
+  (d.compromissos || []).forEach((c) => { if (c.tipo === 'PRAZO' && !c.concluido) out.push({ dia: String(c.data).slice(0, 10), tribunal: c.tribunal, titulo: c.titulo, cliente: c.cliente, numero: c.numero, proc: c.processo_id, hora: c.hora || '' }); });
+  (d.itens || []).forEach((p) => { if (p.status !== 'ENCERRADO' && p.proxima_data) out.push({ dia: String(p.proxima_data).slice(0, 10), tribunal: p.tribunal, titulo: p.proxima_acao || 'Próxima providência', cliente: p.cliente, numero: p.numero, proc: p.id, hora: '' }); });
+  return out;
+}
+async function calendarioPrazos(el, forcar) {
+  let d; try { d = await dados('proc', 'processos', null, forcar); } catch (e) { el.innerHTML = '<div class="card"><div class="vazio">' + esc(e.message) + '</div></div>'; return; }
+  const hoje = d.hoje || hojeChave();
+  S.mesPrazos = S.mesPrazos || hoje.slice(0, 7);
+  const todos = prazosPorDia(d);
+  const desenhar = () => {
+    const mes = S.mesPrazos, [Y, M] = mes.split('-').map(Number);
+    const ini = new Date(Date.UTC(Y, M - 1, 1)), dow = (ini.getUTCDay() + 6) % 7, dias = new Date(Date.UTC(Y, M, 0)).getUTCDate();
+    const mv = (n) => new Date(Date.UTC(Y, M - 1 + n, 1)).toISOString().slice(0, 7);
+    const nomeMes = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(ini);
+    const porDia = {}; todos.forEach((p) => { if (p.dia.slice(0, 7) === mes) (porDia[p.dia] = porDia[p.dia] || []).push(p); });
+    const noMes = Object.values(porDia).flat();
+    const totTrib = {}; noMes.forEach((p) => { totTrib[p.tribunal] = (totTrib[p.tribunal] || 0) + 1; });
+    const venc = todos.filter((p) => p.dia < hoje).length;
+    let h = '<div class="card cal-proc"><div class="cab"><button class="btn fant ico sm" data-mp="' + mv(-1) + '">' + ic('voltar', 's') + '</button><h2 style="flex:1;text-align:center">Prazos · ' + esc(nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)) + '</h2><button class="btn fant sm" data-mp="' + hoje.slice(0, 7) + '">Hoje</button><button class="btn fant ico sm" data-mp="' + mv(1) + '">' + ic('seta', 's') + '</button></div>' +
+      '<div class="prz-leg">' + Object.keys(TRIB).map((k) => '<span class="prz-tag' + (totTrib[k] ? '' : ' zero') + '">' + logoTrib(k, 'xs') + '<b>' + k + '</b><i>' + (totTrib[k] || 0) + '</i></span>').join('') +
+      '<span class="pp mut" style="margin-left:auto">' + noMes.length + ' prazo' + (noMes.length === 1 ? '' : 's') + ' no mês' + (venc ? ' · <b style="color:var(--bad)">' + venc + ' vencido' + (venc > 1 ? 's' : '') + '</b>' : '') + '</span></div>' +
+      '<div class="cal-grade">' + ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((x) => '<div class="cal-sem">' + x + '</div>').join('');
+    for (let i = 0; i < dow; i++) h += '<div class="cal-d vazio"></div>';
+    for (let dd = 1; dd <= dias; dd++) {
+      const k = mes + '-' + String(dd).padStart(2, '0'), ps = porDia[k] || [];
+      const cont = {}; ps.forEach((p) => { cont[p.tribunal] = (cont[p.tribunal] || 0) + 1; });
+      const cor = !ps.length ? '' : k < hoje ? ' atras' : diasEntre(k, hoje) <= 3 ? ' perto' : '';
+      h += '<div class="cal-d prz' + (k === hoje ? ' hoje' : '') + (k < hoje ? ' passado' : '') + cor + '"' + (ps.length ? ' data-pd="' + k + '"' : '') + '><span class="n">' + dd + '</span>' +
+        Object.keys(TRIB).filter((t) => cont[t]).map((t) => '<span class="prz-c' + (/^TRF/.test(t) ? ' trf' : '') + '" title="' + cont[t] + ' prazo(s) no ' + t + '">' + logoTrib(t, 'xs') + '<em>' + t + '</em><b>' + cont[t] + '</b></span>').join('') + '</div>';
+    }
+    h += '</div></div><div id="przDia"></div>';
+    el.innerHTML = h;
+    $$('[data-mp]', el).forEach((b) => b.onclick = () => { S.mesPrazos = b.dataset.mp; desenhar(); });
+    $$('[data-pd]', el).forEach((c) => c.onclick = () => {
+      $$('.cal-d.sel', el).forEach((x) => x.classList.remove('sel')); c.classList.add('sel');
+      const ps = (porDia[c.dataset.pd] || []).sort((a, b) => a.tribunal.localeCompare(b.tribunal));
+      $('#przDia').innerHTML = '<div class="sec-tit">Prazos de ' + dataBR(c.dataset.pd) + '</div><div class="card lista">' + ps.map((p) => '<a class="item" href="#/processo/' + p.proc + '">' + logoTrib(p.tribunal) + '<div class="mid"><div class="t">' + esc(p.titulo) + (p.hora ? ' · ' + esc(p.hora) : '') + '</div><div class="d">' + esc(p.cliente) + (p.numero ? ' · <span class="cnj">' + esc(p.numero) + '</span>' : '') + '</div></div><div class="dir"><span class="tsig">' + esc(p.tribunal) + '</span></div></a>').join('') + '</div>';
+      $('#przDia').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  };
+  desenhar();
 }
 </script>
 </body>
