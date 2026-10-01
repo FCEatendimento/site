@@ -412,6 +412,31 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .chk{display:flex;align-items:center;gap:6px;font-size:14px;margin-bottom:6px;cursor:pointer}
 .com-prev{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .tl-i .chip svg.i{width:12px;height:12px}
+.vista-tg{display:inline-flex;gap:2px;margin:14px 0 0;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.vista-tg button{border:0;background:none;padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;color:var(--mut);cursor:pointer;display:flex;gap:6px;align-items:center}
+.vista-tg button.on{background:var(--surface);color:var(--txt);box-shadow:var(--sh)}
+.dt-box{width:44px;flex:none;text-align:center;border:1px solid var(--line-2);border-radius:9px;padding:3px 0;line-height:1.1}
+.dt-box b{display:block;font-size:17px}.dt-box span{font-size:10.5px;text-transform:uppercase;color:var(--mut);font-weight:700}
+.cal-proc .cab{gap:6px}
+.cal-grade{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);margin-top:12px;border-top:1px solid var(--line)}
+.cal-sem{background:var(--surface);font-size:11px;font-weight:700;color:var(--mut);text-align:center;padding:6px 0;text-transform:uppercase}
+.cal-d{background:var(--surface);min-height:92px;padding:5px 5px 6px;display:flex;flex-direction:column;gap:3px;cursor:pointer;min-width:0}
+.cal-d.vazio{background:var(--surface-2);cursor:default}
+.cal-d:hover:not(.vazio){background:var(--surface-2)}
+.cal-d.sel{box-shadow:inset 0 0 0 2px var(--gold)}
+.cal-d .n{font-size:12px;font-weight:700;color:var(--mut)}
+.cal-d.hoje .n{background:var(--gold);color:#fff;border-radius:99px;width:22px;height:22px;display:grid;place-items:center}
+.cal-d.passado .n{opacity:.55}
+.cal-d .ev{font-size:11px;line-height:1.25;padding:2px 5px;border-radius:5px;background:var(--surface-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.cal-d .ev.bad{background:var(--bad-soft);color:var(--bad)}.cal-d .ev.warn{background:var(--warn-soft);color:var(--warn)}.cal-d .ev.ouro{background:var(--gold-soft);color:var(--gold)}.cal-d .ev.info{background:var(--info-soft);color:var(--info)}.cal-d .ev.nav{background:var(--navy);color:#fff}.cal-d .ev.ok{background:var(--ok-soft);color:var(--ok)}
+.cal-d .ev.feito{opacity:.5;text-decoration:line-through}
+.cal-d .mais{font-size:11px;color:var(--mut);font-weight:600}
+.cal-d .pts{display:none;gap:3px;flex-wrap:wrap}.cal-d .pts i{width:6px;height:6px;border-radius:50%;background:var(--mut)}
+.cal-d .pts i.bad{background:var(--bad)}.cal-d .pts i.warn{background:var(--warn)}.cal-d .pts i.ouro{background:var(--gold)}.cal-d .pts i.info{background:var(--info)}.cal-d .pts i.nav{background:var(--navy)}
+@media (max-width:760px){.cal-d{min-height:52px;padding:4px 3px}.cal-d .ev,.cal-d .mais{display:none}.cal-d .pts{display:flex}}
+.btns-doc{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.proc-caso{margin-bottom:12px}.proc-caso .and-novo textarea{min-height:38px}
+@media (max-width:560px){.item.exito,.item.com{flex-wrap:wrap}.item.exito .mid,.item.com .mid{flex-basis:calc(100% - 48px)}.item.exito .dir,.item.com .dir{width:100%;flex-direction:row!important;justify-content:flex-end;align-items:center}}
 </style>
 </head>
 <body>
@@ -890,7 +915,7 @@ VIEWS.caso = async (id, forcar) => {
     (c.origem_canal ? '<span class="chip">' + ic('link', 's') + esc(CANAL[c.origem_canal] || c.origem_canal) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">' + ic('pessoa', 's') + 'com você (Helena pausada)</span>' : '') + '</div></div>' +
     '<div class="acoes">' + (tel ? '<a class="btn" href="https://wa.me/' + tel + '" target="_blank" rel="noopener">' + ic('zap', 's') + ' WhatsApp</a>' : '') +
     '<button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
-  const abas = [['resumo', 'Resumo', 'doc'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
+  const abas = [['resumo', 'Resumo', 'doc'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['processos', 'Processos e assinaturas', 'martelo'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
   const cont = { conversa: (c.mensagens || []).length, docs: (c.documentos || []).length, prazos: (c.prazos || []).filter((p) => p.status === 'ABERTO').length, notas: (c.notas || []).length };
   S.abaCaso = S.abaCaso || 'resumo';
   h += '<div class="abas" id="abas">' + abas.map(([k, t]) => '<button data-a="' + k + '" class="' + (S.abaCaso === k ? 'on' : '') + '">' + t + (cont[k] ? ' <span class="mut pp">' + cont[k] + '</span>' : '') + '</button>').join('') + '</div><div id="aba"></div>';
@@ -1584,7 +1609,7 @@ function alvoProc(p) {
   if (p.status === 'A_AJUIZAR' && p.meta_ajuizamento) return { d: String(p.meta_ajuizamento).slice(0, 10), t: 'Meta para ajuizar' };
   return null;
 }
-S.procFiltro = S.procFiltro || { trib: '', grupo: 'todos', q: '', dec: '' };
+S.procFiltro = S.procFiltro || { trib: '', grupo: 'todos', q: '', dec: '', vista: 'lista', mes: '' };
 VIEWS.processos = async (_, forcar) => {
   titulo('Processos', '<button class="btn sm pri" id="bNovoProc">' + ic('mais2', 's') + '<span class="so-desk"> Novo processo</span></button>');
   if (!S.cache.proc) carregando(4);
@@ -1619,8 +1644,11 @@ VIEWS.processos = async (_, forcar) => {
     '<span class="fsep"></span>' + Object.entries(DEC_PROC).map(([k, t]) => '<button data-dec="' + k + '"' + (F.dec === k ? ' class="on"' : '') + '>' + (F.dec === k ? ic('check', 's') + ' ' : '') + t + '</button>').join('') +
     (F.trib ? '<button data-limpa class="on">' + esc(F.trib) + ' ' + ic('x', 's') + '</button>' : '') + '</div>' +
     '<input class="inp" id="procQ" type="search" placeholder="Buscar cliente, parte ou número" value="' + esc(F.q) + '"></div>';
+  h += '<div class="vista-tg"><button data-vista="lista"' + (F.vista !== 'cal' ? ' class="on"' : '') + '>' + ic('lista', 's') + ' Lista</button><button data-vista="cal"' + (F.vista === 'cal' ? ' class="on"' : '') + '>' + ic('cal', 's') + ' Calendário</button></div>';
   h += '<div id="procLista"></div>';
   $('#cont').innerHTML = h;
+  $$('[data-vista]').forEach((b) => b.onclick = () => { F.vista = b.dataset.vista; VIEWS.processos(); });
+  if (F.vista === 'cal') { $('.proc-bar').style.display = 'none'; desenharCalendario(d, hoje); ligarRestoProcessos(d, F); return; }
   const desenhar = () => {
     const q = F.q.toLowerCase().trim(), qd = q.replace(/\D/g, '');
     const lista = itens.filter((p) => (!F.trib || p.tribunal === F.trib) && (F.grupo === 'todos' || grupoDe(p) === F.grupo) && (!F.dec || (F.dec === 'liminar' ? p.liminar === 'DEFERIDA' : procedente(p))) &&
@@ -1647,6 +1675,10 @@ VIEWS.processos = async (_, forcar) => {
     const nv = $('[data-novo]'); if (nv) nv.onclick = () => editarProcesso({ tribunal: F.trib || 'TJRS' }, d.casos);
   };
   desenhar();
+  ligarRestoProcessos(d, F);
+  $('#procQ').oninput = (e) => { F.q = e.target.value; desenhar(); };
+};
+function ligarRestoProcessos(d, F) {
   $$('[data-trib]').forEach((b) => b.onclick = () => { F.trib = F.trib === b.dataset.trib ? '' : b.dataset.trib; VIEWS.processos(); });
   $$('[data-g]').forEach((b) => b.onclick = () => { F.grupo = b.dataset.g; VIEWS.processos(); });
   $$('[data-dec]').forEach((b) => b.onclick = () => { F.dec = F.dec === b.dataset.dec ? '' : b.dataset.dec; VIEWS.processos(); });
@@ -1661,9 +1693,8 @@ VIEWS.processos = async (_, forcar) => {
     delete S.cache.proc; VIEWS.processos(null, true);
   };
   const lp = $('[data-limpa]'); if (lp) lp.onclick = () => { F.trib = ''; VIEWS.processos(); };
-  $('#procQ').oninput = (e) => { F.q = e.target.value; desenhar(); };
   $('#bNovoProc').onclick = () => editarProcesso({ tribunal: F.trib || 'TJRS' }, d.casos);
-};
+}
 VIEWS.processo = async (id, forcar) => {
   titulo('Processo', '<a class="btn fant sm" href="#/processos">' + ic('voltar', 's') + '<span class="so-desk"> Processos</span></a>');
   if (!S.cache.proc) carregando(3);
@@ -1688,6 +1719,9 @@ VIEWS.processo = async (id, forcar) => {
     linha('Base de cálculo', base != null ? brl(base) + ' <span class="mut">(' + (p.valor_proveito != null ? 'proveito econômico' : 'valor da causa') + ')</span>' : '') +
     linha('O que conta como proveito', esc(p.base_exito || (p.contrato && p.contrato.base_exito) || '')) + '</div>' +
     (ex.length ? '<div class="lista" style="border-top:1px solid var(--line)">' + ex.map(itemExito).join('') + '</div>' : '') + '</div>';
+  const comps = (d.compromissos || []).filter((c) => c.processo_id === p.id);
+  h += '<div class="card" style="margin-top:12px"><div class="cab"><h2>Compromissos</h2><div class="dir"><button class="btn sm" id="bNovoComp">' + ic('mais2', 's') + ' Novo compromisso</button></div></div>' +
+    (comps.length ? '<div class="lista">' + comps.map((c) => itemCompromisso(c, false)).join('') + '</div>' : '<div class="corpo pq mut">Audiências, perícias, prazos e sessões de julgamento deste processo aparecem aqui e no calendário da aba Processos.</div>') + '</div>';
   h += '<div class="grid g2" style="margin-top:12px"><div class="card"><div class="cab"><h2>Dados</h2></div><div class="corpo plista">' +
     linha('Tribunal', esc(p.tribunal)) + linha('Polo do cliente', p.polo === 'ATIVO' ? 'Autor (polo ativo)' : p.polo === 'PASSIVO' ? 'Réu (polo passivo)' : '') + linha('Classe / ação', esc(p.classe || '')) + linha('Órgão / vara', esc(p.orgao || '')) +
     linha('Valor da causa', p.valor_causa != null ? brl(p.valor_causa) : '') + linha('Ajuizado em', dataBR(p.data_ajuizamento)) + linha('Meta para ajuizar', p.status === 'A_AJUIZAR' ? dataBR(p.meta_ajuizamento) : '') +
@@ -1704,6 +1738,8 @@ VIEWS.processo = async (id, forcar) => {
   const recarregar = async () => { delete S.cache.proc; await VIEWS.processo(id, true); };
   ligarExito(recarregar);
   ligarComunicados(d, recarregar);
+  $('#bNovoComp').onclick = () => editarCompromisso({ processo_id: p.id }, d, recarregar);
+  $$('[data-comp]').forEach((el) => el.onclick = () => editarCompromisso(comps.find((c) => c.id === el.dataset.comp), d, recarregar));
   $$('[data-avisa]').forEach((b) => b.onclick = () => avisarCliente(b, { processo_id: p.id, andamento_id: b.dataset.avisa }, recarregar));
   const bm = $('#bMsgCli'); if (bm) bm.onclick = async () => {
     const t = await pedirTexto('Mensagem ao cliente', 'Escreva o recado do jeito que vier; a Helena transforma em uma mensagem clara para ' + p.cliente.split(' ')[0] + ' e você aprova antes do envio.', 'Ex.: o perito marcou a vistoria do imóvel para 15/10 às 14h; ele precisa estar em casa', true);
@@ -1777,7 +1813,7 @@ async function editarProcesso(x, casos) {
 function itemExito(e) {
   const lim = e.gatilho === 'LIMINAR', fim = e.status !== 'PENDENTE';
   const conta = e.percentual == null ? 'percentual não informado: confira o contrato' : pctBR(e.percentual) + (e.valor_estimado != null ? ' de ' + brl(e.base_valor) + ' = <b>' + brl(e.valor_estimado) + '</b>' : ' (falta o valor do proveito)');
-  return '<div class="item"><div class="ic-circ ' + (fim ? '' : 'ok') + '">' + ic(lim ? 'martelo' : 'din', 's') + '</div><div class="mid"><div class="t">' + (lim ? 'Liminar deferida' : 'Ganho de causa transitado') + ' · <a href="#/processo/' + e.processo_id + '" style="color:inherit">' + esc(e.cliente) + '</a></div>' +
+  return '<div class="item exito"><div class="ic-circ ' + (fim ? '' : 'ok') + '">' + ic(lim ? 'martelo' : 'din', 's') + '</div><div class="mid"><div class="t">' + (lim ? 'Liminar deferida' : 'Ganho de causa transitado') + ' · <a href="#/processo/' + e.processo_id + '" style="color:inherit">' + esc(e.cliente) + '</a></div>' +
     '<div class="d">' + esc(e.tribunal) + (e.numero ? ' ' + esc(e.numero) : '') + ' · ' + dataBR(e.data_evento) + ' · ' + conta + '</div></div><div class="dir" style="flex-direction:row;gap:6px">' +
     (fim ? '<span class="chip ' + (e.status === 'COBRADO' ? 'ok' : '') + '">' + (e.status === 'COBRADO' ? 'cobrado' : 'dispensado') + '</span><button class="btn sm fant" data-ex="' + e.id + '" data-st="PENDENTE" title="Voltar para pendente">' + ic('att', 's') + '</button>'
       : '<button class="btn sm fant" data-ex="' + e.id + '" data-st="DISPENSADO">Dispensar</button><button class="btn sm pri" data-ex="' + e.id + '" data-st="COBRADO">' + ic('check', 's') + ' Cobrado</button>') + '</div></div>';
@@ -1794,7 +1830,7 @@ const ORIG_COM = { ANDAMENTO: 'Andamento', MANUAL: 'Recado seu', MARCO: 'Marco d
 function itemComunicado(c) {
   const st = { REDIGINDO: ['Helena escrevendo', ''], RASCUNHO: ['Aguardando aprovação', 'warn'], FALHOU: ['Não enviado', 'bad'], ENVIADO: ['Enviado', 'ok'], DESCARTADO: ['Descartado', ''] }[c.status] || [c.status, ''];
   const abre = c.status !== 'ENVIADO';
-  return '<div class="item' + (abre ? ' clic" data-com="' + c.id : '') + '"><div class="ic-circ ' + (c.status === 'ENVIADO' ? 'ok' : 'warn') + '">' + ic('zap', 's') + '</div><div class="mid"><div class="t">' + esc(c.cliente) + ' · <span class="mut" style="font-weight:500">' + esc(ORIG_COM[c.origem] || c.origem) + '</span></div>' +
+  return '<div class="item com' + (abre ? ' clic" data-com="' + c.id : '') + '"><div class="ic-circ ' + (c.status === 'ENVIADO' ? 'ok' : 'warn') + '">' + ic('zap', 's') + '</div><div class="mid"><div class="t">' + esc(c.cliente) + ' · <span class="mut" style="font-weight:500">' + esc(ORIG_COM[c.origem] || c.origem) + '</span></div>' +
     '<div class="d com-prev">' + esc(String(c.texto || (c.status === 'REDIGINDO' ? 'A Helena está escrevendo…' : '')).replace(/\s+/g, ' ').slice(0, 220)) + '</div>' + (c.erro && c.status === 'FALHOU' ? '<div class="d" style="color:var(--bad)">' + esc(String(c.erro).slice(0, 160)) + '</div>' : '') + '</div>' +
     '<div class="dir"><span class="chip ' + st[1] + '">' + st[0] + '</span><span class="pp mut">' + esc(quando(c.enviado_em || c.created_at, true)) + '</span></div></div>';
 }
@@ -1835,6 +1871,156 @@ async function revisarComunicado(c, depois) {
     else { const r = await api('processo_enviar', { id: c.id, texto: v.texto === c.texto ? '' : v.texto }); toast((r && r.mensagem) || 'Enviado.'); }
   } catch (e) { toast(e.message, true); }
   delete S.cache.proc; return depois();
+}
+
+// ---------- compromissos e calendário ----------
+const TIPO_COMP = { AUDIENCIA: ['Audiência', 'bad'], PERICIA: ['Perícia', 'warn'], PRAZO: ['Prazo', 'ouro'], JULGAMENTO: ['Julgamento', 'nav'], DILIGENCIA: ['Diligência', 'info'], REUNIAO: ['Reunião', 'info'], OUTRO: ['Outro', ''] };
+function itemCompromisso(c, comCliente) {
+  const t = TIPO_COMP[c.tipo] || TIPO_COMP.OUTRO, f = faltam(String(c.data).slice(0, 10) + 'T12:00:00');
+  return '<div class="item clic" data-comp="' + c.id + '" style="' + (c.concluido ? 'opacity:.55' : '') + '"><div class="dt-box"><b>' + String(c.data).slice(8, 10) + '</b><span>' + esc(fmtD(String(c.data).slice(0, 10) + 'T12:00:00', { month: 'short' }).replace('.', '')) + '</span></div><div class="mid"><div class="t">' + esc(c.titulo) + (c.concluido ? ' <span class="chip ok">feito</span>' : '') + '</div>' +
+    '<div class="d">' + [c.hora ? c.hora : '', comCliente ? esc(c.cliente) + ' · ' + esc(c.tribunal) : '', c.local ? esc(c.local) : ''].filter(Boolean).join(' · ') + '</div></div>' +
+    '<div class="dir"><span class="chip ' + t[1] + '">' + t[0] + '</span>' + (c.concluido ? '' : '<span class="pp" style="color:var(--' + (f.c || 'mut') + ')">' + esc(f.t) + '</span>') + '</div></div>';
+}
+async function editarCompromisso(x, d, depois) {
+  const procs = (d.itens || []).filter((p) => p.status !== 'ENCERRADO' || p.id === x.processo_id);
+  const opt = (obj, sel) => Object.entries(obj).map(([k, v]) => '<option value="' + k + '"' + (k === sel ? ' selected' : '') + '>' + esc(Array.isArray(v) ? v[0] : v) + '</option>').join('');
+  const r = await modal({ titulo: x.id ? 'Editar compromisso' : 'Novo compromisso', corpo:
+    (x.id ? '' : '<label class="pq mut">Processo</label><select class="sel" id="cpp" style="margin:6px 0 12px">' + procs.map((p) => '<option value="' + p.id + '"' + (p.id === x.processo_id ? ' selected' : '') + '>' + esc(p.tribunal) + ' · ' + esc(p.cliente) + (p.numero ? ' · ' + esc(p.numero) : '') + '</option>').join('') + '</select>') +
+    '<div class="grid g2 mg" style="margin-top:0"><div><label class="pq mut">Tipo</label><select class="sel" id="cpt" style="margin-top:6px">' + opt(TIPO_COMP, x.tipo || 'AUDIENCIA') + '</select></div><div><label class="pq mut">Descrição</label><input class="inp" id="cpd" style="margin-top:6px" value="' + esc(x.titulo || '') + '" placeholder="Ex.: Audiência de conciliação"></div></div>' +
+    '<div class="grid g2 mg"><div><label class="pq mut">Data</label><input class="inp" id="cpdt" type="date" style="margin-top:6px" value="' + esc(x.data ? String(x.data).slice(0, 10) : '') + '"></div><div><label class="pq mut">Hora (opcional)</label><input class="inp" id="cph" type="time" style="margin-top:6px" value="' + esc(x.hora || '') + '"></div></div>' +
+    '<label class="pq mut" style="display:block;margin-top:12px">Local ou link (opcional)</label><input class="inp" id="cpl" style="margin-top:6px" value="' + esc(x.local || '') + '" placeholder="Ex.: Fórum de Novo Hamburgo, sala 3 / link do Teams">' +
+    '<label class="pq mut" style="display:block;margin-top:12px">Observações</label><textarea class="inp" id="cpo" rows="2" style="margin-top:6px">' + esc(x.obs || '') + '</textarea>' +
+    (x.id ? '<label class="chk" style="margin-top:12px"><input type="checkbox" id="cpc"' + (x.concluido ? ' checked' : '') + '> Já foi feito</label>' : ''),
+    botoes: (x.id ? [{ t: 'Excluir', c: 'fant', v: 'excluir' }] : []).concat([{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Salvar', c: 'pri', v: (m) => {
+      const t = $('#cpd', m).value.trim(), dt = $('#cpdt', m).value; if (t.length < 2) { $('#cpd', m).focus(); return false; } if (!dt) { $('#cpdt', m).focus(); return false; }
+      return { id: x.id || '', processo_id: x.id ? x.processo_id : $('#cpp', m).value, tipo: $('#cpt', m).value, titulo: t, data: dt, hora: $('#cph', m).value, local: $('#cpl', m).value.trim(), obs: $('#cpo', m).value.trim(), concluido: x.id ? $('#cpc', m).checked : false };
+    } }]) });
+  if (!r) return;
+  try {
+    if (r === 'excluir') { if (!(await confirmar('Excluir compromisso?', x.titulo, 'Excluir', true))) return; await api('processo_compromisso_excluir', { id: x.id }); toast('Compromisso excluído'); }
+    else { await api('processo_compromisso_salvar', r); toast('Compromisso salvo'); }
+  } catch (e) { toast(e.message, true); return; }
+  delete S.cache.proc; await depois();
+}
+function eventosCalendario(d) {
+  const ev = [];
+  (d.compromissos || []).forEach((c) => ev.push({ dia: String(c.data).slice(0, 10), hora: c.hora || '', titulo: c.titulo, sub: c.cliente + ' · ' + c.tribunal, tipo: c.tipo, cor: (TIPO_COMP[c.tipo] || TIPO_COMP.OUTRO)[1], feito: c.concluido, comp: c.id, proc: c.processo_id }));
+  (d.itens || []).forEach((p) => {
+    if (p.status === 'ENCERRADO') return;
+    if (p.proxima_data) ev.push({ dia: String(p.proxima_data).slice(0, 10), titulo: p.proxima_acao || 'Próxima providência', sub: p.cliente + ' · ' + p.tribunal, tipo: 'PROVIDENCIA', cor: 'ouro', proc: p.id });
+    if (p.status === 'A_AJUIZAR' && p.meta_ajuizamento) ev.push({ dia: String(p.meta_ajuizamento).slice(0, 10), titulo: 'Meta para ajuizar', sub: p.cliente + ' · ' + p.tribunal, tipo: 'META', cor: 'info', proc: p.id });
+  });
+  return ev.sort((a, b) => (a.dia + a.hora).localeCompare(b.dia + b.hora));
+}
+function desenharCalendario(d, hoje) {
+  const F = S.procFiltro;
+  const mes = F.mes || hoje.slice(0, 7);
+  const [Y, M] = mes.split('-').map(Number);
+  const ini = new Date(Date.UTC(Y, M - 1, 1)), dow = (ini.getUTCDay() + 6) % 7, dias = new Date(Date.UTC(Y, M, 0)).getUTCDate();
+  const ev = eventosCalendario(d).filter((e) => !F.trib || (d.itens || []).some((p) => p.id === e.proc && p.tribunal === F.trib));
+  const porDia = {}; ev.forEach((e) => { (porDia[e.dia] = porDia[e.dia] || []).push(e); });
+  const nomeMes = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(ini);
+  const mv = (n) => { const t = new Date(Date.UTC(Y, M - 1 + n, 1)); return t.toISOString().slice(0, 7); };
+  let h = '<div class="card cal-proc" style="margin-top:14px"><div class="cab"><button class="btn fant ico sm" data-mes="' + mv(-1) + '">' + ic('voltar', 's') + '</button><h2 style="flex:1;text-align:center">' + esc(nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)) + '</h2><button class="btn fant sm" data-mes="' + hoje.slice(0, 7) + '">Hoje</button><button class="btn fant ico sm" data-mes="' + mv(1) + '">' + ic('seta', 's') + '</button></div>' +
+    '<div class="cal-grade">' + ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((x) => '<div class="cal-sem">' + x + '</div>').join('');
+  for (let i = 0; i < dow; i++) h += '<div class="cal-d vazio"></div>';
+  for (let dd = 1; dd <= dias; dd++) {
+    const k = mes + '-' + String(dd).padStart(2, '0'), es = porDia[k] || [];
+    h += '<div class="cal-d' + (k === hoje ? ' hoje' : '') + (k < hoje ? ' passado' : '') + '" data-dia="' + k + '"><span class="n">' + dd + '</span>' +
+      es.slice(0, 3).map((e) => '<span class="ev ' + e.cor + (e.feito ? ' feito' : '') + '" title="' + esc(e.titulo + ' · ' + e.sub) + '">' + esc((e.hora ? e.hora + ' ' : '') + e.titulo) + '</span>').join('') +
+      (es.length > 3 ? '<span class="mais">+' + (es.length - 3) + '</span>' : '') + (es.length ? '<span class="pts">' + es.slice(0, 4).map((e) => '<i class="' + e.cor + '"></i>').join('') + '</span>' : '') + '</div>';
+  }
+  h += '</div></div>';
+  const prox = ev.filter((e) => e.dia >= hoje && !e.feito).slice(0, 12);
+  h += '<div class="sec-tit">Próximos compromissos<button class="btn sm" id="bCompNovo" style="margin-left:auto">' + ic('mais2', 's') + ' Novo compromisso</button></div><div class="card lista" id="calLista">' +
+    (prox.length ? prox.map(itemEvento).join('') : '<div class="vazio">Nada marcado. Cadastre audiências, perícias e prazos em cada processo ou pelo botão acima.</div>') + '</div>';
+  $('#procLista').innerHTML = h;
+  const recarregar = () => { delete S.cache.proc; return VIEWS.processos(null, true); };
+  $$('[data-mes]').forEach((b) => b.onclick = () => { F.mes = b.dataset.mes; desenharCalendario(d, hoje); });
+  $$('.cal-d[data-dia]').forEach((c) => c.onclick = () => {
+    const k = c.dataset.dia, es = porDia[k] || [];
+    $$('.cal-d.sel').forEach((x) => x.classList.remove('sel')); c.classList.add('sel');
+    $('#calLista').innerHTML = (es.length ? es.map(itemEvento).join('') : '<div class="vazio">Nada marcado em ' + dataBR(k) + '.</div>') +
+      '<div class="item"><button class="btn sm" data-novo-dia="' + k + '">' + ic('mais2', 's') + ' Novo compromisso em ' + dataBR(k) + '</button></div>';
+    $('.sec-tit #bCompNovo').closest('.sec-tit').firstChild.textContent = 'Em ' + dataBR(k);
+    ligarEventos(d, recarregar);
+    const nb = $('[data-novo-dia]'); if (nb) nb.onclick = () => novoCompromissoGeral(d, k, recarregar);
+  });
+  $('#bCompNovo').onclick = () => novoCompromissoGeral(d, '', recarregar);
+  ligarEventos(d, recarregar);
+}
+function itemEvento(e) {
+  const nomes = { PROVIDENCIA: ['Providência', 'ouro'], META: ['A ajuizar', 'info'] };
+  const t = nomes[e.tipo] || TIPO_COMP[e.tipo] || TIPO_COMP.OUTRO, f = faltam(e.dia + 'T12:00:00');
+  return '<div class="item clic" ' + (e.comp ? 'data-ev-comp="' + e.comp + '"' : 'data-ev-proc="' + e.proc + '"') + ' style="' + (e.feito ? 'opacity:.55' : '') + '"><div class="dt-box"><b>' + e.dia.slice(8, 10) + '</b><span>' + esc(fmtD(e.dia + 'T12:00:00', { month: 'short' }).replace('.', '')) + '</span></div><div class="mid"><div class="t">' + esc(e.titulo) + '</div><div class="d">' + [e.hora, esc(e.sub)].filter(Boolean).join(' · ') + '</div></div><div class="dir"><span class="chip ' + t[1] + '">' + t[0] + '</span><span class="pp" style="color:var(--' + (f.c || 'mut') + ')">' + esc(f.t) + '</span></div></div>';
+}
+function ligarEventos(d, depois) {
+  $$('[data-ev-comp]').forEach((el) => el.onclick = () => editarCompromisso((d.compromissos || []).find((c) => c.id === el.dataset.evComp), d, depois));
+  $$('[data-ev-proc]').forEach((el) => el.onclick = () => { location.hash = '#/processo/' + el.dataset.evProc; });
+}
+function novoCompromissoGeral(d, dia, depois) {
+  if (!(d.itens || []).length) return toast('Cadastre um processo primeiro.', true);
+  editarCompromisso({ data: dia, processo_id: (d.itens || [])[0].id }, d, depois);
+}
+
+// ---------- dentro do caso: processos e documentos para assinar ----------
+const DOC_ASS = { PROCURACAO: 'Procuração (ad judicia et extra)', HIPOSSUFICIENCIA: 'Declaração de hipossuficiência' };
+const ST_ASS = { GERAR: ['Preparando', ''], FALTAM_DADOS: ['Faltam dados do cliente', 'bad'], AGUARDANDO_JANELA: ['Pronto, aguardando o cliente responder', 'warn'], ENVIADO: ['Enviado, aguardando assinatura', 'warn'], ASSINADO: ['Assinado', 'ok'] };
+ABAS.processos = () => '<div id="abaProc"><div class="esq" style="height:120px"></div></div>';
+const _ligarAbaOriginal = ligarAba;
+ligarAba = function (k, c) { _ligarAbaOriginal(k, c); if (k === 'processos') carregarProcessosDoCaso(c); };
+async function carregarProcessosDoCaso(c, forcar) {
+  let d; try { d = await api('processos_do_caso', { caso_id: c.id }); } catch (e) { $('#abaProc').innerHTML = '<div class="card"><div class="vazio">' + esc(e.message) + '</div></div>'; return; }
+  if (!$('#abaProc')) return;
+  const ass = d.assinaturas || [], procs = d.processos || [];
+  const temTipo = (t) => ass.some((a) => a.tipo === t);
+  let h = '<div class="card"><div class="cab"><h2>Documentos para assinar pelo gov.br</h2></div>';
+  h += ass.length ? '<div class="lista">' + ass.map((a) => {
+    const st = ST_ASS[a.status] || [a.status, ''];
+    const det = a.status === 'ASSINADO' ? 'Assinado em ' + dataCurta(a.assinado_em) + (a.assinatura_govbr ? ' · assinatura gov.br conferida' : ' · assinatura digital (confira)')
+      : a.status === 'ENVIADO' ? 'Enviado em ' + dataCurta(a.enviado_em) + (a.sem_assinatura_em ? ' · o cliente mandou um arquivo sem assinatura digital' : '')
+      : a.status === 'AGUARDANDO_JANELA' ? 'O cliente não escreve há mais de 24h; o arquivo vai assim que ele responder' + (a.convite_em ? ' (convite enviado em ' + dataCurta(a.convite_em) + ')' : '')
+      : a.status === 'FALTAM_DADOS' ? (a.erro || 'Faltam os dados do formulário do contrato') : 'O Otávio está gerando o PDF';
+    return '<div class="item"><div class="ic-circ ' + (a.status === 'ASSINADO' ? 'ok' : 'warn') + '">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">' + esc(DOC_ASS[a.tipo]) + '</div><div class="d">' + esc(det) + '</div>' +
+      '<div class="btns-doc">' + (a.gerado_id ? '<button class="btn sm fant" data-docv="' + a.gerado_id + '">' + ic('olho', 's') + ' Ver gerado</button>' : '') + (a.assinado_id ? '<button class="btn sm fant" data-docv="' + a.assinado_id + '">' + ic('olho', 's') + ' Ver assinado</button><button class="btn sm fant" data-docb="' + a.assinado_id + '">' + ic('baixar', 's') + ' Baixar</button>' : '') +
+      (a.status !== 'ASSINADO' ? '<button class="btn sm fant" data-reenv="' + a.tipo + '">' + ic('att', 's') + ' Gerar e enviar de novo</button><button class="btn sm fant" data-cancdoc="' + a.id + '">Cancelar</button>' : '') + '</div></div>' +
+      '<div class="dir"><span class="chip ' + st[1] + '">' + st[0] + '</span></div></div>';
+  }).join('') + '</div>' : '<div class="corpo pq mut">A procuração é enviada automaticamente quando o contrato é assinado. ' + (d.tem_dados_contrato ? '' : 'Este caso ainda não tem os dados do cliente do formulário do contrato, necessários para gerar os documentos.') + '</div>';
+  h += '<div class="corpo" style="display:flex;gap:8px;flex-wrap:wrap;padding-top:4px">' + (!temTipo('PROCURACAO') ? '<button class="btn sm" data-pedir="PROCURACAO">' + ic('caneta', 's') + ' Enviar procuração</button>' : '') + (!temTipo('HIPOSSUFICIENCIA') ? '<button class="btn sm" data-pedir="HIPOSSUFICIENCIA">' + ic('caneta', 's') + ' Enviar declaração de hipossuficiência</button>' : '') + '</div></div>';
+  h += '<div class="sec-tit">Processos judiciais<button class="btn sm" id="bProcCaso" style="margin-left:auto">' + ic('mais2', 's') + ' Novo processo</button></div>';
+  if (!procs.length) h += '<div class="card"><div class="vazio">Nenhum processo vinculado a este caso.</div></div>';
+  procs.forEach((p) => {
+    const a = alvoProc(p), f = a ? faltam(a.d + 'T12:00:00') : null;
+    h += '<div class="card proc-caso"><div class="item">' + logoTrib(p.tribunal) + '<div class="mid"><div class="t">' + esc(p.tribunal) + (p.numero ? ' · <span class="cnj">' + esc(p.numero) + '</span>' : ' · sem número ainda') + '</div><div class="d">' + [esc(p.classe || ''), p.parte_contraria ? '× ' + esc(p.parte_contraria) : ''].filter(Boolean).join(' ') + '</div>' +
+      (a ? '<div class="d" style="margin-top:3px">' + ic('relogio', 's') + ' ' + esc(a.t) + ' · <b style="color:var(--' + (f.c || 'mut') + ')">' + esc(dataBR(a.d)) + '</b></div>' : '') + '</div><div class="dir">' + chipProc(p.status) + chipsDecisao(p) + '<a class="btn sm fant" href="#/processo/' + p.id + '">Abrir ' + ic('seta', 's') + '</a></div></div>' +
+      ((p.compromissos || []).filter((x) => !x.concluido).length ? '<div class="corpo pq" style="padding-top:0">' + p.compromissos.filter((x) => !x.concluido).map((x) => '<span class="chip ' + (TIPO_COMP[x.tipo] || TIPO_COMP.OUTRO)[1] + '" style="margin:0 6px 6px 0">' + esc(dataBR(x.data)) + (x.hora ? ' ' + x.hora : '') + ' · ' + esc(x.titulo) + '</span>').join('') + '</div>' : '') +
+      '<div class="corpo" style="padding-top:0"><div class="and-novo"><input class="inp" type="date" data-andd="' + p.id + '" value="' + esc(d.hoje) + '"><textarea class="inp" rows="1" data-andt="' + p.id + '" placeholder="Registrar movimentação…"></textarea><button class="btn pri sm" data-andok="' + p.id + '">' + ic('mais2', 's') + ' Registrar</button></div>' +
+      '<div class="timeline">' + ((p.andamentos || []).length ? p.andamentos.map((x) => '<div class="tl-i"><span class="tl-d">' + esc(dataBR(x.data)) + '</span><div class="tl-t">' + esc(x.texto).replace(/\n/g, '<br>') + '</div></div>').join('') : '<div class="mut pq" style="padding:6px 0">Nenhuma movimentação registrada.</div>') + '</div></div></div>';
+  });
+  $('#abaProc').innerHTML = h;
+  const rec = () => carregarProcessosDoCaso(c, true);
+  const abrirDoc = async (b, id, baixar) => {
+    const w = baixar ? null : window.open('about:blank', '_blank');
+    try { const r = await agir(b, () => api('doc_link', { id, baixar })); if (!r || !r.url) { if (w) w.close(); return toast('Arquivo não encontrado.', true); } if (w) w.location.href = r.url; else { const l = document.createElement('a'); l.href = r.url; document.body.appendChild(l); l.click(); l.remove(); } } catch (e) { if (w) w.close(); }
+  };
+  $$('[data-docv]').forEach((b) => b.onclick = () => abrirDoc(b, b.dataset.docv, false));
+  $$('[data-docb]').forEach((b) => b.onclick = () => abrirDoc(b, b.dataset.docb, true));
+  const pedir = async (b, tipo, reenviar) => {
+    if (!d.tem_dados_contrato && !(await confirmar('Faltam os dados do cliente', 'Os documentos usam os dados do formulário do contrato (nome, CPF, endereço). Sem eles o Otávio não consegue gerar. Quer registrar o pedido mesmo assim?', 'Registrar'))) return;
+    try {
+      const r = await agir(b, async () => { const x = await api('processo_doc_pedir', { caso_id: c.id, tipo, reenviar }); if (x && x.ok === false) throw new Error(x.erro); await api('processo_doc_processar', {}); return x; });
+      toast('Pedido registrado. O Otávio gera o PDF e a Helena envia ao cliente com o passo a passo do gov.br.');
+    } catch (e) {}
+    setTimeout(rec, 2500);
+  };
+  $$('[data-pedir]').forEach((b) => b.onclick = () => pedir(b, b.dataset.pedir, false));
+  $$('[data-reenv]').forEach((b) => b.onclick = async () => { if (await confirmar('Gerar e enviar de novo?', 'O documento é gerado outra vez com os dados atuais e reenviado ao cliente.', 'Reenviar')) pedir(b, b.dataset.reenv, true); });
+  $$('[data-cancdoc]').forEach((b) => b.onclick = async () => { if (!(await confirmar('Cancelar o pedido?', 'O cliente não recebe mais lembretes deste documento.', 'Cancelar pedido', true))) return; try { await api('processo_doc_cancelar', { id: b.dataset.cancdoc }); toast('Pedido cancelado'); } catch (e) { toast(e.message, true); } rec(); });
+  $$('[data-andok]').forEach((b) => b.onclick = async () => {
+    const id = b.dataset.andok, t = $('[data-andt="' + id + '"]').value.trim(); if (t.length < 2) return $('[data-andt="' + id + '"]').focus();
+    try { await agir(b, () => api('processo_andamento', { id, data: $('[data-andd="' + id + '"]').value, texto: t }), 'Movimentação registrada'); delete S.cache.proc; rec(); } catch (e) {}
+  });
+  $('#bProcCaso').onclick = async () => { const dp = await dados('proc', 'processos'); editarProcesso({ tribunal: 'TJRS', caso_id: c.id, cliente: c.nome }, dp.casos); };
 }
 </script>
 </body>
