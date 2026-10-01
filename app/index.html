@@ -410,6 +410,8 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .item.proc .dir .chip.ok{font-size:11px;height:22px}
 .modal .sec-mod{font:700 12px var(--sans);text-transform:uppercase;letter-spacing:.7px;color:var(--gold);margin:18px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
 .chk{display:flex;align-items:center;gap:6px;font-size:14px;margin-bottom:6px;cursor:pointer}
+.com-prev{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tl-i .chip svg.i{width:12px;height:12px}
 </style>
 </head>
 <body>
@@ -1604,6 +1606,13 @@ VIEWS.processos = async (_, forcar) => {
     return '<button class="card trib' + (F.trib === k ? ' on' : '') + '" data-trib="' + k + '"><span class="tl">' + logoTrib(k, 'g') + '</span><span class="tn">' + t.nome + '</span><span class="ts">' + esc(t.longo) + '</span>' +
       '<span class="tc">' + (c.ajuizar + c.andamento ? (c.andamento ? '<b>' + c.andamento + '</b> em andamento' : '') + (c.ajuizar && c.andamento ? ' · ' : '') + (c.ajuizar ? '<b>' + c.ajuizar + '</b> a ajuizar' : '') : 'nenhum processo') + '</span></button>';
   }).join('') + '</div>';
+  const rasc = (d.comunicados || []).filter((c) => ['RASCUNHO', 'FALHOU', 'REDIGINDO'].includes(c.status));
+  if (rasc.length) {
+    const mensais = rasc.filter((c) => c.origem === 'MENSAL' && c.status === 'RASCUNHO');
+    h += '<div class="sec-tit">' + ic('zap', 's') + ' Helena · avisos aos clientes aguardando sua aprovação<span class="mut pp" style="margin-left:auto;text-transform:none;letter-spacing:0">' + rasc.length + '</span></div>' +
+      (mensais.length > 1 ? '<div style="margin:-2px 0 8px"><button class="btn sm" id="bEnvMensais">' + ic('check', 's') + ' Enviar os ' + mensais.length + ' informes mensais</button></div>' : '') +
+      '<div class="card lista">' + rasc.map(itemComunicado).join('') + '</div>';
+  }
   const pend = (d.exito || []).filter((e) => e.status === 'PENDENTE');
   if (pend.length) h += '<div class="sec-tit">' + ic('din', 's') + ' Otávio · honorários de liminar e êxito a cobrar<span class="mut pp" style="margin-left:auto;text-transform:none;letter-spacing:0">' + pend.length + '</span></div><div class="card lista">' + pend.map(itemExito).join('') + '</div>';
   h += '<div class="proc-bar"><div class="filtros" style="margin:0">' + Object.entries(GRUPO_PROC).map(([k, t]) => '<button data-g="' + k + '"' + (F.grupo === k ? ' class="on"' : '') + '>' + t + '</button>').join('') +
@@ -1642,6 +1651,15 @@ VIEWS.processos = async (_, forcar) => {
   $$('[data-g]').forEach((b) => b.onclick = () => { F.grupo = b.dataset.g; VIEWS.processos(); });
   $$('[data-dec]').forEach((b) => b.onclick = () => { F.dec = F.dec === b.dataset.dec ? '' : b.dataset.dec; VIEWS.processos(); });
   ligarExito(() => VIEWS.processos(null, true));
+  ligarComunicados(d, () => VIEWS.processos(null, true));
+  const bm = $('#bEnvMensais'); if (bm) bm.onclick = async () => {
+    const ms = (d.comunicados || []).filter((c) => c.origem === 'MENSAL' && c.status === 'RASCUNHO');
+    if (!(await confirmar('Enviar os informes mensais?', 'A Helena envia agora os ' + ms.length + ' informes, como estão escritos. Se quiser ajustar algum, abra-o antes.', 'Enviar todos'))) return;
+    let ok = 0, falhas = [];
+    for (const c of ms) { try { await api('processo_enviar', { id: c.id }); ok++; } catch (e) { falhas.push(c.cliente + ': ' + e.message); } }
+    toast(ok + ' enviado(s)' + (falhas.length ? '. Não foram: ' + falhas.join(' | ') : ''), !!falhas.length);
+    delete S.cache.proc; VIEWS.processos(null, true);
+  };
   const lp = $('[data-limpa]'); if (lp) lp.onclick = () => { F.trib = ''; VIEWS.processos(); };
   $('#procQ').oninput = (e) => { F.q = e.target.value; desenhar(); };
   $('#bNovoProc').onclick = () => editarProcesso({ tribunal: F.trib || 'TJRS' }, d.casos);
@@ -1656,11 +1674,12 @@ VIEWS.processo = async (id, forcar) => {
   const linha = (rot, val) => val ? '<div class="pl"><span class="mut">' + rot + '</span><span>' + val + '</span></div>' : '';
   let h = '<div class="card proc-cab" style="margin-top:12px">' + logoTrib(p.tribunal, 'g') + '<div style="min-width:0;flex:1"><div class="mut pq">' + esc(t.longo || p.tribunal) + ' · ' + esc(t.sis || '') + '</div><h2>' + esc(p.cliente) + (p.parte_contraria ? ' <span class="mut">× ' + esc(p.parte_contraria) + '</span>' : '') + '</h2>' +
     '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">' + chipProc(p.status) + (p.numero ? '<span class="chip cnj" data-copiar="' + esc(p.numero) + '" title="Copiar número" style="cursor:pointer">' + esc(p.numero) + '</span>' : '') + '</div></div>' +
-    '<div class="proc-acoes"><button class="btn sm" id="bEdProc">' + ic('caneta', 's') + ' Editar</button>' + (p.link ? '<a class="btn sm fant" href="' + esc(p.link) + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Abrir processo</a>' : '<a class="btn sm fant" href="' + esc(t.site || '#') + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Site do ' + esc(p.tribunal) + '</a>') + '</div></div>';
+    '<div class="proc-acoes"><button class="btn sm" id="bEdProc">' + ic('caneta', 's') + ' Editar</button>' + (p.tem_whatsapp ? '<button class="btn sm" id="bMsgCli">' + ic('zap', 's') + ' Mensagem ao cliente</button>' : '') + (p.link ? '<a class="btn sm fant" href="' + esc(p.link) + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Abrir processo</a>' : '<a class="btn sm fant" href="' + esc(t.site || '#') + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Site do ' + esc(p.tribunal) + '</a>') + '</div></div>';
   if (a) h += '<div class="card" style="margin-top:12px;border-color:var(--' + (f.c || 'line') + ')"><div class="item"><div class="ic-circ ' + (f.c || 'ouro') + '">' + ic('relogio', 's') + '</div><div class="mid"><div class="t">' + esc(a.t) + '</div><div class="d">' + esc(dataBR(a.d)) + ' · ' + esc(f.t) + '</div></div></div></div>';
   const pl = pctVale(p, 'liminar'), pe = pctVale(p, 'exito'), base = p.valor_proveito != null ? Number(p.valor_proveito) : (p.valor_causa != null ? Number(p.valor_causa) : null);
   const est = (pc) => pc && base != null ? ' · cerca de <b>' + brl(base * pc.v / 100) + '</b>' : '';
   const ex = (d.exito || []).filter((e) => e.processo_id === p.id);
+  const coms = (d.comunicados || []).filter((c) => c.processo_id === p.id);
   h += '<div class="card" style="margin-top:12px"><div class="cab"><h2>Decisões e honorários de êxito</h2></div><div class="corpo plista">' +
     linha('Liminar', '<span class="chip ' + (LIM_PROC[p.liminar] || ['', ''])[1] + '">' + esc((LIM_PROC[p.liminar] || [p.liminar || '—'])[0]) + '</span>' + (p.liminar_data ? ' em ' + dataBR(p.liminar_data) : '')) +
     linha('Resultado', p.resultado ? esc((p.resultado_tipo === 'ACORDAO' ? 'Acórdão ' : 'Sentença ') + (RES_PROC[p.resultado] || '').toLowerCase()) + (p.resultado_data ? ' em ' + dataBR(p.resultado_data) : '') + (p.transito_julgado ? ' · <b>transitado em julgado</b>' + (p.transito_data ? ' em ' + dataBR(p.transito_data) : '') : ' · sem trânsito em julgado') : '<span class="mut">ainda sem sentença</span>') +
@@ -1674,10 +1693,22 @@ VIEWS.processo = async (id, forcar) => {
     linha('Valor da causa', p.valor_causa != null ? brl(p.valor_causa) : '') + linha('Ajuizado em', dataBR(p.data_ajuizamento)) + linha('Meta para ajuizar', p.status === 'A_AJUIZAR' ? dataBR(p.meta_ajuizamento) : '') +
     linha('Caso no app', p.caso_id ? '<a href="#/caso/' + p.caso_id + '" style="color:var(--gold);font-weight:600">Abrir caso</a>' : '') + linha('Observações', p.obs ? esc(p.obs).replace(/\n/g, '<br>') : '') + '</div></div>' +
     '<div class="card"><div class="cab"><h2>Andamentos</h2></div><div class="corpo"><div class="and-novo"><input class="inp" id="anD" type="date" value="' + esc(d.hoje || hojeChave()) + '"><textarea class="inp" id="anT" rows="2" placeholder="Ex.: Petição inicial protocolada; despacho citando o réu; prazo de 15 dias para réplica…"></textarea><button class="btn pri sm" id="bAnd">' + ic('mais2', 's') + ' Registrar</button></div>' +
-    '<div class="timeline">' + ((p.andamentos || []).length ? p.andamentos.map((x) => '<div class="tl-i"><span class="tl-d">' + esc(dataBR(x.data)) + '</span><div class="tl-t">' + esc(x.texto).replace(/\n/g, '<br>') + '</div><button class="btn fant ico sm" title="Apagar" data-apaga="' + x.id + '">' + ic('x', 's') + '</button></div>').join('') : '<div class="mut pq" style="padding:10px 0">Nenhum andamento registrado.</div>') + '</div></div></div></div>';
+    '<div class="timeline">' + ((p.andamentos || []).length ? p.andamentos.map((x) => { const cm = coms.find((c) => c.andamento_id === x.id && c.status !== 'DESCARTADO'); return '<div class="tl-i"><span class="tl-d">' + esc(dataBR(x.data)) + '</span><div class="tl-t">' + esc(x.texto).replace(/\n/g, '<br>') +
+      (cm ? '<div style="margin-top:4px"><span class="chip ' + (cm.status === 'ENVIADO' ? 'ok' : 'warn') + '" ' + (cm.status !== 'ENVIADO' ? 'data-com="' + cm.id + '" style="cursor:pointer"' : '') + '>' + ic('zap', 's') + ' ' + (cm.status === 'ENVIADO' ? 'cliente avisado ' + esc(dataCurta(cm.enviado_em)) : 'aviso aguardando aprovação') + '</span></div>' : '') + '</div>' +
+      (!cm && p.tem_whatsapp ? '<button class="btn fant ico sm" title="Avisar o cliente (a Helena escreve e você aprova)" data-avisa="' + x.id + '">' + ic('zap', 's') + '</button>' : '') +
+      '<button class="btn fant ico sm" title="Apagar" data-apaga="' + x.id + '">' + ic('x', 's') + '</button></div>'; }).join('') : '<div class="mut pq" style="padding:10px 0">Nenhum andamento registrado.</div>') + '</div></div></div></div>';
+  const vistos = coms.filter((c) => c.status !== 'DESCARTADO');
+  h += '<div class="card" style="margin-top:12px"><div class="cab"><h2>Comunicações ao cliente</h2></div>' + (vistos.length ? '<div class="lista">' + vistos.map(itemComunicado).join('') + '</div>'
+    : '<div class="corpo pq mut">' + (p.tem_whatsapp ? 'Nenhuma mensagem enviada sobre este processo ainda. Toque no ícone do WhatsApp ao lado de um andamento, ou "Mensagem ao cliente", e a Helena escreve para você aprovar.' : 'Para avisar o cliente pelo WhatsApp, vincule este processo ao caso dele (Editar → Caso no app).') + '</div>') + '</div>';
   $('#cont').innerHTML = h;
   const recarregar = async () => { delete S.cache.proc; await VIEWS.processo(id, true); };
   ligarExito(recarregar);
+  ligarComunicados(d, recarregar);
+  $$('[data-avisa]').forEach((b) => b.onclick = () => avisarCliente(b, { processo_id: p.id, andamento_id: b.dataset.avisa }, recarregar));
+  const bm = $('#bMsgCli'); if (bm) bm.onclick = async () => {
+    const t = await pedirTexto('Mensagem ao cliente', 'Escreva o recado do jeito que vier; a Helena transforma em uma mensagem clara para ' + p.cliente.split(' ')[0] + ' e você aprova antes do envio.', 'Ex.: o perito marcou a vistoria do imóvel para 15/10 às 14h; ele precisa estar em casa', true);
+    if (t) avisarCliente(bm, { processo_id: p.id, texto: t }, recarregar);
+  };
   $('#bEdProc').onclick = () => editarProcesso(p, d.casos);
   const cp = $('[data-copiar]'); if (cp) cp.onclick = () => { try { navigator.clipboard.writeText(cp.dataset.copiar); toast('Número copiado'); } catch (e) {} };
   $('#bAnd').onclick = async (e) => {
@@ -1756,6 +1787,54 @@ function ligarExito(depois) {
     ev.preventDefault(); ev.stopPropagation();
     try { await agir(b, () => api('processo_exito', { id: b.dataset.ex, status: b.dataset.st }), b.dataset.st === 'COBRADO' ? 'Marcado como cobrado' : b.dataset.st === 'DISPENSADO' ? 'Dispensado' : 'Voltou para pendente'); delete S.cache.proc; await depois(); } catch (e) {}
   });
+}
+
+// ---------- avisos ao cliente (Helena escreve, o Dr. Fábio aprova) ----------
+const ORIG_COM = { ANDAMENTO: 'Andamento', MANUAL: 'Recado seu', MARCO: 'Marco do processo', MENSAL: 'Informe mensal' };
+function itemComunicado(c) {
+  const st = { REDIGINDO: ['Helena escrevendo', ''], RASCUNHO: ['Aguardando aprovação', 'warn'], FALHOU: ['Não enviado', 'bad'], ENVIADO: ['Enviado', 'ok'], DESCARTADO: ['Descartado', ''] }[c.status] || [c.status, ''];
+  const abre = c.status !== 'ENVIADO';
+  return '<div class="item' + (abre ? ' clic" data-com="' + c.id : '') + '"><div class="ic-circ ' + (c.status === 'ENVIADO' ? 'ok' : 'warn') + '">' + ic('zap', 's') + '</div><div class="mid"><div class="t">' + esc(c.cliente) + ' · <span class="mut" style="font-weight:500">' + esc(ORIG_COM[c.origem] || c.origem) + '</span></div>' +
+    '<div class="d com-prev">' + esc(String(c.texto || (c.status === 'REDIGINDO' ? 'A Helena está escrevendo…' : '')).replace(/\s+/g, ' ').slice(0, 220)) + '</div>' + (c.erro && c.status === 'FALHOU' ? '<div class="d" style="color:var(--bad)">' + esc(String(c.erro).slice(0, 160)) + '</div>' : '') + '</div>' +
+    '<div class="dir"><span class="chip ' + st[1] + '">' + st[0] + '</span><span class="pp mut">' + esc(quando(c.enviado_em || c.created_at, true)) + '</span></div></div>';
+}
+function ligarComunicados(d, depois) {
+  $$('[data-com]').forEach((el) => el.onclick = (ev) => { ev.preventDefault(); const c = (d.comunicados || []).find((x) => x.id === el.dataset.com); if (c) revisarComunicado(c, depois); });
+}
+async function avisarCliente(btn, dados_, depois) {
+  try {
+    const r = await agir(btn, async () => {
+      const x = await api('processo_comunicar', dados_);
+      if (!x || x.ok === false) throw new Error((x && x.erro) || 'Não foi possível preparar o aviso.');
+      toast('A Helena está escrevendo a mensagem…');
+      await api('processo_redigir', { id: x.id });
+      return x;
+    });
+    delete S.cache.proc;
+    const d = await dados('proc', 'processos', null, true);
+    const c = (d.comunicados || []).find((k) => k.id === r.id);
+    if (c) await revisarComunicado(c, depois); else await depois();
+  } catch (e) { delete S.cache.proc; }
+}
+async function revisarComunicado(c, depois) {
+  if (c.status === 'REDIGINDO') {
+    const v = await modal({ titulo: 'Aviso para ' + c.cliente, corpo: '<p class="pq mut" style="margin:0">A Helena ainda não terminou de escrever esta mensagem.</p>', botoes: [{ t: 'Descartar', c: 'fant', v: 'descartar' }, { t: 'Fechar', c: 'fant', v: null }, { t: 'Escrever agora', c: 'pri', v: 'refazer' }] });
+    if (!v) return;
+    try { if (v === 'descartar') await api('processo_descartar', { id: c.id }); else { toast('A Helena está escrevendo…'); await api('processo_redigir', { id: c.id }); } } catch (e) { toast(e.message, true); }
+    delete S.cache.proc; return depois();
+  }
+  const v = await modal({ titulo: 'Aviso para ' + c.cliente, corpo:
+    '<p class="pq mut" style="margin:0 0 8px">' + esc(ORIG_COM[c.origem] || '') + ' · ' + esc(c.tribunal) + (c.numero ? ' ' + esc(c.numero) : '') + '. Ajuste o texto se quiser; só sai depois que você tocar em <b>Enviar</b>.</p>' +
+    (c.status === 'FALHOU' && c.erro ? '<p class="pq" style="color:var(--bad);margin:0 0 8px">Última tentativa: ' + esc(String(c.erro).slice(0, 200)) + '</p>' : '') +
+    '<textarea class="inp" id="ctx" rows="11" style="font-size:14.5px;line-height:1.5">' + esc(c.texto || '') + '</textarea><p class="pp mut" style="margin:6px 0 0">Vai como mensagem da Helena no WhatsApp do escritório. Se o cliente não escreve há mais de 24 horas, segue pelo modelo de mensagem aprovado pela Meta.</p>',
+    botoes: [{ t: 'Descartar', c: 'fant', v: 'descartar' }, { t: 'Reescrever', c: 'fant', v: 'refazer' }, { t: 'Enviar', c: 'pri', v: (m) => { const t = $('#ctx', m).value.trim(); if (t.length < 5) return false; return { texto: t }; } }] });
+  if (!v) return;
+  try {
+    if (v === 'descartar') { await api('processo_descartar', { id: c.id }); toast('Aviso descartado'); }
+    else if (v === 'refazer') { toast('A Helena está reescrevendo…'); await api('processo_redigir', { id: c.id }); delete S.cache.proc; const d = await dados('proc', 'processos', null, true); const n = (d.comunicados || []).find((k) => k.id === c.id); if (n) return revisarComunicado(n, depois); }
+    else { const r = await api('processo_enviar', { id: c.id, texto: v.texto === c.texto ? '' : v.texto }); toast((r && r.mensagem) || 'Enviado.'); }
+  } catch (e) { toast(e.message, true); }
+  delete S.cache.proc; return depois();
 }
 </script>
 </body>
