@@ -405,6 +405,11 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .kpis.kpis4{grid-template-columns:repeat(4,minmax(0,1fr))}@media (max-width:760px){.kpis.kpis4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ic-circ.nav{background:var(--navy);color:#fff}
 @media (max-width:560px){.item.proc .tsig{display:none}}
+.filtros .fsep{flex:none;width:1px;background:var(--line-2);margin:4px 2px}
+.filtros button svg.i{width:13px;height:13px;vertical-align:-2px}
+.item.proc .dir .chip.ok{font-size:11px;height:22px}
+.modal .sec-mod{font:700 12px var(--sans);text-transform:uppercase;letter-spacing:.7px;color:var(--gold);margin:18px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
+.chk{display:flex;align-items:center;gap:6px;font-size:14px;margin-bottom:6px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1557,6 +1562,14 @@ const TRIB = {
   STF: { nome: 'STF', longo: 'Supremo Tribunal Federal', sis: 'STF', site: 'https://portal.stf.jus.br', logo: 'STF' }
 };
 const ST_PROC = { A_AJUIZAR: ['A ajuizar', 'ouro'], AJUIZADO: ['Ajuizado', 'info'], EM_ANDAMENTO: ['Em andamento', 'info'], SUSPENSO: ['Suspenso', 'warn'], SENTENCIADO: ['Sentenciado', 'ok'], EM_RECURSO: ['Em recurso', 'nav'], ENCERRADO: ['Encerrado', ''] };
+const LIM_PROC = { NAO_PEDIDA: ['Liminar não pedida', ''], PEDIDA: ['Liminar pedida', 'warn'], DEFERIDA: ['Liminar deferida', 'ok'], INDEFERIDA: ['Liminar indeferida', 'bad'] };
+const RES_PROC = { PROCEDENTE: 'Procedente', PARCIALMENTE_PROCEDENTE: 'Parcialmente procedente', IMPROCEDENTE: 'Improcedente' };
+const DEC_PROC = { liminar: 'Liminar deferida', procedente: 'Procedente (sentença/acórdão)' };
+const procedente = (p) => p.resultado === 'PROCEDENTE' || p.resultado === 'PARCIALMENTE_PROCEDENTE';
+const pctBR = (n) => String(Math.round(Number(n) * 100) / 100).replace('.', ',') + '%';
+// percentual que vale para o processo: o informado nele ou, se vazio, o do contrato do caso
+const pctVale = (p, k) => p[k === 'liminar' ? 'perc_liminar' : 'perc_exito'] != null ? { v: Number(p[k === 'liminar' ? 'perc_liminar' : 'perc_exito']), de: 'processo' } : (p.contrato && p.contrato['percentual_' + k] != null ? { v: Number(p.contrato['percentual_' + k]), de: 'contrato' } : null);
+const chipsDecisao = (p) => (p.liminar === 'DEFERIDA' ? '<span class="chip ok">Liminar deferida</span>' : '') + (procedente(p) ? '<span class="chip ok">' + (p.resultado === 'PARCIALMENTE_PROCEDENTE' ? 'Parc. procedente' : 'Procedente') + (p.transito_julgado ? ' · trânsito' : '') + '</span>' : '');
 const GRUPO_PROC = { todos: 'Todos', ajuizar: 'A ajuizar', andamento: 'Em andamento', encerrados: 'Encerrados' };
 const grupoDe = (p) => p.status === 'A_AJUIZAR' ? 'ajuizar' : p.status === 'ENCERRADO' ? 'encerrados' : 'andamento';
 const logoTrib = (t, cls) => { const x = TRIB[t]; return x ? '<span class="tlogo ' + (cls || '') + '"><img src="' + TRIB_LOGO[x.logo] + '" alt="' + esc(x.nome) + '"></span>' : ''; };
@@ -1569,7 +1582,7 @@ function alvoProc(p) {
   if (p.status === 'A_AJUIZAR' && p.meta_ajuizamento) return { d: String(p.meta_ajuizamento).slice(0, 10), t: 'Meta para ajuizar' };
   return null;
 }
-S.procFiltro = S.procFiltro || { trib: '', grupo: 'todos', q: '' };
+S.procFiltro = S.procFiltro || { trib: '', grupo: 'todos', q: '', dec: '' };
 VIEWS.processos = async (_, forcar) => {
   titulo('Processos', '<button class="btn sm pri" id="bNovoProc">' + ic('mais2', 's') + '<span class="so-desk"> Novo processo</span></button>');
   if (!S.cache.proc) carregando(4);
@@ -1591,14 +1604,17 @@ VIEWS.processos = async (_, forcar) => {
     return '<button class="card trib' + (F.trib === k ? ' on' : '') + '" data-trib="' + k + '"><span class="tl">' + logoTrib(k, 'g') + '</span><span class="tn">' + t.nome + '</span><span class="ts">' + esc(t.longo) + '</span>' +
       '<span class="tc">' + (c.ajuizar + c.andamento ? (c.andamento ? '<b>' + c.andamento + '</b> em andamento' : '') + (c.ajuizar && c.andamento ? ' · ' : '') + (c.ajuizar ? '<b>' + c.ajuizar + '</b> a ajuizar' : '') : 'nenhum processo') + '</span></button>';
   }).join('') + '</div>';
+  const pend = (d.exito || []).filter((e) => e.status === 'PENDENTE');
+  if (pend.length) h += '<div class="sec-tit">' + ic('din', 's') + ' Otávio · honorários de liminar e êxito a cobrar<span class="mut pp" style="margin-left:auto;text-transform:none;letter-spacing:0">' + pend.length + '</span></div><div class="card lista">' + pend.map(itemExito).join('') + '</div>';
   h += '<div class="proc-bar"><div class="filtros" style="margin:0">' + Object.entries(GRUPO_PROC).map(([k, t]) => '<button data-g="' + k + '"' + (F.grupo === k ? ' class="on"' : '') + '>' + t + '</button>').join('') +
+    '<span class="fsep"></span>' + Object.entries(DEC_PROC).map(([k, t]) => '<button data-dec="' + k + '"' + (F.dec === k ? ' class="on"' : '') + '>' + (F.dec === k ? ic('check', 's') + ' ' : '') + t + '</button>').join('') +
     (F.trib ? '<button data-limpa class="on">' + esc(F.trib) + ' ' + ic('x', 's') + '</button>' : '') + '</div>' +
     '<input class="inp" id="procQ" type="search" placeholder="Buscar cliente, parte ou número" value="' + esc(F.q) + '"></div>';
   h += '<div id="procLista"></div>';
   $('#cont').innerHTML = h;
   const desenhar = () => {
     const q = F.q.toLowerCase().trim(), qd = q.replace(/\D/g, '');
-    const lista = itens.filter((p) => (!F.trib || p.tribunal === F.trib) && (F.grupo === 'todos' || grupoDe(p) === F.grupo) &&
+    const lista = itens.filter((p) => (!F.trib || p.tribunal === F.trib) && (F.grupo === 'todos' || grupoDe(p) === F.grupo) && (!F.dec || (F.dec === 'liminar' ? p.liminar === 'DEFERIDA' : procedente(p))) &&
       (!q || [p.cliente, p.parte_contraria, p.classe, p.orgao, p.numero].join(' ').toLowerCase().includes(q) || (qd.length > 3 && String(p.numero || '').replace(/\D/g, '').includes(qd))));
     let l = '';
     if (!itens.length) l = '<div class="card" style="margin-top:14px"><div class="vazio">' + ic('martelo') + '<div>Nenhum processo cadastrado ainda.</div><div class="pq mut" style="max-width:420px">Cadastre as ações que vão ser ajuizadas no TJRS, TRF4, TJSP, TRF2, STJ ou STF e acompanhe aqui os andamentos e as próximas providências.</div><button class="btn pri" style="margin-top:12px" data-novo>' + ic('mais2', 's') + ' Cadastrar o primeiro</button></div></div>';
@@ -1613,7 +1629,7 @@ VIEWS.processos = async (_, forcar) => {
           l += '<a class="item proc" href="#/processo/' + p.id + '">' + logoTrib(p.tribunal) + '<div class="mid"><div class="t">' + esc(p.cliente) + (p.parte_contraria ? ' <span class="mut" style="font-weight:500">× ' + esc(p.parte_contraria) + '</span>' : '') + '</div>' +
             '<div class="d">' + [p.numero ? '<span class="cnj">' + esc(p.numero) + '</span>' : (p.status === 'A_AJUIZAR' ? 'sem número ainda' : ''), esc(p.classe || ''), esc(p.orgao || '')].filter(Boolean).join(' · ') + '</div>' +
             (a ? '<div class="d" style="margin-top:4px">' + ic('relogio', 's') + ' ' + esc(a.t) + ' · <b style="color:var(--' + (f.c || 'mut') + ')">' + esc(dataBR(a.d)) + ' (' + esc(f.t) + ')</b></div>' : '') +
-            '</div><div class="dir"><span class="tsig">' + esc(p.tribunal) + '</span>' + chipProc(p.status) + '</div></a>';
+            '</div><div class="dir"><span class="tsig">' + esc(p.tribunal) + '</span>' + chipProc(p.status) + chipsDecisao(p) + '</div></a>';
         });
         l += '</div>';
       });
@@ -1624,6 +1640,8 @@ VIEWS.processos = async (_, forcar) => {
   desenhar();
   $$('[data-trib]').forEach((b) => b.onclick = () => { F.trib = F.trib === b.dataset.trib ? '' : b.dataset.trib; VIEWS.processos(); });
   $$('[data-g]').forEach((b) => b.onclick = () => { F.grupo = b.dataset.g; VIEWS.processos(); });
+  $$('[data-dec]').forEach((b) => b.onclick = () => { F.dec = F.dec === b.dataset.dec ? '' : b.dataset.dec; VIEWS.processos(); });
+  ligarExito(() => VIEWS.processos(null, true));
   const lp = $('[data-limpa]'); if (lp) lp.onclick = () => { F.trib = ''; VIEWS.processos(); };
   $('#procQ').oninput = (e) => { F.q = e.target.value; desenhar(); };
   $('#bNovoProc').onclick = () => editarProcesso({ tribunal: F.trib || 'TJRS' }, d.casos);
@@ -1640,6 +1658,17 @@ VIEWS.processo = async (id, forcar) => {
     '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">' + chipProc(p.status) + (p.numero ? '<span class="chip cnj" data-copiar="' + esc(p.numero) + '" title="Copiar número" style="cursor:pointer">' + esc(p.numero) + '</span>' : '') + '</div></div>' +
     '<div class="proc-acoes"><button class="btn sm" id="bEdProc">' + ic('caneta', 's') + ' Editar</button>' + (p.link ? '<a class="btn sm fant" href="' + esc(p.link) + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Abrir processo</a>' : '<a class="btn sm fant" href="' + esc(t.site || '#') + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Site do ' + esc(p.tribunal) + '</a>') + '</div></div>';
   if (a) h += '<div class="card" style="margin-top:12px;border-color:var(--' + (f.c || 'line') + ')"><div class="item"><div class="ic-circ ' + (f.c || 'ouro') + '">' + ic('relogio', 's') + '</div><div class="mid"><div class="t">' + esc(a.t) + '</div><div class="d">' + esc(dataBR(a.d)) + ' · ' + esc(f.t) + '</div></div></div></div>';
+  const pl = pctVale(p, 'liminar'), pe = pctVale(p, 'exito'), base = p.valor_proveito != null ? Number(p.valor_proveito) : (p.valor_causa != null ? Number(p.valor_causa) : null);
+  const est = (pc) => pc && base != null ? ' · cerca de <b>' + brl(base * pc.v / 100) + '</b>' : '';
+  const ex = (d.exito || []).filter((e) => e.processo_id === p.id);
+  h += '<div class="card" style="margin-top:12px"><div class="cab"><h2>Decisões e honorários de êxito</h2></div><div class="corpo plista">' +
+    linha('Liminar', '<span class="chip ' + (LIM_PROC[p.liminar] || ['', ''])[1] + '">' + esc((LIM_PROC[p.liminar] || [p.liminar || '—'])[0]) + '</span>' + (p.liminar_data ? ' em ' + dataBR(p.liminar_data) : '')) +
+    linha('Resultado', p.resultado ? esc((p.resultado_tipo === 'ACORDAO' ? 'Acórdão ' : 'Sentença ') + (RES_PROC[p.resultado] || '').toLowerCase()) + (p.resultado_data ? ' em ' + dataBR(p.resultado_data) : '') + (p.transito_julgado ? ' · <b>transitado em julgado</b>' + (p.transito_data ? ' em ' + dataBR(p.transito_data) : '') : ' · sem trânsito em julgado') : '<span class="mut">ainda sem sentença</span>') +
+    linha('% por liminar', pl ? pctBR(pl.v) + ' <span class="mut">(' + pl.de + ')</span>' + est(pl) : '<span class="mut">não informado' + (p.caso_id ? ' no contrato' : ' (vincule o caso ou informe no processo)') + '</span>') +
+    linha('% de êxito', pe ? pctBR(pe.v) + ' <span class="mut">(' + pe.de + ')</span>' + est(pe) : '<span class="mut">não informado' + (p.caso_id ? ' no contrato' : ' (vincule o caso ou informe no processo)') + '</span>') +
+    linha('Base de cálculo', base != null ? brl(base) + ' <span class="mut">(' + (p.valor_proveito != null ? 'proveito econômico' : 'valor da causa') + ')</span>' : '') +
+    linha('O que conta como proveito', esc(p.base_exito || (p.contrato && p.contrato.base_exito) || '')) + '</div>' +
+    (ex.length ? '<div class="lista" style="border-top:1px solid var(--line)">' + ex.map(itemExito).join('') + '</div>' : '') + '</div>';
   h += '<div class="grid g2" style="margin-top:12px"><div class="card"><div class="cab"><h2>Dados</h2></div><div class="corpo plista">' +
     linha('Tribunal', esc(p.tribunal)) + linha('Polo do cliente', p.polo === 'ATIVO' ? 'Autor (polo ativo)' : p.polo === 'PASSIVO' ? 'Réu (polo passivo)' : '') + linha('Classe / ação', esc(p.classe || '')) + linha('Órgão / vara', esc(p.orgao || '')) +
     linha('Valor da causa', p.valor_causa != null ? brl(p.valor_causa) : '') + linha('Ajuizado em', dataBR(p.data_ajuizamento)) + linha('Meta para ajuizar', p.status === 'A_AJUIZAR' ? dataBR(p.meta_ajuizamento) : '') +
@@ -1648,6 +1677,7 @@ VIEWS.processo = async (id, forcar) => {
     '<div class="timeline">' + ((p.andamentos || []).length ? p.andamentos.map((x) => '<div class="tl-i"><span class="tl-d">' + esc(dataBR(x.data)) + '</span><div class="tl-t">' + esc(x.texto).replace(/\n/g, '<br>') + '</div><button class="btn fant ico sm" title="Apagar" data-apaga="' + x.id + '">' + ic('x', 's') + '</button></div>').join('') : '<div class="mut pq" style="padding:10px 0">Nenhum andamento registrado.</div>') + '</div></div></div></div>';
   $('#cont').innerHTML = h;
   const recarregar = async () => { delete S.cache.proc; await VIEWS.processo(id, true); };
+  ligarExito(recarregar);
   $('#bEdProc').onclick = () => editarProcesso(p, d.casos);
   const cp = $('[data-copiar]'); if (cp) cp.onclick = () => { try { navigator.clipboard.writeText(cp.dataset.copiar); toast('Número copiado'); } catch (e) {} };
   $('#bAnd').onclick = async (e) => {
@@ -1672,6 +1702,14 @@ async function editarProcesso(x, casos) {
     g2 + campo('Órgão / vara / comarca', inp('po', x.orgao, 'Ex.: 2ª Vara Federal de Novo Hamburgo')) + campo('Valor da causa (R$)', inp('pv', x.valor_causa != null ? String(x.valor_causa).replace('.', ',') : '', '0,00')) + '</div>' +
     g2 + campo('Meta para ajuizar', inp('pm', x.meta_ajuizamento ? String(x.meta_ajuizamento).slice(0, 10) : '', '', 'date')) + campo('Ajuizado em', inp('pa', x.data_ajuizamento ? String(x.data_ajuizamento).slice(0, 10) : '', '', 'date')) + '</div>' +
     g2 + campo('Próxima providência', inp('ppa', x.proxima_acao, 'Ex.: Réplica à contestação')) + campo('Data', inp('ppd', x.proxima_data ? String(x.proxima_data).slice(0, 10) : '', '', 'date')) + '</div>' +
+    '<div class="sec-mod">Decisões</div>' +
+    g2 + campo('Liminar', '<select class="sel" id="plm" style="margin-top:6px">' + opt(LIM_PROC, x.liminar || 'NAO_PEDIDA', (v) => v[0].replace('Liminar ', '').replace(/^\w/, (c) => c.toUpperCase())) + '</select>') + campo('Data da liminar', inp('pld', x.liminar_data ? String(x.liminar_data).slice(0, 10) : '', '', 'date')) + '</div>' +
+    g2 + campo('Resultado', '<select class="sel" id="prs" style="margin-top:6px"><option value="">— sem sentença ainda —</option>' + opt(RES_PROC, x.resultado) + '</select>') + campo('Por', '<select class="sel" id="prt" style="margin-top:6px">' + opt({ SENTENCA: 'Sentença', ACORDAO: 'Acórdão' }, x.resultado_tipo || 'SENTENCA') + '</select>') + '</div>' +
+    g2 + campo('Data da decisão', inp('prd', x.resultado_data ? String(x.resultado_data).slice(0, 10) : '', '', 'date')) + campo('Trânsito em julgado', '<label class="chk" style="margin-top:6px"><input type="checkbox" id="ptj"' + (x.transito_julgado ? ' checked' : '') + '> Transitou</label>' + inp('ptd', x.transito_data ? String(x.transito_data).slice(0, 10) : '', '', 'date')) + '</div>' +
+    '<div class="sec-mod">Honorários de liminar e êxito</div><p class="pp mut" style="margin:0">Deixe em branco para usar o percentual do contrato do caso' + (x.contrato ? ' (liminar ' + pctBR(x.contrato.percentual_liminar || 0) + ', êxito ' + pctBR(x.contrato.percentual_exito || 0) + ')' : '') + '. Quando a liminar for deferida, ou a sentença/acórdão procedente transitar em julgado, o Otávio é avisado.</p>' +
+    g2 + campo('% por liminar deferida', inp('ppl', x.perc_liminar != null ? String(x.perc_liminar).replace('.', ',') : '', x.contrato ? String(x.contrato.percentual_liminar || 0).replace('.', ',') + ' (contrato)' : 'do contrato')) + campo('% de êxito (ganho de causa)', inp('ppe', x.perc_exito != null ? String(x.perc_exito).replace('.', ',') : '', x.contrato ? String(x.contrato.percentual_exito || 0).replace('.', ',') + ' (contrato)' : 'do contrato')) + '</div>' +
+    g2 + campo('Proveito econômico (R$)', inp('ppv', x.valor_proveito != null ? String(x.valor_proveito).replace('.', ',') : '', 'se vazio, usa o valor da causa')) + campo('O que conta como proveito', inp('ppb', x.base_exito, (x.contrato && x.contrato.base_exito) || 'Ex.: valor do imóvel mantido')) + '</div>' +
+    '<div class="sec-mod">Vínculos</div>' +
     campo('Caso no app (opcional)', '<select class="sel" id="pca" style="margin-top:6px"><option value="">— nenhum —</option>' + (casos || []).map((c) => '<option value="' + c.id + '"' + (c.id === x.caso_id ? ' selected' : '') + '>' + esc(c.nome) + ' · ' + esc(ETAPA[c.etapa] || c.etapa) + '</option>').join('') + '</select>', ' style="margin-top:12px"') +
     campo('Link do processo (opcional)', inp('pl', x.link, 'https://…'), ' style="margin-top:12px"') +
     campo('Observações', '<textarea class="inp" id="pob" rows="3" style="margin-top:6px" placeholder="Tese, documentos pendentes, estratégia…">' + esc(x.obs || '') + '</textarea>', ' style="margin-top:12px"'),
@@ -1680,7 +1718,9 @@ async function editarProcesso(x, casos) {
       const sel = $('#pca', m).value;
       return { id: x.id || '', tribunal: ($('input[name=pt]:checked', m) || {}).value || 'TJRS', status: $('#ps', m).value, numero: $('#pn', m).value.trim(), cliente, parte_contraria: $('#pp', m).value.trim(),
         classe: $('#pcl', m).value.trim(), polo: $('#ppo', m).value, orgao: $('#po', m).value.trim(), valor_causa: $('#pv', m).value.trim(), meta_ajuizamento: $('#pm', m).value, data_ajuizamento: $('#pa', m).value,
-        proxima_acao: $('#ppa', m).value.trim(), proxima_data: $('#ppd', m).value, caso_id: sel, link: $('#pl', m).value.trim(), obs: $('#pob', m).value.trim() };
+        proxima_acao: $('#ppa', m).value.trim(), proxima_data: $('#ppd', m).value, caso_id: sel, link: $('#pl', m).value.trim(), obs: $('#pob', m).value.trim(),
+        liminar: $('#plm', m).value, liminar_data: $('#pld', m).value, resultado: $('#prs', m).value, resultado_tipo: $('#prt', m).value, resultado_data: $('#prd', m).value,
+        transito_julgado: $('#ptj', m).checked, transito_data: $('#ptd', m).value, perc_liminar: $('#ppl', m).value.trim(), perc_exito: $('#ppe', m).value.trim(), valor_proveito: $('#ppv', m).value.trim(), base_exito: $('#ppb', m).value.trim() };
     } }]) });
   if (!r) return;
   let novoId = x.id;
@@ -1688,12 +1728,34 @@ async function editarProcesso(x, casos) {
     if (r === 'excluir') {
       if (!(await confirmar('Excluir processo?', 'O processo de ' + x.cliente + ' sai da lista, com os andamentos.', 'Excluir', true))) return;
       await api('processo_excluir', { id: x.id }); toast('Processo excluído'); novoId = '';
-    } else { const s = await api('processo_salvar', r); novoId = (s && s.id) || x.id; toast('Processo salvo'); }
+    } else {
+      if (r.liminar === 'DEFERIDA' && !r.liminar_data) r.liminar_data = hojeChave();
+      if (r.transito_julgado && !r.transito_data) r.transito_data = hojeChave();
+      const s = await api('processo_salvar', r); novoId = (s && s.id) || x.id;
+      const ot = (s && s.otavio) || [];
+      toast(ot.length ? 'Processo salvo. O Otávio foi avisado: ' + ot.map((g) => g === 'LIMINAR' ? 'honorários da liminar' : 'honorários de êxito').join(' e ') + '.' : 'Processo salvo');
+    }
   } catch (e) { toast(e.message, true); return; }
   delete S.cache.proc;
   if (novoId && location.hash !== '#/processo/' + novoId) location.hash = '#/processo/' + novoId;
   else if (!novoId) { if (location.hash !== '#/processos') location.hash = '#/processos'; else VIEWS.processos(null, true); }
   else VIEWS.processo(novoId, true);
+}
+
+// item da fila de honorários de liminar/êxito (Otávio) com ações Cobrado / Dispensar
+function itemExito(e) {
+  const lim = e.gatilho === 'LIMINAR', fim = e.status !== 'PENDENTE';
+  const conta = e.percentual == null ? 'percentual não informado: confira o contrato' : pctBR(e.percentual) + (e.valor_estimado != null ? ' de ' + brl(e.base_valor) + ' = <b>' + brl(e.valor_estimado) + '</b>' : ' (falta o valor do proveito)');
+  return '<div class="item"><div class="ic-circ ' + (fim ? '' : 'ok') + '">' + ic(lim ? 'martelo' : 'din', 's') + '</div><div class="mid"><div class="t">' + (lim ? 'Liminar deferida' : 'Ganho de causa transitado') + ' · <a href="#/processo/' + e.processo_id + '" style="color:inherit">' + esc(e.cliente) + '</a></div>' +
+    '<div class="d">' + esc(e.tribunal) + (e.numero ? ' ' + esc(e.numero) : '') + ' · ' + dataBR(e.data_evento) + ' · ' + conta + '</div></div><div class="dir" style="flex-direction:row;gap:6px">' +
+    (fim ? '<span class="chip ' + (e.status === 'COBRADO' ? 'ok' : '') + '">' + (e.status === 'COBRADO' ? 'cobrado' : 'dispensado') + '</span><button class="btn sm fant" data-ex="' + e.id + '" data-st="PENDENTE" title="Voltar para pendente">' + ic('att', 's') + '</button>'
+      : '<button class="btn sm fant" data-ex="' + e.id + '" data-st="DISPENSADO">Dispensar</button><button class="btn sm pri" data-ex="' + e.id + '" data-st="COBRADO">' + ic('check', 's') + ' Cobrado</button>') + '</div></div>';
+}
+function ligarExito(depois) {
+  $$('[data-ex]').forEach((b) => b.onclick = async (ev) => {
+    ev.preventDefault(); ev.stopPropagation();
+    try { await agir(b, () => api('processo_exito', { id: b.dataset.ex, status: b.dataset.st }), b.dataset.st === 'COBRADO' ? 'Marcado como cobrado' : b.dataset.st === 'DISPENSADO' ? 'Dispensado' : 'Voltou para pendente'); delete S.cache.proc; await depois(); } catch (e) {}
+  });
 }
 </script>
 </body>
