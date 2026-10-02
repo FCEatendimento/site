@@ -2040,7 +2040,6 @@ async function carregarProcessosDoCaso(c, forcar) {
 function prazosPorDia(d) {
   const out = [];
   (d.compromissos || []).forEach((c) => { if (c.tipo === 'PRAZO' && !c.concluido) out.push({ dia: String(c.data).slice(0, 10), tribunal: c.tribunal, titulo: c.titulo, cliente: c.cliente, numero: c.numero, proc: c.processo_id, hora: c.hora || '' }); });
-  (d.itens || []).forEach((p) => { if (p.status !== 'ENCERRADO' && p.proxima_data) out.push({ dia: String(p.proxima_data).slice(0, 10), tribunal: p.tribunal, titulo: p.proxima_acao || 'Próxima providência', cliente: p.cliente, numero: p.numero, proc: p.id, hora: '' }); });
   return out;
 }
 async function calendarioPrazos(el, forcar) {
