@@ -1,0 +1,22 @@
+name: Gerar guias do site
+on:
+  push:
+    branches: [main]
+    paths: ['content/**', 'scripts/gerar_guias.py']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/gerar_guias.py
+      - run: |
+          git config user.name "FCE Site"
+          git config user.email "atendimento@fceadvogados.com.br"
+          git add -A guia sobre index.html sitemap.xml
+          git diff --cached --quiet || (git commit -m "Site: guias regerados" && git push)
