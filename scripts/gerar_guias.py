@@ -24,13 +24,34 @@ ART_CSS='''<style>
 .cards a{display:grid;gap:.5rem;padding:1.25rem;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-decoration:none}
 .cards a:hover{border-color:var(--ink)}
 .cards span{color:var(--muted);font-size:.95rem}
+.cards time{font:500 .78rem var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.eb-grid{display:grid;grid-template-columns:1.2fr 1fr;column-gap:clamp(1.5rem,4vw,3rem);align-items:start}.eb-int{grid-column:1;grid-row:1}.eb-det{grid-column:1;grid-row:2}.eb-form{grid-column:2;grid-row:1/span 2}
+.eb .wrap{max-width:var(--wrap)}
+.eb-capa{width:min(220px,60%);height:auto;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.2);margin:.5rem 0 1rem}
+.eb-form{position:sticky;top:5.5rem;display:grid;gap:.9rem;padding:clamp(1.25rem,3vw,1.75rem);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:8px;background:var(--surface)}
+.eb-form h2{margin:0 0 .25rem;font-size:1.35rem}
+.eb-form label{display:grid;gap:.35rem;font-weight:600;font-size:.95rem}
+.eb-form label span{font-weight:400;color:var(--muted)}
+.eb-form input,.eb-form select{font:inherit;font-weight:400;padding:.75rem .85rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+.eb-form input:focus,.eb-form select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.eb-form .eb-ok{display:flex;gap:.6rem;align-items:flex-start;font-weight:400;font-size:.88rem;line-height:1.45}
+.eb-form .eb-ok input{width:1.1rem;height:1.1rem;flex:none;margin-top:.15rem}
+.eb-form .eb-ok span{color:var(--ink)}
+.eb-form .btn{justify-content:center}
+.eb-nota{font-size:.82rem;color:var(--muted);margin:0}
+.eb-erro{background:var(--prazo-soft);color:var(--prazo);padding:.7rem .85rem;border-radius:6px;margin:0;font-size:.92rem}
+.eb-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+@media (max-width:820px){.eb-grid{grid-template-columns:1fr;row-gap:1.5rem}.eb-int,.eb-det,.eb-form{grid-column:1;grid-row:auto}.eb-form{order:2}.eb-det{order:3}.eb-form{position:static}}
+.eb-box{margin-top:2rem;padding:1.25rem;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;background:var(--surface)}
+.eb-box p{margin:.3rem 0 .9rem;color:var(--muted)}
+.dl{display:grid;gap:1rem;justify-items:start}
 </style>'''
 def fix(s, tag):
     s=s.replace('href="#inicio"','href="/"')
     s=re.sub(r'href="#([a-z]+)"', r'href="/#\1"', s)
     s=s.replace('p=home', 'p='+tag)
     return s
-def page(path, title, desc, canon, body, ld, tag):
+def page(path, title, desc, canon, body, ld, tag, robots=''):
     h=f'''<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -39,7 +60,7 @@ def page(path, title, desc, canon, body, ld, tag):
 <title>{html.escape(title)}</title>
 <meta name="description" content="{html.escape(desc)}">
 <link rel="icon" href="/img/logo.svg">
-<link rel="canonical" href="{canon}">
+<link rel="canonical" href="{canon}">{robots}
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="FCE Advogados">
 <meta property="og:title" content="{html.escape(title)}">
@@ -114,8 +135,68 @@ SOBRE=open(SITE+'/content/sobre.html',encoding='utf-8').read()
 ldp={"@context":"https://schema.org","@graph":[{"@type":"ProfilePage","url":"https://fceadvogados.com.br/sobre/","mainEntity":{"@id":"https://fceadvogados.com.br/sobre/#fabio"}},
  {"@type":"Person","@id":"https://fceadvogados.com.br/sobre/#fabio","name":"Fábio de Castro Emerim","jobTitle":"Advogado","identifier":"OAB/RS 88.912","image":"https://fceadvogados.com.br/img/fabio.jpg","worksFor":ORG,"url":"https://fceadvogados.com.br/sobre/","sameAs":["https://www.linkedin.com/in/fabioemerimadv"],"knowsAbout":["Leilão de imóveis","Alienação fiduciária","Execução civil","Execução fiscal","Direito tributário"],"address":{"@type":"PostalAddress","addressLocality":"Novo Hamburgo","addressRegion":"RS","addressCountry":"BR"}}]}
 page('/sobre/index.html','Fábio de Castro Emerim, advogado (OAB/RS 88.912) | FCE Advogados','Fábio de Castro Emerim, advogado em Novo Hamburgo/RS, sócio da FCE Advogados. Atuação em leilões de imóveis, execuções cíveis desde 2013 e execução fiscal desde 2017.','https://fceadvogados.com.br/sobre/',SOBRE,ldp,'sobre')
+# blog
+import datetime
+MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
+def dbr(d):
+    y,m,dd=map(int,d.split('-')); return f'{dd} de {MESES[m-1]} de {y}'
+B=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/content/blog/*.json')],key=lambda b:(b.get('data',''),b['slug']),reverse=True)
+EBOX='<aside class="eb-box"><p class="eyebrow">Guia gratuito em PDF</p><strong>Parcelas atrasadas do imóvel financiado: o que acontece e o que ainda é possível fazer</strong><p>Da intimação do cartório ao leilão, com checklist de documentos e os erros mais comuns.</p><a class="btn btn-primary" href="/ebook/?o=TAG">Baixar o guia gratuito</a></aside>'
+for b in B:
+    url=f'https://fceadvogados.com.br/blog/{b["slug"]}/'
+    outros=''.join(f'<li><a href="/blog/{o["slug"]}/">{html.escape(o["titulo"])}</a></li>' for o in B if o is not b)[:6000]
+    guias=''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for g in G[:4])
+    body=f'''  <article class="art">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › <a href="/blog/">Blog</a></p>
+      <p class="eyebrow">{b["eyebrow"]}</p>
+      <h1>{html.escape(b["titulo"])}</h1>
+      <p class="crumb"><time datetime="{b["data"]}">{dbr(b["data"])}</time> · Por <a href="/sobre/">Fábio de Castro Emerim</a></p>
+      <p class="lead">{b["lead"]}</p>
+{b["corpo"]}
+      <p class="crumb">Fábio de Castro Emerim, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Conteúdo informativo; não substitui a análise individual do caso.</p>
+      {EBOX.replace('TAG','blog-'+b['slug'][:40])}
+      <nav class="rel" aria-label="Leia também"><p class="eyebrow">Leia também</p><ul>{outros}{guias}</ul></nav>
+    </div>
+  </article>'''
+    ld={"@context":"https://schema.org","@graph":[
+      {"@type":"BlogPosting","headline":b["titulo"],"description":b["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":b["data"],"dateModified":b.get("atualizado",b["data"]),"image":"https://fceadvogados.com.br/img/whatsapp-perfil.jpg"},
+      {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fceadvogados.com.br/blog/"},{"@type":"ListItem","position":3,"name":b["titulo"],"item":url}]}]}
+    page(f'/blog/{b["slug"]}/index.html', b["seo"] if 'FCE' in b["seo"] else b["seo"]+' | FCE Advogados', b["desc"], url, body, ld, 'blog')
+cards=''.join(f'<a href="/blog/{b["slug"]}/"><time datetime="{b["data"]}">{dbr(b["data"])}</time><strong>{html.escape(b["titulo"])}</strong><span>{html.escape(b["desc"])}</span></a>' for b in B) or '<p>Em breve, os primeiros artigos.</p>'
+body=f'''  <article class="art">
+    <div class="wrap" style="max-width:var(--wrap)">
+      <p class="crumb"><a href="/">Início</a> › Blog</p>
+      <p class="eyebrow">Leilão de imóveis</p>
+      <h1>Blog da FCE Advogados</h1>
+      <p class="lead">Artigos sobre leilão de imóveis, alienação fiduciária e arrematação: novidades, alertas e explicações para quem tem imóvel em risco e para quem quer comprar em leilão. Procurando a explicação de uma fase específica? Veja os <a href="/guia/">guias por situação</a>.</p>
+      <div class="cards">{cards}</div>
+      {EBOX.replace('TAG','blog')}
+    </div>
+  </article>'''
+ld={"@context":"https://schema.org","@type":"Blog","name":"Blog da FCE Advogados","url":"https://fceadvogados.com.br/blog/","publisher":ORG,"inLanguage":"pt-BR","blogPost":[{"@type":"BlogPosting","headline":b["titulo"],"url":f'https://fceadvogados.com.br/blog/{b["slug"]}/',"datePublished":b["data"]} for b in B]}
+page('/blog/index.html','Blog sobre leilão de imóveis e alienação fiduciária | FCE Advogados','Artigos da FCE Advogados sobre leilão de imóveis, alienação fiduciária, arrematação e golpes: novidades e alertas em linguagem simples.','https://fceadvogados.com.br/blog/',body,ld,'blog')
+# e-book e privacidade
+EB=open(SITE+'/content/ebook.html',encoding='utf-8').read()
+lde={"@context":"https://schema.org","@type":"WebPage","name":"Guia gratuito: parcelas atrasadas do imóvel financiado","url":"https://fceadvogados.com.br/ebook/","publisher":ORG,"author":AUT}
+page('/ebook/index.html','Guia gratuito: parcelas atrasadas do imóvel financiado (PDF) | FCE Advogados','Baixe grátis o guia em PDF sobre parcelas atrasadas e alienação fiduciária: da intimação do cartório ao leilão, com checklist de documentos.','https://fceadvogados.com.br/ebook/',EB,lde,'ebook')
+OB='''  <article class="art">
+    <div class="wrap">
+      <p class="eyebrow">Pronto</p>
+      <h1>O seu guia está aqui</h1>
+      <p class="lead">Obrigado. Baixe o PDF agora e guarde no celular para consultar quando precisar.</p>
+      <div class="dl">
+        <a class="btn btn-primary" href="/ebook/fce-guia-parcelas-atrasadas.pdf" download>Baixar o guia em PDF</a>
+        <p>Se preferir, comece pelo capítulo 2, “A linha do tempo”, e pelo quadro “Onde você está agora?”, na última parte.</p>
+        <p>Enquanto isso, veja também os <a href="/guia/">guias por situação</a> e o <a href="/blog/">blog</a>.</p>
+      </div>
+    </div>
+  </article>'''
+page('/ebook/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito sobre parcelas atrasadas do imóvel financiado.','https://fceadvogados.com.br/ebook/obrigado/',OB,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'ebook-obrigado','<meta name="robots" content="noindex">')
+PR=open(SITE+'/content/privacidade.html',encoding='utf-8').read()
+page('/privacidade/index.html','Política de privacidade | FCE Advogados','Como a FCE Advogados trata dados pessoais de visitantes, contatos e clientes, nos termos da LGPD.','https://fceadvogados.com.br/privacidade/',PR,{"@context":"https://schema.org","@type":"WebPage","name":"Política de privacidade","url":"https://fceadvogados.com.br/privacidade/","publisher":ORG},'privacidade')
 # sitemap
-urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]
+urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/privacidade/']
 open(SITE+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{u}</loc><lastmod>2026-10-03</lastmod></url>\n' for u in urls)+'</urlset>\n')
 print('ok')
 

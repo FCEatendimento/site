@@ -226,6 +226,8 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 @media (max-width:360px){.menu-btn{font-size:0;gap:0;padding:.55rem}.menu-btn svg{width:1.2rem;height:1.2rem}}
 .top nav a{white-space:nowrap}.brand-tag{white-space:nowrap}
 @media (min-width:761px) and (max-width:1180px){.top nav a[href$="#localizacao"],.top nav a[href$="#perguntas"]{display:none}}
+.ebook-cta{margin-top:1.5rem;display:grid;grid-template-columns:auto 1fr;gap:1.25rem;align-items:center;padding:1.25rem;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;background:var(--surface)}.ebook-cta img{width:84px;height:auto;border-radius:3px;box-shadow:0 4px 14px rgba(0,0,0,.18)}.ebook-cta p{margin:.25rem 0 .75rem;color:var(--muted)}.ebook-cta strong{font-family:var(--display);font-size:1.1rem}.ebook-cta .btn{display:inline-flex}
+@media (max-width:520px){.ebook-cta{grid-template-columns:1fr}.ebook-cta img{width:72px}}
 .guias-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}.guias-list a{display:block;height:100%;padding:1rem 1.15rem;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-weight:600;text-decoration:none}.guias-list a:hover{border-color:var(--ink)}
 .fase-link{display:inline-block;margin-top:.6rem;font-weight:600;color:var(--accent-text)}
 </style>
@@ -246,6 +248,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <a href="#localizacao">Localização</a>
       <a href="#perguntas">Perguntas</a>
       <a href="/calculadora/">Simulador</a>
+      <a href="/blog/">Blog</a>
       <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
       <a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=home" aria-label="Conversar pelo WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.5-.2Z"/></svg><span>WhatsApp</span></a>
     </nav>
@@ -261,6 +264,8 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <li><a href="#localizacao">Localização</a></li>
       <li><a href="#avaliacoes">Avaliações no Google</a></li>
       <li><a href="/guia/">Guias por situação</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/ebook/">E-book gratuito: parcelas atrasadas</a></li>
       <li><a href="/sobre/">Sobre o advogado</a></li>
       <li><a href="#perguntas">Perguntas frequentes</a></li>
       <li><a href="/calculadora/">Simule quanto do seu imóvel está em jogo</a></li>
@@ -501,6 +506,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
         <p>Explicações em linguagem simples sobre cada fase do leilão. <a href="/guia/">Ver todos os guias</a>.</p>
       </div>
       <ul class="guias-list"><li><a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Recebi intimação do cartório por parcelas atrasadas: o que fazer</a></li><li><a href="/guia/leilao-extrajudicial-caixa/">Leilão extrajudicial da Caixa: como funciona e o que ainda é possível fazer</a></li><li><a href="/guia/propriedade-consolidada-no-nome-do-banco/">Propriedade consolidada no nome do banco: ainda dá para reverter?</a></li><li><a href="/guia/arrematei-imovel-ocupado-desocupacao/">Arrematei um imóvel ocupado em leilão: como fazer a desocupação</a></li><li><a href="/guia/como-saber-se-meu-imovel-vai-a-leilao/">Como saber se o meu imóvel vai a leilão</a></li><li><a href="/guia/leilao-judicial-ou-extrajudicial-diferencas/">Leilão judicial e leilão extrajudicial: quais são as diferenças</a></li><li><a href="/guia/direito-de-preferencia-recomprar-imovel-antes-do-leilao/">Direito de preferência: como recomprar o imóvel antes do segundo leilão</a></li><li><a href="/guia/saldo-do-leilao-como-receber/">Sobrou dinheiro no leilão do meu imóvel: como receber o saldo</a></li><li><a href="/guia/comprar-imovel-em-leilao-checklist-do-edital/">Comprar imóvel em leilão com segurança: checklist do edital</a></li><li><a href="/guia/iptu-e-condominio-imovel-arrematado-quem-paga/">Dívidas de IPTU e condomínio no imóvel arrematado: quem paga</a></li></ul>
+      <aside class="ebook-cta"><img src="/img/ebook-capa.jpg" alt="Capa do guia em PDF Parcelas atrasadas do imóvel financiado" width="84" height="119" loading="lazy"><div><strong>Guia gratuito em PDF: parcelas atrasadas do imóvel financiado</strong><p>Da intimação do cartório ao leilão, com o que ainda é possível fazer em cada fase, um checklist de documentos e os erros mais comuns.</p><a class="btn btn-primary" href="/ebook/?o=site-home">Baixar o guia gratuito</a></div></aside>
     </div>
   </section>
 
@@ -544,7 +550,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     <div><strong>FCE Advogados</strong><br>Fabio de Castro Emerim Sociedade Individual de Advocacia<br>OAB/RS 15.656 · CNPJ 57.727.037/0001-33</div>
     <div><strong>Endereço</strong><br>Rua Araguaia, 509, Jardim Mauá<br>Novo Hamburgo/RS · CEP 93548-350</div>
     <div><strong>Contato</strong><br>WhatsApp (51) 99206-8037<br>atendimento@fceadvogados.com.br</div>
-    <p class="aviso">Conteúdo de caráter informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. As informações não substituem a análise individual de cada caso e não representam promessa de resultado.</p>
+    <p class="aviso">Conteúdo de caráter informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. As informações não substituem a análise individual de cada caso e não representam promessa de resultado. <a href="/privacidade/">Política de privacidade</a>.</p>
   </div>
 </footer>
 

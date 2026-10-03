@@ -1,0 +1,50 @@
+  <article class="art eb">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › Guia gratuito</p>
+      <div class="eb-grid">
+        <div class="eb-int">
+          <p class="eyebrow">Guia gratuito · PDF com 13 páginas</p>
+          <h1>Parcelas atrasadas do imóvel financiado: o que acontece e o que ainda é possível fazer</h1>
+          <p class="lead">Um guia em linguagem simples sobre a alienação fiduciária, da intimação do cartório ao leilão, escrito pelo advogado Fábio de Castro Emerim (OAB/RS 88.912).</p>
+        </div>
+        <div class="eb-det">
+          <img class="eb-capa" src="/img/ebook-capa.jpg" alt="Capa do guia Parcelas atrasadas do imóvel financiado" width="300" height="425">
+          <h2>O que você vai encontrar</h2>
+          <ul>
+            <li>A linha do tempo completa, da parcela atrasada ao leilão, com o que muda em cada fase</li>
+            <li>O que conferir na intimação do cartório e por que os 15 dias importam tanto</li>
+            <li>Direito de preferência e saldo do leilão: o que muita gente perde por não saber</li>
+            <li>Sete erros que custam caro</li>
+            <li>Checklist de documentos e o quadro “Onde você está agora?”</li>
+          </ul>
+        </div>
+        <form class="eb-form" id="baixar" method="post" action="https://emerim.app.n8n.cloud/webhook/fce-ebook">
+          <h2>Receba o guia gratuito</h2>
+          <p class="eb-erro" id="eb-erro" hidden>Confira os dados: nome, WhatsApp com DDD e a autorização são obrigatórios.</p>
+          <label>Nome<input name="nome" required autocomplete="name" maxlength="120"></label>
+          <label>WhatsApp com DDD<input name="whatsapp" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20"></label>
+          <label>E-mail (opcional)<input name="email" type="email" autocomplete="email" maxlength="160"></label>
+          <label>Em que situação você está?
+            <select name="situacao">
+              <option value="">Prefiro não dizer</option>
+              <option value="atraso">Parcelas atrasadas, sem intimação</option>
+              <option value="intimacao">Recebi intimação do cartório</option>
+              <option value="consolidado">A propriedade já está no nome do banco</option>
+              <option value="leilao">Já tem data de leilão</option>
+              <option value="arrematado">O imóvel já foi arrematado</option>
+              <option value="comprar">Quero comprar imóvel em leilão</option>
+              <option value="outro">Outra situação</option>
+            </select>
+          </label>
+          <input type="text" name="site" tabindex="-1" autocomplete="off" class="eb-hp" aria-hidden="true">
+          <input type="hidden" name="origem" id="eb-origem" value="direto">
+          <label class="eb-ok"><input type="checkbox" name="aceite" value="sim" required> <span>Autorizo a FCE Advogados a usar estes dados para enviar o guia e entrar em contato sobre o assunto, conforme a <a href="/privacidade/">Política de Privacidade</a>.</span></label>
+          <button class="btn btn-primary" type="submit">Receber o guia gratuito</button>
+          <p class="eb-nota">Seus dados ficam só com o escritório e você pode pedir a exclusão a qualquer momento.</p>
+        </form>
+      </div>
+    </div>
+  </article>
+  <script>
+  (function(){var q=new URLSearchParams(location.search);var o=q.get('o')||[q.get('utm_source'),q.get('utm_medium'),q.get('utm_campaign')].filter(Boolean).join('/')||(document.referrer?('ref:'+new URL(document.referrer).hostname):'direto');document.getElementById('eb-origem').value=o.slice(0,80);if(q.get('erro'))document.getElementById('eb-erro').hidden=false;})();
+  </script>
