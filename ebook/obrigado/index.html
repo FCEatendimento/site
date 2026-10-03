@@ -270,6 +270,13 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .eb-box{margin-top:2rem;padding:1.25rem;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;background:var(--surface)}
 .eb-box p{margin:.3rem 0 .9rem;color:var(--muted)}
 .dl{display:grid;gap:1rem;justify-items:start}
+.vei-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3rem);margin:1rem 0 2rem}
+@media (max-width:820px){.vei-grid{grid-template-columns:1fr}}
+.vei-fases{list-style:none;padding:0;counter-reset:f;display:grid;gap:.9rem}
+.vei-fases li{counter-increment:f;position:relative;padding-left:2.6rem}
+.vei-fases li::before{content:counter(f);position:absolute;left:0;top:0;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--ink);color:var(--bg);font:700 .95rem var(--display);display:flex;align-items:center;justify-content:center}
+.vei-fases b{display:block;font-family:var(--display)}.vei-fases span{color:var(--muted)}
+.vei-faq details{border-bottom:1px solid var(--line);padding:.9rem 0}.vei-faq summary{font-weight:600;cursor:pointer}.vei-faq p{margin:.6rem 0 0;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -305,6 +312,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <li><a href="/guia/">Guias por situação</a></li>
       <li><a href="/blog/">Blog</a></li>
       <li><a href="/ebook/">E-book gratuito: parcelas atrasadas</a></li>
+      <li><a href="/veiculo/">Veículo financiado: busca e apreensão</a></li>
       <li><a href="/sobre/">Sobre o advogado</a></li>
       <li><a href="/#perguntas">Perguntas frequentes</a></li>
       <li><a href="/calculadora/">Simule quanto do seu imóvel está em jogo</a></li>

@@ -45,6 +45,13 @@ ART_CSS='''<style>
 .eb-box{margin-top:2rem;padding:1.25rem;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;background:var(--surface)}
 .eb-box p{margin:.3rem 0 .9rem;color:var(--muted)}
 .dl{display:grid;gap:1rem;justify-items:start}
+.vei-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3rem);margin:1rem 0 2rem}
+@media (max-width:820px){.vei-grid{grid-template-columns:1fr}}
+.vei-fases{list-style:none;padding:0;counter-reset:f;display:grid;gap:.9rem}
+.vei-fases li{counter-increment:f;position:relative;padding-left:2.6rem}
+.vei-fases li::before{content:counter(f);position:absolute;left:0;top:0;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--ink);color:var(--bg);font:700 .95rem var(--display);display:flex;align-items:center;justify-content:center}
+.vei-fases b{display:block;font-family:var(--display)}.vei-fases span{color:var(--muted)}
+.vei-faq details{border-bottom:1px solid var(--line);padding:.9rem 0}.vei-faq summary{font-weight:600;cursor:pointer}.vei-faq p{margin:.6rem 0 0;color:var(--muted)}
 </style>'''
 def fix(s, tag):
     s=s.replace('href="#inicio"','href="/"')
@@ -86,7 +93,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
       <div class="box">
         <div>
           <h2>Conte o que está acontecendo</h2>
-          <p>Pelo WhatsApp, a qualquer hora. Se tiver a intimação, a matrícula ou o edital, já pode enviar.</p>
+          <p>Pelo WhatsApp, a qualquer hora. {'Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.' if tag=='veiculo' else 'Se tiver a intimação, a matrícula ou o edital, já pode enviar.'}</p>
         </div>
         <a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p={tag}">Conversar pelo WhatsApp</a>
       </div>
@@ -195,8 +202,35 @@ OB='''  <article class="art">
 page('/ebook/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito sobre parcelas atrasadas do imóvel financiado.','https://fceadvogados.com.br/ebook/obrigado/',OB,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'ebook-obrigado','<meta name="robots" content="noindex">')
 PR=open(SITE+'/content/privacidade.html',encoding='utf-8').read()
 page('/privacidade/index.html','Política de privacidade | FCE Advogados','Como a FCE Advogados trata dados pessoais de visitantes, contatos e clientes, nos termos da LGPD.','https://fceadvogados.com.br/privacidade/',PR,{"@context":"https://schema.org","@type":"WebPage","name":"Política de privacidade","url":"https://fceadvogados.com.br/privacidade/","publisher":ORG},'privacidade')
+# veiculo
+V=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/content/veiculo/*.json')],key=lambda g:(g.get('ordem',999),g['slug']))
+for g in V:
+    url=f'https://fceadvogados.com.br/veiculo/{g["slug"]}/'
+    outros=''.join(f'<li><a href="/veiculo/{o["slug"]}/">{html.escape(o["titulo"])}</a></li>' for o in V if o is not g)
+    body=f'''  <article class="art">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › <a href="/veiculo/">Veículo</a></p>
+      <p class="eyebrow">{g["eyebrow"]}</p>
+      <h1>{html.escape(g["titulo"])}</h1>
+      <p class="lead">{g["lead"]}</p>
+{g["corpo"]}
+      <p class="crumb">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Conteúdo informativo; não substitui a análise individual do caso.</p>
+      <nav class="rel" aria-label="Outros guias"><p class="eyebrow">Outros guias sobre veículo</p><ul>{outros}<li><a href="/veiculo/">Busca e apreensão de veículo: visão geral</a></li></ul></nav>
+    </div>
+  </article>'''
+    ld={"@context":"https://schema.org","@graph":[
+      {"@type":"Article","headline":g["titulo"],"description":g["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":g.get("data","2026-10-03"),"dateModified":g.get("data","2026-10-03"),"image":"https://fceadvogados.com.br/img/og-fce.jpg"},
+      {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Veículo","item":"https://fceadvogados.com.br/veiculo/"},{"@type":"ListItem","position":3,"name":g["titulo"],"item":url}]}]}
+    page(f'/veiculo/{g["slug"]}/index.html', g["seo"] if 'FCE' in g["seo"] else g["seo"]+' | FCE Advogados', g["desc"], url, body, ld, 'veiculo')
+VH=open(SITE+'/content/veiculo.html',encoding='utf-8').read().replace('{{GUIAS}}',''.join(f'<a href="/veiculo/{g["slug"]}/"><strong>{html.escape(g["titulo"])}</strong><span>{html.escape(g["desc"])}</span></a>' for g in V))
+faq=[]
+for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',VH,re.S):
+    faq.append({"@type":"Question","name":html.unescape(m.group(1)),"acceptedAnswer":{"@type":"Answer","text":html.unescape(m.group(2))}})
+ldv={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Busca e apreensão de veículo financiado","url":"https://fceadvogados.com.br/veiculo/","publisher":ORG,"author":AUT},{"@type":"FAQPage","mainEntity":faq},
+  {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Veículo","item":"https://fceadvogados.com.br/veiculo/"}]}]}
+page('/veiculo/index.html','Busca e apreensão de veículo: defesa e revisional | FCE Advogados','Carro, moto ou caminhão financiado com parcelas atrasadas ou apreendido? Defesa na busca e apreensão, na Justiça ou no cartório, e revisão dos juros do financiamento.','https://fceadvogados.com.br/veiculo/',VH,ldv,'veiculo')
 # sitemap
-urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/privacidade/']
+urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/privacidade/']
 open(SITE+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{u}</loc><lastmod>2026-10-03</lastmod></url>\n' for u in urls)+'</urlset>\n')
 print('ok')
 
