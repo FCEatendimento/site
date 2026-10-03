@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://fceadvogados.com.br/</loc><lastmod>2026-10-03</lastmod><priority>1.0</priority></url>
-  <url><loc>https://fceadvogados.com.br/calculadora/</loc><lastmod>2026-10-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://fceadvogados.com.br/</loc><lastmod>2026-10-03</lastmod></url>
+  <url><loc>https://fceadvogados.com.br/calculadora/</loc><lastmod>2026-10-03</lastmod></url>
+  <url><loc>https://fceadvogados.com.br/guia/</loc><lastmod>2026-10-03</lastmod></url>
+  <url><loc>https://fceadvogados.com.br/guia/intimacao-do-cartorio-parcelas-atrasadas/</loc><lastmod>2026-10-03</lastmod></url>
+  <url><loc>https://fceadvogados.com.br/guia/leilao-extrajudicial-caixa/</loc><lastmod>2026-10-03</lastmod></url>
+  <url><loc>https://fceadvogados.com.br/guia/propriedade-consolidada-no-nome-do-banco/</loc><lastmod>2026-10-03</lastmod></url>
+  <url><loc>https://fceadvogados.com.br/guia/arrematei-imovel-ocupado-desocupacao/</loc><lastmod>2026-10-03</lastmod></url>
 </urlset>
