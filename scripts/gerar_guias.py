@@ -93,7 +93,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
       <div class="box">
         <div>
           <h2>Conte o que está acontecendo</h2>
-          <p>Pelo WhatsApp, a qualquer hora. {'Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.' if tag=='veiculo' else 'Se tiver a intimação, a matrícula ou o edital, já pode enviar.'}</p>
+          <p>Pelo WhatsApp, a qualquer hora. {'Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.' if tag=='veiculo' else ('Se tiver o contrato, os aditivos ou a matrícula, já pode enviar.' if tag.startswith('empresario') else 'Se tiver a intimação, a matrícula ou o edital, já pode enviar.')}</p>
         </div>
         <a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p={tag}">Conversar pelo WhatsApp</a>
       </div>
@@ -200,6 +200,12 @@ OB='''  <article class="art">
     </div>
   </article>'''
 page('/ebook/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito sobre parcelas atrasadas do imóvel financiado.','https://fceadvogados.com.br/ebook/obrigado/',OB,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'ebook-obrigado','<meta name="robots" content="noindex">')
+# guia do empresario
+EM=open(SITE+'/content/empresario.html',encoding='utf-8').read()
+ldm={"@context":"https://schema.org","@type":"WebPage","name":"Guia gratuito para empresários: imóvel dado em garantia","url":"https://fceadvogados.com.br/empresario/","publisher":ORG,"author":AUT}
+page('/empresario/index.html','Imóvel dado em garantia de empréstimo da empresa: guia gratuito (PDF) | FCE Advogados','Deu a sede, o galpão ou a casa em garantia de um empréstimo da empresa? Guia gratuito sobre o que acontece se as parcelas atrasarem: cartório, aditivos, recuperação judicial e leilão.','https://fceadvogados.com.br/empresario/',EM,ldm,'empresario')
+OBM=OB.replace('/ebook/fce-guia-parcelas-atrasadas.pdf','/empresario/fce-guia-imovel-em-garantia.pdf').replace('comece pelo capítulo 2, “A linha do tempo”','comece pelo capítulo 3, “A linha do tempo”')
+page('/empresario/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito para empresários sobre imóvel dado em garantia.','https://fceadvogados.com.br/empresario/obrigado/',OBM,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'empresario-obrigado','<meta name="robots" content="noindex">')
 PR=open(SITE+'/content/privacidade.html',encoding='utf-8').read()
 page('/privacidade/index.html','Política de privacidade | FCE Advogados','Como a FCE Advogados trata dados pessoais de visitantes, contatos e clientes, nos termos da LGPD.','https://fceadvogados.com.br/privacidade/',PR,{"@context":"https://schema.org","@type":"WebPage","name":"Política de privacidade","url":"https://fceadvogados.com.br/privacidade/","publisher":ORG},'privacidade')
 # veiculo
@@ -230,7 +236,7 @@ ldv={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Busca 
   {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Veículo","item":"https://fceadvogados.com.br/veiculo/"}]}]}
 page('/veiculo/index.html','Busca e apreensão de veículo: defesa e revisional | FCE Advogados','Carro, moto ou caminhão financiado com parcelas atrasadas ou apreendido? Defesa na busca e apreensão, na Justiça ou no cartório, e revisão dos juros do financiamento.','https://fceadvogados.com.br/veiculo/',VH,ldv,'veiculo')
 # sitemap
-urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/privacidade/']
+urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/privacidade/']
 open(SITE+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{u}</loc><lastmod>2026-10-03</lastmod></url>\n' for u in urls)+'</urlset>\n')
 print('ok')
 
