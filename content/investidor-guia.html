@@ -1,0 +1,51 @@
+  <article class="art eb">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › <a href="/investidor/">Investidores</a> › Guia gratuito</p>
+      <div class="eb-grid">
+        <div class="eb-int">
+          <p class="eyebrow">Guia gratuito para investidores · PDF com 13 páginas</p>
+          <h1>Leilão de imóveis sem surpresas: 20 pontos para conferir antes do lance</h1>
+          <p class="lead">Para quem quer comprar imóvel em leilão e prefere descobrir os problemas antes do lance. Edital, matrícula, dívidas, ocupação, riscos de anulação e a conta completa, pelo advogado Fábio de Castro Emerim (OAB/RS 88.912).</p>
+        </div>
+        <div class="eb-det">
+          <img class="eb-capa" src="/img/investidor-capa.jpg" alt="Capa do guia Leilão de imóveis sem surpresas" width="300" height="425">
+          <h2>O que você vai encontrar</h2>
+          <ul>
+            <li>Leilão judicial ou do banco: o que muda para quem compra</li>
+            <li>Os 6 pontos do edital que mais geram problema</li>
+            <li>O que a matrícula mostra e o anúncio não conta</li>
+            <li>Condomínio, IPTU e outras dívidas: quem paga</li>
+            <li>Imóvel ocupado: caminho, tempo e custo da desocupação</li>
+            <li>A conta completa, com exemplo, e o checklist dos 20 pontos</li>
+          </ul>
+        </div>
+        <form class="eb-form" id="baixar" method="post" action="https://emerim.app.n8n.cloud/webhook/fce-ebook">
+          <h2>Receba o guia gratuito</h2>
+          <p class="eb-erro" id="eb-erro" hidden>Confira os dados: nome, WhatsApp com DDD e a autorização são obrigatórios.</p>
+          <label>Nome<input name="nome" required autocomplete="name" maxlength="120"></label>
+          <label>WhatsApp com DDD<input name="whatsapp" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20"></label>
+          <label>E-mail (opcional)<input name="email" type="email" autocomplete="email" maxlength="160"></label>
+          <label>Em que situação você está?
+            <select name="situacao">
+              <option value="">Prefiro não dizer</option>
+              <option value="inv_primeira">Quero comprar meu primeiro imóvel em leilão</option>
+              <option value="inv_recorrente">Já comprei e quero comprar mais</option>
+              <option value="inv_imovel">Tenho um imóvel em vista, com data de leilão</option>
+              <option value="inv_arrematei">Já arrematei e preciso de ajuda</option>
+              <option value="outro">Outra situação</option>
+            </select>
+          </label>
+          <input type="text" name="site" tabindex="-1" autocomplete="off" class="eb-hp" aria-hidden="true">
+          <input type="hidden" name="origem" id="eb-origem" value="direto">
+          <input type="hidden" name="material" value="investidor">
+          <label class="eb-ok"><input type="checkbox" name="aceite" value="sim" required> <span>Autorizo a FCE Advogados a usar estes dados para enviar o guia e entrar em contato sobre o assunto, conforme a <a href="/privacidade/">Política de Privacidade</a>.</span></label>
+          <button class="btn btn-primary" type="submit">Receber o guia gratuito</button>
+          <p class="eb-nota">Seus dados ficam só com o escritório e você pode pedir a exclusão a qualquer momento.</p>
+        </form>
+        <p class="eb-nota" style="grid-column:1/-1">Quer analisar um imóvel específico? Veja a <a href="/investidor/">análise pré-lance</a>.</p>
+      </div>
+    </div>
+  </article>
+  <script>
+  (function(){var q=new URLSearchParams(location.search);var o=q.get('o')||[q.get('utm_source'),q.get('utm_medium'),q.get('utm_campaign')].filter(Boolean).join('/')||(document.referrer?('ref:'+new URL(document.referrer).hostname):'direto');document.getElementById('eb-origem').value=o.slice(0,80);if(q.get('erro'))document.getElementById('eb-erro').hidden=false;})();
+  </script>

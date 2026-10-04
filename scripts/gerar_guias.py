@@ -93,7 +93,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
       <div class="box">
         <div>
           <h2>Conte o que está acontecendo</h2>
-          <p>Pelo WhatsApp, a qualquer hora. {'Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.' if tag=='veiculo' else ('Se tiver o contrato, os aditivos ou a matrícula, já pode enviar.' if tag.startswith('empresario') else 'Se tiver a intimação, a matrícula ou o edital, já pode enviar.')}</p>
+          <p>Pelo WhatsApp, a qualquer hora. {'Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.' if tag=='veiculo' else ('Se tiver o contrato, os aditivos ou a matrícula, já pode enviar.' if tag.startswith('empresario') else ('Se tiver o edital ou o link do leilão, já pode enviar.' if tag.startswith('investidor') else 'Se tiver a intimação, a matrícula ou o edital, já pode enviar.'))}</p>
         </div>
         <a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p={tag}">Conversar pelo WhatsApp</a>
       </div>
@@ -206,6 +206,18 @@ ldm={"@context":"https://schema.org","@type":"WebPage","name":"Guia gratuito par
 page('/empresario/index.html','Imóvel dado em garantia de empréstimo da empresa: guia gratuito (PDF) | FCE Advogados','Deu a sede, o galpão ou a casa em garantia de um empréstimo da empresa? Guia gratuito sobre o que acontece se as parcelas atrasarem: cartório, aditivos, recuperação judicial e leilão.','https://fceadvogados.com.br/empresario/',EM,ldm,'empresario')
 OBM=OB.replace('/ebook/fce-guia-parcelas-atrasadas.pdf','/empresario/fce-guia-imovel-em-garantia.pdf').replace('comece pelo capítulo 2, “A linha do tempo”','comece pelo capítulo 3, “A linha do tempo”')
 page('/empresario/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito para empresários sobre imóvel dado em garantia.','https://fceadvogados.com.br/empresario/obrigado/',OBM,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'empresario-obrigado','<meta name="robots" content="noindex">')
+# area do investidor
+INV_SLUGS=['comprar-imovel-em-leilao-checklist-do-edital','iptu-e-condominio-imovel-arrematado-quem-paga','arrematei-imovel-ocupado-desocupacao','leilao-judicial-ou-extrajudicial-diferencas']
+GI=[g for s in INV_SLUGS for g in G if g['slug']==s]
+IV=open(SITE+'/content/investidor.html',encoding='utf-8').read().replace('{{GUIAS}}',''.join(f'<a href="/guia/{g["slug"]}/"><strong>{html.escape(g["titulo"])}</strong><span>{html.escape(g["desc"])}</span></a>' for g in GI))
+faqi=[{"@type":"Question","name":html.unescape(m.group(1)),"acceptedAnswer":{"@type":"Answer","text":html.unescape(m.group(2))}} for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',IV,re.S)]
+ldi={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Comprar imóvel em leilão com segurança jurídica","url":"https://fceadvogados.com.br/investidor/","publisher":ORG,"author":AUT},{"@type":"FAQPage","mainEntity":faqi}]}
+page('/investidor/index.html','Advogado para comprar imóvel em leilão: análise pré-lance | FCE Advogados','Análise jurídica antes do lance e assessoria na compra de imóvel em leilão: edital, matrícula, dívidas, ocupação, riscos e a conta completa. Atendimento em todo o Brasil.','https://fceadvogados.com.br/investidor/',IV,ldi,'investidor')
+IG=open(SITE+'/content/investidor-guia.html',encoding='utf-8').read()
+ldg={"@context":"https://schema.org","@type":"WebPage","name":"Guia gratuito: 20 pontos para conferir antes do lance","url":"https://fceadvogados.com.br/investidor/guia/","publisher":ORG,"author":AUT}
+page('/investidor/guia/index.html','Guia gratuito: 20 pontos antes do lance no leilão de imóveis (PDF) | FCE Advogados','Baixe grátis o checklist do investidor em leilão de imóveis: edital, matrícula, dívidas, ocupação, riscos de anulação e a conta completa antes do lance.','https://fceadvogados.com.br/investidor/guia/',IG,ldg,'investidor-guia')
+OBI=OB.replace('/ebook/fce-guia-parcelas-atrasadas.pdf','/investidor/guia/fce-guia-investidor-20-pontos.pdf').replace('Se preferir, comece pelo capítulo 2, “A linha do tempo”, e pelo quadro “Onde você está agora?”, na última parte.','O checklist dos 20 pontos está numa página só, no final: salve e use em cada imóvel. Para analisar um imóvel específico, veja a <a href="/investidor/">análise pré-lance</a>.')
+page('/investidor/guia/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito para investidores em leilão de imóveis.','https://fceadvogados.com.br/investidor/guia/obrigado/',OBI,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'investidor-obrigado','<meta name="robots" content="noindex">')
 PR=open(SITE+'/content/privacidade.html',encoding='utf-8').read()
 page('/privacidade/index.html','Política de privacidade | FCE Advogados','Como a FCE Advogados trata dados pessoais de visitantes, contatos e clientes, nos termos da LGPD.','https://fceadvogados.com.br/privacidade/',PR,{"@context":"https://schema.org","@type":"WebPage","name":"Política de privacidade","url":"https://fceadvogados.com.br/privacidade/","publisher":ORG},'privacidade')
 # veiculo
@@ -236,7 +248,7 @@ ldv={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Busca 
   {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Veículo","item":"https://fceadvogados.com.br/veiculo/"}]}]}
 page('/veiculo/index.html','Busca e apreensão de veículo: defesa e revisional | FCE Advogados','Carro, moto ou caminhão financiado com parcelas atrasadas ou apreendido? Defesa na busca e apreensão, na Justiça ou no cartório, e revisão dos juros do financiamento.','https://fceadvogados.com.br/veiculo/',VH,ldv,'veiculo')
 # sitemap
-urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/privacidade/']
+urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/privacidade/']
 open(SITE+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{u}</loc><lastmod>2026-10-03</lastmod></url>\n' for u in urls)+'</urlset>\n')
 print('ok')
 
