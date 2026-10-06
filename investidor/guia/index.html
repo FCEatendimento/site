@@ -190,10 +190,17 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .nota-num{font:500 3rem/1 var(--display);grid-row:span 2}
 .estrelas{color:var(--accent);letter-spacing:.1em;font-size:1.1rem;line-height:1}
 .nota-qtd{font-size:.9rem;color:var(--muted)}
-.reviews{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem}
+.reviews{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
+@media (max-width:1000px){.reviews{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .review{margin:0;display:grid;gap:.85rem;align-content:start;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:1.5rem}
 .review blockquote{margin:0;font-size:1.02rem;line-height:1.6}
 .review figcaption{font:500 .78rem/1.4 var(--mono);letter-spacing:.04em;color:var(--muted)}
+.rev-who{display:flex;align-items:center;gap:.75rem}
+.rev-who b{display:block;font:600 .95rem/1.3 var(--body);letter-spacing:0;color:var(--ink)}
+.rev-src{display:block}
+.rev-av{position:relative;flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center}
+.rev-av::before{content:attr(data-ini);font:600 .8rem/1 var(--mono);color:var(--muted)}
+.rev-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .aval-foot{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.5rem;margin-top:1.75rem}
 .aval-foot p{font-size:.85rem;color:var(--muted);max-width:34rem;min-width:0}
 @media (max-width:700px){.reviews{grid-template-columns:1fr}}
@@ -326,9 +333,9 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <p class="crumb"><a href="/">Início</a> › <a href="/investidor/">Investidores</a> › Guia gratuito</p>
       <div class="eb-grid">
         <div class="eb-int">
-          <p class="eyebrow">Guia gratuito para investidores · PDF com 13 páginas</p>
+          <p class="eyebrow">Guia gratuito para investidores · PDF com 17 páginas</p>
           <h1>Leilão de imóveis sem surpresas: 20 pontos para conferir antes do lance</h1>
-          <p class="lead">Para quem quer comprar imóvel em leilão e prefere descobrir os problemas antes do lance. Edital, matrícula, dívidas, ocupação, riscos de anulação e a conta completa, pelo advogado Fábio de Castro Emerim (OAB/RS 88.912).</p>
+          <p class="lead">Para quem quer comprar imóvel em leilão e prefere descobrir os problemas antes do lance. Edital, matrícula, dívidas, ocupação, riscos de anulação e a conta que define o seu lance máximo, pelo advogado Fábio de Castro Emerim (OAB/RS 88.912).</p>
         </div>
         <div class="eb-det">
           <img class="eb-capa" src="/img/investidor-capa.jpg" alt="Capa do guia Leilão de imóveis sem surpresas" width="300" height="425">
@@ -339,7 +346,9 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
             <li>O que a matrícula mostra e o anúncio não conta</li>
             <li>Condomínio, IPTU e outras dívidas: quem paga</li>
             <li>Imóvel ocupado: caminho, tempo e custo da desocupação</li>
-            <li>A conta completa, com exemplo, e o checklist dos 20 pontos</li>
+            <li>A conta completa, do lance ao lucro, com exemplo em números</li>
+            <li>Como chegar ao lance máximo, à vista ou parcelado</li>
+            <li>Ficha de cálculo e checklist dos 20 pontos para imprimir</li>
           </ul>
         </div>
         <form class="eb-form" id="baixar" method="post" action="https://emerim.app.n8n.cloud/webhook/fce-ebook">
