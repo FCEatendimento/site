@@ -301,6 +301,8 @@ for _p,_hd,_tg in (('/calculadora/index.html',None,'calculadora'),('/investidor/
     if 'footer .flinks{' not in _s: _s=_s.replace('footer .aviso{',_FCSS+'footer .aviso{',1)
     if '.top nav a[aria-current' not in _s: _s=_s.replace('</style>',_NAVCSS+'</style>',1)
     open(SITE+_p,'w',encoding='utf-8').write(_s)
+# /leilao/ (destino dos anuncios do devedor): copia sempre atualizada da pagina principal
+open(SITE+'/leilao/index.html','w',encoding='utf-8').write(IDX.replace('p=home','p=leilao'))
 # sitemap
 urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/privacidade/']
 open(SITE+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{u}</loc><lastmod>2026-10-03</lastmod></url>\n' for u in urls)+'</urlset>\n')
