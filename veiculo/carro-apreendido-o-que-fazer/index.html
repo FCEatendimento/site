@@ -159,6 +159,9 @@ section{padding-block:clamp(3rem,7vw,5rem)}
 footer{border-top:1px solid var(--line);padding-block:2.5rem calc(2.5rem + 4.5rem);font-size:.9rem;color:var(--muted)}
 footer .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1.5rem}
 footer strong{color:var(--ink)}
+footer .flinks{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1.25rem;border-top:1px solid var(--line);padding-top:1.25rem}
+footer .flinks ul{list-style:none;padding:0;margin:.5rem 0 0;display:grid;gap:.4rem}
+footer .flinks a{color:var(--muted);text-decoration:none}footer .flinks a:hover{color:var(--ink);text-decoration:underline}
 footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25rem;font-size:.82rem}
 @media (min-width:761px){footer{padding-bottom:2.5rem}}
 
@@ -231,6 +234,8 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
   .menu-panel{max-height:calc(100vh - 4.5rem);overflow-y:auto}
 }
 @media (max-width:360px){.menu-btn{font-size:0;gap:0;padding:.55rem}.menu-btn svg{width:1.2rem;height:1.2rem}}
+.top nav a[aria-current="page"]{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:.4em}
+@media (min-width:761px) and (max-width:1180px){.top nav a[href$="#guias"]{display:none}}
 .top nav a{white-space:nowrap}.brand-tag{white-space:nowrap}
 @media (min-width:761px) and (max-width:1180px){.top nav a[href$="#localizacao"],.top nav a[href$="#perguntas"]{display:none}}
 .ebook-cta{margin-top:1.5rem;display:grid;grid-template-columns:auto 1fr;gap:1.25rem;align-items:center;padding:1.25rem;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;background:var(--surface)}.ebook-cta img{width:84px;height:auto;border-radius:3px;box-shadow:0 4px 14px rgba(0,0,0,.18)}.ebook-cta p{margin:.25rem 0 .75rem;color:var(--muted)}.ebook-cta strong{font-family:var(--display);font-size:1.1rem}.ebook-cta .btn{display:inline-flex}
@@ -319,6 +324,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <li><a href="/ebook/">E-book gratuito: parcelas atrasadas</a></li>
       <li><a href="/empresario/">Guia para empresários: imóvel em garantia</a></li>
       <li><a href="/investidor/">Para investidores: comprar em leilão</a></li>
+      <li><a href="/investidor/calculadora/">Calculadora do lance máximo (investidores)</a></li>
       <li><a href="/veiculo/">Veículo financiado: busca e apreensão</a></li>
       <li><a href="/sobre/">Sobre o advogado</a></li>
       <li><a href="/#perguntas">Perguntas frequentes</a></li>
@@ -381,6 +387,11 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     <div><strong>FCE Advogados</strong><br>Fabio de Castro Emerim Sociedade Individual de Advocacia<br>OAB/RS 15.656 · CNPJ 57.727.037/0001-33</div>
     <div><strong>Endereço</strong><br>Rua Araguaia, 509, Jardim Mauá<br>Novo Hamburgo/RS · CEP 93548-350</div>
     <div><strong>Contato</strong><br>WhatsApp (51) 99206-8037<br>atendimento@fceadvogados.com.br</div>
+    <nav class="flinks" aria-label="Mapa do site">
+      <div><strong>Imóvel em risco</strong><ul><li><a href="/">Leilão de imóvel financiado</a></li><li><a href="/calculadora/">Simulador: quanto está em jogo</a></li><li><a href="/ebook/">Guia gratuito: parcelas atrasadas</a></li><li><a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Intimação do cartório</a></li><li><a href="/guia/propriedade-consolidada-no-nome-do-banco/">Propriedade consolidada</a></li><li><a href="/guia/saldo-do-leilao-como-receber/">Saldo do leilão</a></li></ul></div>
+      <div><strong>Para investidores</strong><ul><li><a href="/investidor/">Comprar imóvel em leilão</a></li><li><a href="/investidor/#analise">Análise pré-lance</a></li><li><a href="/investidor/calculadora/">Calculadora do lance máximo</a></li><li><a href="/investidor/guia/">Guia: 20 pontos antes do lance</a></li><li><a href="/guia/comprar-imovel-em-leilao-checklist-do-edital/">Checklist do edital</a></li><li><a href="/guia/arrematei-imovel-ocupado-desocupacao/">Imóvel arrematado ocupado</a></li></ul></div>
+      <div><strong>Mais conteúdo</strong><ul><li><a href="/guia/">Guias por situação</a></li><li><a href="/blog/">Blog</a></li><li><a href="/empresario/">Empresas: imóvel em garantia</a></li><li><a href="/veiculo/">Veículo: busca e apreensão</a></li><li><a href="/sobre/">Sobre o advogado</a></li><li><a href="/privacidade/">Privacidade</a></li></ul></div>
+    </nav>
     <p class="aviso">Conteúdo de caráter informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. As informações não substituem a análise individual de cada caso e não representam promessa de resultado. <a href="/privacidade/">Política de privacidade</a>.</p>
   </div>
 </footer>
