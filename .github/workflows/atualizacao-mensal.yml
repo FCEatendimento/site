@@ -1,0 +1,32 @@
+name: Atualizar guias em PDF (todo mes)
+# Todo dia 1, as 06h15 (Brasilia), regera os 3 guias em PDF e as paginas de download
+# com "Atualizado em <mes>/<ano>". Tambem roda quando o texto de um guia muda.
+on:
+  schedule:
+    - cron: '15 9 1 * *'
+  push:
+    branches: [main]
+    paths: ['materiais/**', 'scripts/gerar_ebooks.py']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: guias-pdf
+  cancel-in-progress: false
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright qrcode pypdf
+      - run: python -m playwright install --with-deps chromium
+      - run: python scripts/gerar_ebooks.py
+      - run: python scripts/gerar_guias.py
+      - run: |
+          git config user.name "FCE Site"
+          git config user.email "atendimento@fceadvogados.com.br"
+          git add -A guia blog sobre ebook empresario investidor privacidade veiculo index.html sitemap.xml
+          git diff --cached --quiet || (git commit -m "Guias: atualizados em $(date +%m/%Y)" && git pull --rebase && git push)

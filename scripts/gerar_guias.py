@@ -58,7 +58,14 @@ def fix(s, tag):
     s=re.sub(r'href="#([a-z]+)"', r'href="/#\1"', s)
     s=s.replace('p=home', 'p='+tag)
     return s
+import datetime as _dt
+from zoneinfo import ZoneInfo as _ZI
+_MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
+_d=_dt.datetime.now(_ZI('America/Sao_Paulo'))
+MES_ATUAL=_MESES[_d.month-1]+'/'+str(_d.year)  # 'Atualizado em' dos guias em PDF (ver gerar_ebooks.py)
+
 def page(path, title, desc, canon, body, ld, tag, robots=''):
+    body=body.replace('{{ATUALIZADO}}', MES_ATUAL)
     h=f'''<!doctype html>
 <html lang="pt-BR">
 <head>
