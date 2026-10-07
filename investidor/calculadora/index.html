@@ -301,6 +301,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .top nav a[aria-current="page"]{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:.4em}
 @media (min-width:761px) and (max-width:1180px){.top nav a[href$="#guias"]{display:none}}
 </style>
+<script src="/js/medicao.js" defer></script>
 </head>
 <body>
 
@@ -460,9 +461,10 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     <nav class="flinks" aria-label="Mapa do site">
       <div><strong>Imóvel em risco</strong><ul><li><a href="/">Leilão de imóvel financiado</a></li><li><a href="/calculadora/">Simulador: quanto está em jogo</a></li><li><a href="/ebook/">Guia gratuito: parcelas atrasadas</a></li><li><a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Intimação do cartório</a></li><li><a href="/guia/propriedade-consolidada-no-nome-do-banco/">Propriedade consolidada</a></li><li><a href="/guia/saldo-do-leilao-como-receber/">Saldo do leilão</a></li></ul></div>
       <div><strong>Para investidores</strong><ul><li><a href="/investidor/">Comprar imóvel em leilão</a></li><li><a href="/investidor/#analise">Análise pré-lance</a></li><li><a href="/investidor/calculadora/">Calculadora do lance máximo</a></li><li><a href="/investidor/guia/">Guia: 20 pontos antes do lance</a></li><li><a href="/guia/comprar-imovel-em-leilao-checklist-do-edital/">Checklist do edital</a></li><li><a href="/guia/arrematei-imovel-ocupado-desocupacao/">Imóvel arrematado ocupado</a></li></ul></div>
+      <div><strong>Atendimento por cidade</strong><ul><li><a href="/leilao-de-imoveis/porto-alegre/">Porto Alegre</a></li><li><a href="/leilao-de-imoveis/novo-hamburgo/">Novo Hamburgo</a></li><li><a href="/leilao-de-imoveis/canoas/">Canoas</a></li><li><a href="/leilao-de-imoveis/sao-paulo/">São Paulo</a></li><li><a href="/leilao-de-imoveis/">Outras cidades</a></li></ul></div>
       <div><strong>Mais conteúdo</strong><ul><li><a href="/guia/">Guias por situação</a></li><li><a href="/blog/">Blog</a></li><li><a href="/empresario/">Empresas: imóvel em garantia</a></li><li><a href="/veiculo/">Veículo: busca e apreensão</a></li><li><a href="/sobre/">Sobre o advogado</a></li><li><a href="/privacidade/">Privacidade</a></li></ul></div>
     </nav>
-    <p class="aviso">Conteúdo de caráter informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. As informações não substituem a análise individual de cada caso e não representam promessa de resultado. <a href="/privacidade/">Política de privacidade</a>.</p>
+    <p class="aviso">Conteúdo de caráter informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. As informações não substituem a análise individual de cada caso e não representam promessa de resultado. <a href="/privacidade/">Política de privacidade</a> · <a href="/#cookies" data-cookies>Cookies</a>.</p>
   </div>
 </footer>
 
@@ -505,7 +507,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     Object.keys(utm).forEach(function(k){d[k]=utm[k]});
     var btn=$("b-lead"); btn.disabled=true; btn.textContent="Enviando...";
     enviar(d).then(function(r){
-      if(r&&r.ok&&r.id){leadId=r.id; try{sessionStorage.setItem("fce_calcinv_id",r.id)}catch(e){} mostrar("f-sim")}
+      if(r&&r.ok&&r.id){leadId=r.id; try{sessionStorage.setItem("fce_calcinv_id",r.id)}catch(e){} try{window.dispatchEvent(new CustomEvent("fce:lead",{detail:"calc-investidor"}))}catch(e){} mostrar("f-sim")}
       else err.textContent=(r&&r.erro)||"Não foi possível continuar. Tente de novo.";
     }).catch(function(){err.textContent="Sem conexão. Tente de novo."}).finally(function(){btn.disabled=false; btn.textContent="Continuar para a calculadora"});
   });

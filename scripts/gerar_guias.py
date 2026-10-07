@@ -118,6 +118,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700;800&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@500&display=swap"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700;800&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@500&display=swap"></noscript>
 {style}
 {ART_CSS}
+<script src="/js/medicao.js" defer></script>
 </head>
 <body>
 
@@ -290,6 +291,82 @@ for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',
 ldv={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Busca e apreensão de veículo financiado","url":"https://fceadvogados.com.br/veiculo/","publisher":ORG,"author":AUT},{"@type":"FAQPage","mainEntity":faq},
   {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Veículo","item":"https://fceadvogados.com.br/veiculo/"}]}]}
 page('/veiculo/index.html','Busca e apreensão de veículo: defesa e revisional | FCE Advogados','Carro, moto ou caminhão financiado com parcelas atrasadas ou apreendido? Defesa na busca e apreensão, na Justiça ou no cartório, e revisão dos juros do financiamento.','https://fceadvogados.com.br/veiculo/',VH,ldv,'veiculo')
+# paginas por cidade (atendimento local)
+CID=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/content/cidades/*.json')],key=lambda c:c.get('ordem',99))
+CIDN={c['slug']:c for c in CID}
+for c in CID:
+    url=f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/'
+    nh=c['slug']=='novo-hamburgo'; sp=c['uf']=='SP'
+    onde='no escritório, na Rua Araguaia, 509, Jardim Mauá' if nh else ('por videochamada' if sp else 'por videochamada ou presencialmente no escritório em Novo Hamburgo')
+    faq=[
+      ('Onde fica o escritório?' if nh else 'Preciso ir ao escritório em Novo Hamburgo?',
+       'Na Rua Araguaia, 509, Jardim Mauá, Novo Hamburgo/RS. A consulta pode ser presencial ou por videochamada, como for melhor para você.' if nh else
+       ('Não. A conversa começa pelo WhatsApp e a consulta é por videochamada. Os documentos são enviados digitalmente e os processos são eletrônicos.' if sp else
+        'Não é obrigatório. A conversa começa pelo WhatsApp e a consulta pode ser por videochamada ou presencial, em Novo Hamburgo. Os documentos são enviados digitalmente.')),
+      (f'O financiamento é da Caixa. Vocês atendem casos assim em {c["nome"]}?',
+       'Sim. A Caixa é a instituição que mais leiloa imóveis financiados. Quando é preciso ir à Justiça contra ela, a ação corre na Justiça Federal, com processo eletrônico.'),
+      ('Quanto tempo tenho depois da intimação do cartório?',
+       'Pela Lei 9.514/97, o prazo para pagar as parcelas atrasadas e os encargos é de 15 dias a partir da intimação. Depois disso, o banco pode pedir a consolidação da propriedade. Por isso, vale buscar orientação logo que a intimação chegar.')]
+    faqh=''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q,a in faq)
+    outras=''.join(f'<li><a href="/leilao-de-imoveis/{o["slug"]}/">Leilão de imóveis em {o["nome"]}</a></li>' for o in CID if o is not c)
+    body=f'''  <article class="art">
+    <div class="wrap" style="max-width:var(--wrap)">
+      <p class="crumb"><a href="/">Início</a> › <a href="/leilao-de-imoveis/">Atendimento por cidade</a> › {html.escape(c["nome"])}</p>
+      <p class="eyebrow">Leilão de imóveis · {html.escape(c["nome"])}/{c["uf"]}</p>
+      <h1>Advogado para leilão de imóveis em {html.escape(c["nome"])}</h1>
+      <p class="lead">{c["lead"]}</p>
+
+      <h2 id="devedor">Imóvel financiado em risco em {html.escape(c["nome"])}</h2>
+      <p>Na alienação fiduciária, o imóvel fica em garantia do banco até a última parcela. Se as parcelas atrasam, o banco pode retomá-lo pelo cartório, sem processo judicial, e cada fase tem prazo curto:</p>
+      <ol class="vei-fases">
+        <li><b>Intimação do cartório</b><span>O Registro de Imóveis intima para pagar as parcelas atrasadas em 15 dias. <a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Entenda a intimação</a>.</span></li>
+        <li><b>Consolidação da propriedade</b><span>Sem pagamento, o imóvel passa para o nome do banco na matrícula. <a href="/guia/propriedade-consolidada-no-nome-do-banco/">O que ainda é possível</a>.</span></li>
+        <li><b>Leilões</b><span>O banco faz até dois leilões. Até o segundo, o antigo dono tem preferência para recomprar. <a href="/guia/direito-de-preferencia-recomprar-imovel-antes-do-leilao/">Direito de preferência</a>.</span></li>
+        <li><b>Depois do leilão</b><span>Se o imóvel for vendido por mais do que a dívida, a diferença é do antigo dono. <a href="/guia/saldo-do-leilao-como-receber/">Saldo do leilão</a>.</span></li>
+      </ol>
+      <p>{c["registro"]}</p>
+      <p>{c["justica"]}</p>
+      {DEV_BOX.replace('TAG','cidade-'+c['slug'])}
+
+      <h2 id="investidor">Para quem quer comprar imóvel em leilão em {html.escape(c["nome"])}</h2>
+      <p>{c["invest"]}</p>
+      <p>A FCE faz a <a href="/investidor/#analise">análise pré-lance</a> do imóvel que você escolheu (edital, matrícula, processo, dívidas, ocupação e a conta completa) e a <a href="/investidor/#assessoria">assessoria na arrematação</a>, do lance ao registro e à posse.</p>
+      {INV_BOX.replace('TAG','cidade-'+c['slug'])}
+
+      <h2 id="atendimento">Como funciona o atendimento</h2>
+      <ul>
+        <li>Você chama pelo WhatsApp, a qualquer hora, e já pode enviar a intimação, a matrícula ou o edital.</li>
+        <li>A consulta com o advogado é {onde}.</li>
+        <li>Os documentos são enviados digitalmente, e os processos são eletrônicos, acompanhados a distância.</li>
+      </ul>
+      <p>Também atendemos <a href="/veiculo/">busca e apreensão de veículo financiado</a> e <a href="/empresario/">empresas com imóvel dado em garantia</a>.</p>
+
+      <h2 id="perguntas">Perguntas frequentes</h2>
+      <div class="vei-faq">{faqh}</div>
+
+      <p class="crumb" style="margin-top:2rem">Fábio de Castro Emerim, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656), com escritório em Novo Hamburgo/RS. Conteúdo informativo; não substitui a análise individual do caso.</p>
+      <nav class="rel" aria-label="Outras cidades"><p class="eyebrow">Atendimento em outras cidades</p><ul>{outras}<li><a href="/leilao-de-imoveis/">Todas as cidades</a></li><li><a href="/guia/">Guias por situação</a></li></ul></nav>
+    </div>
+  </article>'''
+    ld={"@context":"https://schema.org","@graph":[
+      {"@type":"WebPage","name":f'Advogado para leilão de imóveis em {c["nome"]}',"url":url,"inLanguage":"pt-BR","publisher":ORG,"author":AUT},
+      {"@type":"Service","serviceType":"Advocacia em leilão de imóveis e alienação fiduciária","provider":ORG,"areaServed":{"@type":"City","name":c["nome"],"containedInPlace":{"@type":"State","name":"Rio Grande do Sul" if c["uf"]=="RS" else "São Paulo"}},"url":url},
+      {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faq]},
+      {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Atendimento por cidade","item":"https://fceadvogados.com.br/leilao-de-imoveis/"},{"@type":"ListItem","position":3,"name":c["nome"],"item":url}]}]}
+    page(f'/leilao-de-imoveis/{c["slug"]}/index.html', c['seo'], c['desc'], url, body, ld, 'cidade-'+c['slug'])
+cards=''.join(f'<a href="/leilao-de-imoveis/{c["slug"]}/"><strong>Leilão de imóveis em {html.escape(c["nome"])}/{c["uf"]}</strong><span>{html.escape(c["desc"])}</span></a>' for c in CID)
+body=f'''  <article class="art">
+    <div class="wrap" style="max-width:var(--wrap)">
+      <p class="crumb"><a href="/">Início</a> › Atendimento por cidade</p>
+      <p class="eyebrow">Leilão de imóveis</p>
+      <h1>Advogado para leilão de imóveis: atendimento por cidade</h1>
+      <p class="lead">O escritório fica em Novo Hamburgo/RS e atende presencialmente na Região Metropolitana de Porto Alegre e por videochamada em todo o Brasil, com foco no Rio Grande do Sul e em São Paulo. Escolha a sua cidade para ver como funciona o caminho do leilão aí.</p>
+      <div class="cards">{cards}</div>
+      <p style="margin-top:1.5rem">Não encontrou a sua cidade? O atendimento online funciona do mesmo jeito: a conversa começa pelo WhatsApp, a consulta é por vídeo e os processos são eletrônicos.</p>
+    </div>
+  </article>'''
+ldc={"@context":"https://schema.org","@type":"CollectionPage","name":"Advogado para leilão de imóveis: atendimento por cidade","url":"https://fceadvogados.com.br/leilao-de-imoveis/","publisher":ORG}
+page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade (RS e SP) | FCE Advogados','Atendimento da FCE Advogados em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, Canoas e São Paulo, presencial na Região Metropolitana e online em todo o Brasil.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
 # paginas feitas a mao (calculadoras): mesmo rodape e menu do resto do site
 _FCSS=IDX[IDX.index('footer .flinks{'):IDX.index('footer .aviso{')]
 for _p,_hd,_tg in (('/calculadora/index.html',None,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
@@ -300,11 +377,12 @@ for _p,_hd,_tg in (('/calculadora/index.html',None,'calculadora'),('/investidor/
         _s=_s[:_s.index('<header class="top">')]+_h+_s[_s.index('</header>')+9:]
     if 'footer .flinks{' not in _s: _s=_s.replace('footer .aviso{',_FCSS+'footer .aviso{',1)
     if '.top nav a[aria-current' not in _s: _s=_s.replace('</style>',_NAVCSS+'</style>',1)
+    if 'medicao.js' not in _s: _s=_s.replace('</head>','<script src="/js/medicao.js" defer></script>\n</head>',1)
     open(SITE+_p,'w',encoding='utf-8').write(_s)
 # /leilao/ (destino dos anuncios do devedor): copia sempre atualizada da pagina principal
 open(SITE+'/leilao/index.html','w',encoding='utf-8').write(IDX.replace('p=home','p=leilao'))
 # sitemap
-urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/privacidade/']
+urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/leilao-de-imoveis/']+[f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/' for c in CID]+['https://fceadvogados.com.br/privacidade/']
 open(SITE+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{u}</loc><lastmod>2026-10-03</lastmod></url>\n' for u in urls)+'</urlset>\n')
 print('ok')
 
