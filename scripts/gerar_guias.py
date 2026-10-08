@@ -402,7 +402,7 @@ for _p,_hd,_tg in (('/calculadora/index.html',None,'calculadora'),('/investidor/
     _nm='Calculadora do lance máximo em leilão de imóveis' if 'investidor' in _p else 'Calculadora: quanto do seu imóvel está em jogo'
     _ldc=json.dumps({"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":_nm,"url":_u,"applicationCategory":"FinanceApplication","operatingSystem":"Web","inLanguage":"pt-BR","isAccessibleForFree":True,"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"},"publisher":ORG,"author":AUT},_bci(*((("Investidores","https://fceadvogados.com.br/investidor/"),(_nm,_u)) if 'investidor' in _p else ((_nm,_u),)))]},ensure_ascii=False)
     import re as _re
-    if '"WebApplication"' in _s: _s=_re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.org","@graph":\[\{"@type":"WebApplication".*?</script>\n','',_s,1,flags=_re.S)
+    _s=_re.sub(r'<script type="application/ld\+json">\{"@context": ?"https://schema.org", ?"@graph": ?\[\{"@type": ?"WebApplication".*?</script>\n','',_s,flags=_re.S)
     _s=_s.replace('</head>',f'<script type="application/ld+json">{_ldc}</script>\n</head>',1)
     open(SITE+_p,'w',encoding='utf-8').write(_s)
 # paginas de servico: /leilao/ (defesa do devedor) e /suspensao-de-leilao/
@@ -425,6 +425,11 @@ _HOJE=_d.strftime('%Y-%m-%d')
 def _lastmod(u):
     # data do conteudo-fonte (git) ou de hoje quando o arquivo mudou e ainda nao foi commitado
     rel=u.replace('https://fceadvogados.com.br','').strip('/')
+    # conteudo com data propria (JSON): usa 'atualizado' ou 'data'
+    for pre,lst in (('guia/',G),('blog/',B),('veiculo/',V)):
+        if rel.startswith(pre):
+            for x in lst:
+                if x['slug']==rel.split('/')[1]: return x.get('atualizado',x.get('data',_HOJE))
     cand=[]
     if rel=='': cand=['index.html']
     elif rel.startswith('guia/'): cand=['content/guias/'+rel.split('/')[1]+'.json']
