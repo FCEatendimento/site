@@ -4,13 +4,14 @@
  "uf": "RS",
  "ordem": 3,
  "seo": "Advogado de leilão de imóveis em Canoas | FCE Advogados",
- "desc": "Imóvel financiado em risco de leilão em Canoas/RS ou quer comprar em leilão? Defesa do devedor na alienação fiduciária e análise pré-lance para investidores, com atendimento online e presencial.",
+ "desc": "Imóvel financiado em risco de leilão em Canoas/RS? Defesa do devedor na alienação fiduciária e análise pré-lance para quem compra. Escritório em Novo Hamburgo.",
  "lead": "Para quem mora em Canoas e está com parcelas do financiamento atrasadas, recebeu intimação do cartório ou já tem data de leilão, e para quem quer comprar imóvel em leilão na cidade. O escritório fica em Novo Hamburgo, vizinho a Canoas, e atende por videochamada ou presencialmente.",
- "registro": "Os imóveis de Canoas estão matriculados no <strong>Registro de Imóveis de Canoas</strong>. É nele que o banco pede a intimação para pagar, registra a consolidação da propriedade e averba os leilões. A matrícula atualizada mostra em que fase o seu caso está.",
- "justica": "Canoas tem <strong>Foro da Justiça Estadual</strong> (TJRS) e <strong>Subseção da Justiça Federal</strong> (TRF4). Contra a Caixa, a ação costuma correr na Justiça Federal; contra bancos privados, na Justiça Estadual.",
+ "registro": "Os imóveis de Canoas estão matriculados no <strong>Registro de Imóveis de Canoas</strong>, que atende também Nova Santa Rita. É nele que o banco pede a intimação para pagar, averba a consolidação da propriedade e os leilões; a certidão integral do procedimento, com as diligências do oficial, é pedida no mesmo cartório e pode ser solicitada online pela Central de Registradores do RS. A matrícula atualizada mostra em que fase o seu caso está.",
+ "justica": "Canoas tem <strong>Foro da Justiça Estadual</strong> (TJRS), com varas cíveis onde correm as ações contra bancos privados, e <strong>Subseção Judiciária da Justiça Federal</strong> (TRF4), onde correm as ações contra a Caixa. Nos dois casos o processo é eletrônico (eproc). No TJRS, os cartórios gaúchos seguem o Provimento 39/2025 da Corregedoria, que exige informar na intimação a janela de 30 dias do financiamento habitacional; veja as <a href=\"/guia/alienacao-fiduciaria-no-rio-grande-do-sul/\">regras do RS</a>.",
  "invest": "Em Canoas, além do edital, confira a matrícula no Registro de Imóveis, o IPTU na Prefeitura e o condomínio antes de definir o lance. Imóveis ocupados exigem prever prazo e custo da desocupação.",
  "perto": [
   "porto-alegre",
   "novo-hamburgo"
- ]
+ ],
+ "extra": "      <h3>Particularidades de Canoas</h3>\n      <p>Grande parte dos imóveis financiados em Canoas, sobretudo nos empreendimentos do Minha Casa, Minha Vida, tem a Caixa como credora, o que leva o caso à Justiça Federal quando é preciso ir a juízo. Em condomínios, a lei admite que a intimação seja entregue ao funcionário da portaria (art. 26, § 3º-B), e por isso vale conferir quem recebeu, quando e se o condomínio tinha funcionário responsável pela correspondência. A enchente de maio de 2024 atingiu bairros inteiros da cidade e levou a pausas e renegociações nos financiamentos: se o procedimento de consolidação começou durante uma pausa combinada com o banco, isso é um ponto de defesa a documentar.</p>"
 }

@@ -17,7 +17,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Download do guia"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700;800&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@500&display=swap"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700;800&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@500&display=swap"></noscript>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700&family=Red+Hat+Text:wght@400;500;600&family=Red+Hat+Mono:wght@500&display=swap"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700&family=Red+Hat+Text:wght@400;500;600&family=Red+Hat+Mono:wght@500&display=swap"></noscript>
 <style>
 /* Marca FCE: preto, cinza e amarelo do logotipo. Layout: registro de cartório — coluna de leitura estreita, linha do tempo das fases como espinha da página */
 :root{
@@ -159,6 +159,7 @@ section{padding-block:clamp(3rem,7vw,5rem)}
 footer{border-top:1px solid var(--line);padding-block:2.5rem calc(2.5rem + 4.5rem);font-size:.9rem;color:var(--muted)}
 footer .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1.5rem}
 footer strong{color:var(--ink)}
+footer .muted-foot{color:var(--muted);font-size:.85rem}
 footer .flinks{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1.25rem;border-top:1px solid var(--line);padding-top:1.25rem}
 footer .flinks ul{list-style:none;padding:0;margin:.5rem 0 0;display:grid;gap:.4rem}
 footer .flinks a{color:var(--muted);text-decoration:none}footer .flinks a:hover{color:var(--ink);text-decoration:underline}
@@ -204,6 +205,8 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .rev-av{position:relative;flex:0 0 40px;width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center}
 .rev-av::before{content:attr(data-ini);font:600 .8rem/1 var(--mono);color:var(--muted)}
 .rev-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.aval-txt{color:var(--muted);max-width:var(--read);margin:0}
+.mapa-btn{display:grid;gap:.5rem;place-content:center;text-align:center;width:100%;min-height:16rem;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}.mapa-btn:hover{border-color:var(--ink)}.mapa-btn span{color:var(--muted)}.mapa-btn strong{font-family:var(--display);text-decoration:underline}
 .aval-foot{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.5rem;margin-top:1.75rem}
 .aval-foot p{font-size:.85rem;color:var(--muted);max-width:34rem;min-width:0}
 @media (max-width:700px){.reviews{grid-template-columns:1fr}}
@@ -281,6 +284,9 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 @media (max-width:820px){.eb-grid{grid-template-columns:1fr;row-gap:1.5rem}.eb-int,.eb-det,.eb-form{grid-column:1;grid-row:auto}.eb-form{order:2}.eb-det{order:3}.eb-form{position:static}}
 .eb-box{margin-top:2rem;padding:1.25rem;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;background:var(--surface)}
 .eb-box p{margin:.3rem 0 .9rem;color:var(--muted)}
+.art table{width:100%;border-collapse:collapse;margin:0 0 1.2rem;font-size:.95rem}.art th,.art td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}.art th{font-family:var(--display);font-weight:700}
+.fases{margin:0 0 1.5rem;padding:1rem 1.25rem;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.fases p{margin:0 0 .5rem;font-weight:600}.fases ol{margin:0;padding-left:1.2rem;gap:.3rem}.fases a{color:var(--ink)}.fases li.atual a{font-weight:700;text-decoration:none;border-bottom:2px solid var(--accent)}
+.revisado{font-size:.85rem;color:var(--muted);margin:-1.2rem 0 1.5rem}
 .dl{display:grid;gap:1rem;justify-items:start}
 .vei-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3rem);margin:1rem 0 2rem}
 @media (max-width:820px){.vei-grid{grid-template-columns:1fr}}
@@ -365,17 +371,20 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
   <div class="wrap">
     <div><strong>FCE Advogados</strong><br>Fabio de Castro Emerim Sociedade Individual de Advocacia<br>OAB/RS 15.656 · CNPJ 57.727.037/0001-33</div>
     <div><strong>Endereço</strong><br>Rua Araguaia, 509, Jardim Mauá<br>Novo Hamburgo/RS · CEP 93548-350</div>
-    <div><strong>Contato</strong><br>WhatsApp (51) 99206-8037<br>atendimento@fceadvogados.com.br</div>
+    <div><strong>Contato</strong><br>WhatsApp (51) 99206-8037<br>atendimento@fceadvogados.com.br<br><span class="muted-foot">WhatsApp de segunda a sexta, das 8h às 20h. Consultas mediante agendamento.</span></div>
     <nav class="flinks" aria-label="Mapa do site">
-      <div><strong>Imóvel em risco</strong><ul><li><a href="/">Leilão de imóvel financiado</a></li><li><a href="/calculadora/">Simulador: quanto está em jogo</a></li><li><a href="/ebook/">Guia gratuito: parcelas atrasadas</a></li><li><a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Intimação do cartório</a></li><li><a href="/guia/propriedade-consolidada-no-nome-do-banco/">Propriedade consolidada</a></li><li><a href="/guia/saldo-do-leilao-como-receber/">Saldo do leilão</a></li></ul></div>
-      <div><strong>Para investidores</strong><ul><li><a href="/investidor/">Comprar imóvel em leilão</a></li><li><a href="/investidor/#analise">Análise pré-lance</a></li><li><a href="/investidor/calculadora/">Calculadora do lance máximo</a></li><li><a href="/investidor/guia/">Guia: 20 pontos antes do lance</a></li><li><a href="/guia/comprar-imovel-em-leilao-checklist-do-edital/">Checklist do edital</a></li><li><a href="/guia/arrematei-imovel-ocupado-desocupacao/">Imóvel arrematado ocupado</a></li></ul></div>
-      <div><strong>Atendimento por cidade</strong><ul><li><a href="/leilao-de-imoveis/porto-alegre/">Porto Alegre</a></li><li><a href="/leilao-de-imoveis/novo-hamburgo/">Novo Hamburgo</a></li><li><a href="/leilao-de-imoveis/canoas/">Canoas</a></li><li><a href="/leilao-de-imoveis/sao-paulo/">São Paulo</a></li><li><a href="/leilao-de-imoveis/">Outras cidades</a></li></ul></div>
+      <div><strong>Imóvel em risco</strong><ul><li><a href="/leilao/">Defesa do devedor: leilão de imóvel financiado</a></li><li><a href="/suspensao-de-leilao/">Suspensão de leilão</a></li><li><a href="/guia/alienacao-fiduciaria-fase-a-fase/">Alienação fiduciária fase a fase</a></li><li><a href="/calculadora/">Simulador: quanto está em jogo</a></li><li><a href="/ebook/">Guia gratuito: parcelas atrasadas</a></li><li><a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Intimação do cartório</a></li><li><a href="/guia/propriedade-consolidada-no-nome-do-banco/">Propriedade consolidada</a></li><li><a href="/guia/saldo-do-leilao-como-receber/">Saldo do leilão</a></li></ul></div>
+      <div><strong>Para investidores</strong><ul><li><a href="/investidor/">Comprar imóvel em leilão</a></li><li><a href="/investidor/#analise">Análise pré-lance</a></li><li><a href="/investidor/calculadora/">Calculadora do lance máximo</a></li><li><a href="/investidor/guia/">Guia: 20 pontos antes do lance</a></li><li><a href="/guia/comprar-imovel-em-leilao-checklist-do-edital/">Checklist do edital</a></li><li><a href="/guia/riscos-de-comprar-imovel-em-leilao/">Riscos de comprar em leilão</a></li><li><a href="/guia/arrematei-imovel-ocupado-desocupacao/">Imóvel arrematado ocupado</a></li></ul></div>
+      <div><strong>Atendimento por cidade</strong><ul><li><a href="/leilao-de-imoveis/porto-alegre/">Porto Alegre</a></li><li><a href="/leilao-de-imoveis/novo-hamburgo/">Novo Hamburgo</a></li><li><a href="/leilao-de-imoveis/canoas/">Canoas</a></li><li><a href="/leilao-de-imoveis/sao-paulo/">São Paulo</a></li><li><a href="/guia/alienacao-fiduciaria-no-rio-grande-do-sul/">Regras no RS</a></li><li><a href="/guia/leilao-extrajudicial-em-sao-paulo/">Como decide o TJSP</a></li><li><a href="/leilao-de-imoveis/">Outras cidades</a></li></ul></div>
       <div><strong>Mais conteúdo</strong><ul><li><a href="/guia/">Guias por situação</a></li><li><a href="/blog/">Blog</a></li><li><a href="/empresario/">Empresas: imóvel em garantia</a></li><li><a href="/veiculo/">Veículo: busca e apreensão</a></li><li><a href="/sobre/">Sobre o advogado</a></li><li><a href="/privacidade/">Privacidade</a></li></ul></div>
     </nav>
     <p class="aviso">Conteúdo de caráter informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. As informações não substituem a análise individual de cada caso e não representam promessa de resultado. <a href="/privacidade/">Política de privacidade</a> · <a href="/#cookies" data-cookies>Cookies</a>.</p>
     <p class="aviso aviso-fb" style="border-top:0;padding-top:0;margin-top:-.5rem">Este site não é parte do site Facebook ou do Facebook Inc. Além disso, este site NÃO é endossado pelo Facebook de nenhuma forma. FACEBOOK é uma marca registrada do FACEBOOK, Inc.</p>
   </div>
 </footer>
+<script>
+(function(){var b=document.querySelector('.mapa-btn');if(!b)return;b.addEventListener('click',function(){var f=document.createElement('iframe');f.title='Mapa: Rua Araguaia, 509, Novo Hamburgo/RS';f.src=b.getAttribute('data-src');f.loading='lazy';f.referrerPolicy='no-referrer-when-downgrade';b.replaceWith(f);});})();
+</script>
 
 <div class="mbar"><a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=empresario-obrigado">Conversar pelo WhatsApp</a></div>
 
