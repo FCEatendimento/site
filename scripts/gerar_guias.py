@@ -97,6 +97,7 @@ MES_ATUAL=_MESES[_d.month-1]+'/'+str(_d.year)  # 'Atualizado em' dos guias em PD
 def _marca(h, path):
     u=path[:-len('index.html')] if path.endswith('index.html') else path
     return h.replace(f'<a href="{u}">', f'<a href="{u}" aria-current="page">', 1)
+TEMA_JS='''<script>(function(){try{var t=localStorage.getItem("tema");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>'''
 def page(path, title, desc, canon, body, ld, tag, robots=''):
     body=body.replace('{{ATUALIZADO}}', MES_ATUAL)
     h=f'''<!doctype html>
@@ -105,6 +106,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{html.escape(title)}</title>
+{TEMA_JS}
 <meta name="description" content="{html.escape(desc)}">
 <link rel="icon" href="/img/logo.svg">
 <link rel="canonical" href="{canon}">{robots}
@@ -391,6 +393,10 @@ for _p,_hd,_tg in (('/calculadora/index.html',None,'calculadora'),('/investidor/
     if 'footer .flinks{' not in _s: _s=_s.replace('footer .aviso{',_FCSS+'footer .aviso{',1)
     _MB=tail[tail.index('<div class="mbar">'):tail.index('</div>',tail.index('<div class="mbar">'))+6]
     _MBCSS=IDX[IDX.index('/* Barra fixa no celular */'):IDX.index('/* Topo no celular')]
+    if 'localStorage.getItem("tema")' not in _s: _s=_s.replace('</title>','</title>\n'+TEMA_JS,1)
+    if '.tema-btn{' not in _s: _s=_s.replace('</style>','\n'+IDX[IDX.index('.tema-btn{'):IDX.index('.menu-btn{display:none;')]+'</style>',1)
+    if '/* Tema claro/escuro */' not in _s: _s=_s.replace('</body>',IDX[IDX.index('<script>\n/* Tema claro/escuro */'):IDX.index('</script>',IDX.index('/* Tema claro/escuro */'))+9]+'\n</body>',1)
+    if 'data-tema' not in _s: _s=_s.replace('<a class="btn btn-primary wa"',IDX[IDX.index('<button class="tema-btn"'):IDX.index('</button>',IDX.index('<button class="tema-btn"'))+9]+'\n      <a class="btn btn-primary wa"',1)
     if 'class="mbar"' not in _s: _s=_s.replace('</footer>','</footer>\n'+fix(_MB,_tg),1).replace('</style>','\n'+_MBCSS+'</style>',1)
     _u='https://fceadvogados.com.br'+_p[:-len('index.html')]
     _nm='Calculadora do lance máximo em leilão de imóveis' if 'investidor' in _p else 'Calculadora: quanto do seu imóvel está em jogo'
