@@ -75,41 +75,14 @@
     d.innerHTML = '<p>Usamos cookies do Google e da Meta para medir quais anúncios trazem contatos e para mostrar anúncios do escritório a quem já visitou o site. O que você digita nos formulários não é compartilhado. <a href="/privacidade/">Saiba mais</a>.</p>' +
       '<div class="b"><button type="button" class="ok">Aceitar</button><button type="button" class="no">Recusar</button></div>';
     document.body.appendChild(d);
-    mostrarBotao(false);
-    d.querySelector('.ok').onclick = function () { gravar('sim'); aceitar(); d.remove(); mostrarBotao(true); };
+    d.querySelector('.ok').onclick = function () { gravar('sim'); aceitar(); d.remove(); };
     d.querySelector('.no').onclick = function () {
-      gravar('nao'); d.remove(); mostrarBotao(true);
+      gravar('nao'); d.remove();
       gtag('consent', 'update', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' });
       if (pixelOk && window.fbq) fbq('consent', 'revoke');
     };
   }
-  // Botão fixo de cookies: aparece em todas as páginas depois da escolha e reabre o aviso
-  var btn = null;
-  function criarBotao() {
-    if (btn) return;
-    var css = document.createElement('style');
-    css.textContent = '#fce-ck-btn{position:fixed;left:16px;bottom:16px;z-index:55;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--surface,#fff);color:var(--ink,#0E1A2B);border:1px solid var(--line,#ddd);box-shadow:0 4px 14px rgba(0,0,0,.16);padding:0}' +
-      '#fce-ck-btn:hover,#fce-ck-btn:focus-visible{border-color:var(--accent,#f2c200);outline:none;box-shadow:0 0 0 3px var(--accent,#f2c200)}' +
-      '#fce-ck-btn[hidden]{display:none}#fce-ck-btn svg{width:22px;height:22px}' +
-      '.fce-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}' +
-      '@media (max-width:760px){body:has(.mbar) #fce-ck-btn{bottom:calc(5.25rem + env(safe-area-inset-bottom,0px))}}' +
-      '@media print{#fce-ck-btn,#fce-cookies{display:none}}';
-    document.head.appendChild(css);
-    btn = document.createElement('button');
-    btn.type = 'button'; btn.id = 'fce-ck-btn'; btn.title = 'Preferências de cookies';
-    btn.setAttribute('aria-label', 'Preferências de cookies');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M12 3a9 9 0 1 0 9 9 3 3 0 0 1-3.5-3A3 3 0 0 1 14 5.5 3 3 0 0 1 12 3z"/>' +
-      '<circle cx="8.5" cy="10.5" r="1" fill="currentColor"/><circle cx="10" cy="15.5" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/></svg>' +
-      '<span class="fce-sr">Cookies</span>';
-    btn.addEventListener('click', function () { aviso(true); });
-    document.body.appendChild(btn);
-  }
-  function mostrarBotao(v) { criarBotao(); btn.hidden = !v; }
-
   function iniciar() {
-    criarBotao();
-    btn.hidden = !ler();
     aviso(false);
     document.addEventListener('click', function (e) {
       var c = e.target.closest && e.target.closest('[data-cookies]');
