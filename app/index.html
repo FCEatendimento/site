@@ -987,7 +987,9 @@ const ABAS = {
         const k = diaChave(x.t);
         if (k !== ult) { ult = k; h += '<div class="dia-sep">' + esc(fmtD(x.t, { weekday: 'short', day: '2-digit', month: 'short' })) + '</div>'; }
         const out = String(x.dir).toUpperCase() === 'OUTBOUND', eu = out && x.autor === 'fabio';
-        const corpo = x.tipo && x.tipo !== 'text' ? '<span class="doc">' + ic('doc', 's') + esc(x.tipo) + '</span>' + (x.texto ? esc(x.texto) : '') : esc(x.texto || '');
+        const TIPO = { audio: 'Áudio', image: 'Imagem', document: 'Documento', video: 'Vídeo', sticker: 'Figurinha', template: 'Modelo' };
+        const txt = x.tipo === 'audio' ? String(x.texto || '').replace(/^\(mensagem de voz\)\s*/i, '').replace(/^\[ÁUDIO\]$/i, '') : x.texto;
+        const corpo = x.tipo && x.tipo !== 'text' ? '<span class="doc">' + ic('doc', 's') + esc(TIPO[x.tipo] || x.tipo) + '</span>' + (txt ? esc(txt) : '') : esc(x.texto || '');
         h += '<div class="bolha ' + (out ? 'out' : 'in') + (eu ? ' eu' : '') + '">' + (eu ? '<span class="quem">Você</span>' : '') + corpo + '<span class="h">' + esc(hora(x.t)) + (out && x.origem === 'CHAT_TESTE' ? ' · teste' : '') + (out && !eu ? ' · Helena' : '') + '</span></div>';
       });
       h += '</div>';
@@ -1545,11 +1547,46 @@ function toastMsg(m) {
   t.onclick = () => t.remove();
   document.body.appendChild(t); setTimeout(() => t.remove(), 9000);
 }
+// Assinatura da conversa (nº de mensagens, a mais recente e o status): igual à que o servidor calcula.
+function assinaturaCaso(c) {
+  if (!c) return '';
+  const m = c.mensagens || [];
+  const t = m.reduce((x, y) => Math.max(x, new Date(y.t).getTime() || 0), 0);
+  return Math.min(m.length, 400) + '|' + t + '|' + (c.conv_status || '');
+}
+function assinaturaServidor(v) { return v ? Number(v.n || 0) + '|' + (v.t ? new Date(v.t).getTime() : 0) + '|' + (v.s || '') : ''; }
+S.sigVista = {};
+// Redesenha o caso aberto com os dados novos sem perder o que o senhor está escrevendo nem a posição da leitura.
+async function atualizarCasoAberto(id, sigNova) {
+  if ($('.veu')) return; // janela aberta por cima: tenta de novo na próxima checagem
+  let c; try { c = await api('caso', { id }); } catch (e) { return; }
+  S.sigVista[id] = sigNova;
+  Object.values(S.cache).forEach((x) => { x.t = 0; });
+  gravar('caso:' + id, c);
+  if ((location.hash.match(/#\/caso\/([0-9a-f-]{36})/) || [])[1] !== id || $('.veu')) return;
+  // guarda rascunhos (resposta ao cliente, nota etc.), o campo em foco e a rolagem
+  const rasc = {}; $$('#cont textarea[id], #cont input[id]').forEach((e) => { if (e.value) rasc[e.id] = e.value; });
+  const fe = document.activeElement, focoId = fe && fe.id && /TEXTAREA|INPUT/.test(fe.tagName) ? fe.id : '';
+  const sel = focoId ? [fe.selectionStart, fe.selectionEnd] : null;
+  const ch = $('#chat'), noFim = !ch || ch.scrollHeight - ch.scrollTop - ch.clientHeight < 120, st = ch ? ch.scrollTop : 0;
+  const y = window.scrollY;
+  await VIEWS.caso(id);
+  window.scrollTo(0, y);
+  Object.entries(rasc).forEach(([k, v]) => { const e = document.getElementById(k); if (e && !e.value) e.value = v; });
+  const f2 = focoId && document.getElementById(focoId);
+  if (f2) { f2.focus(); try { f2.setSelectionRange(sel[0], sel[1]); } catch (e) {} }
+  const ch2 = $('#chat'); if (ch2 && !noFim) ch2.scrollTop = st;
+}
 async function checarMensagens() {
   if (!S.token || !$('.app')) return;
-  let l; try { l = await api('notificacoes'); } catch (e) { return; }
-  const v = vistas();
   const aqui = (location.hash.match(/#\/caso\/([0-9a-f-]{36})/) || [])[1];
+  let l, conv = null;
+  try { const r = await api('notificacoes', aqui ? { caso: aqui } : null); if (Array.isArray(r)) l = r; else { l = (r && r.lista) || []; conv = r && r.conv; } } catch (e) { return; }
+  if (aqui && conv) {
+    const sig = assinaturaServidor(conv), local = assinaturaCaso((S.cache['caso:' + aqui] || {}).d);
+    if (local && sig !== local && sig !== S.sigVista[aqui]) atualizarCasoAberto(aqui, sig);
+  }
+  const v = vistas();
   (l || []).forEach((x) => { if (aqui === x.caso_id && S.abaCaso === 'conversa') marcarVista(x.caso_id, x.t); });
   const v2 = vistas();
   const novas = (l || []).filter((x) => !v2[x.caso_id] || new Date(x.t) > new Date(v2[x.caso_id]));
@@ -1558,7 +1595,7 @@ async function checarMensagens() {
   inedita.forEach((x) => { S.avisadas[x.caso_id] = x.t; });
   if (inedita.length) {
     if (document.visibilityState === 'visible') toastMsg(inedita[0]); else inedita.forEach(avisoSistema);
-    if (aqui && inedita.some((x) => x.caso_id === aqui)) { S.cache = {}; VIEWS.caso(aqui, true); }
+    if (aqui && inedita.some((x) => x.caso_id === aqui)) { if (!conv) atualizarCasoAberto(aqui, ''); }
     else if (document.visibilityState === 'visible' && /^(#\/?(inicio)?)?$/.test(location.hash) && !$('.veu')) { rota(); }
   }
 }
@@ -1579,9 +1616,15 @@ function ligarCartaoMsgs() {
     rota();
   };
 }
-setInterval(checarMensagens, 30000);
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setTimeout(checarMensagens, 1500); });
-setTimeout(checarMensagens, 2500);
+// Checagem de mensagens: a cada 15 s com um caso aberto na tela; a cada 30 s nas demais telas.
+function agendarChecagem(ms) {
+  clearTimeout(S.tChk);
+  const casoAberto = /#\/caso\/[0-9a-f-]{36}/.test(location.hash) && document.visibilityState === 'visible';
+  S.tChk = setTimeout(async () => { try { await checarMensagens(); } finally { agendarChecagem(); } }, ms != null ? ms : (casoAberto ? 15000 : 30000));
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') agendarChecagem(1500); });
+window.addEventListener('hashchange', () => { if (/#\/caso\/[0-9a-f-]{36}/.test(location.hash)) agendarChecagem(4000); });
+agendarChecagem(2500);
 // ---------- início ----------
 if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
 (function boot() {
