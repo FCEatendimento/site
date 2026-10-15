@@ -1616,11 +1616,13 @@ function ligarCartaoMsgs() {
     rota();
   };
 }
-// Checagem de mensagens: a cada 15 s com um caso aberto na tela; a cada 30 s nas demais telas.
+// Checagem de mensagens (cada checagem é uma execução no n8n, então o ritmo é econômico):
+// 20 s com um caso aberto na tela; 60 s nas demais telas; 3 min com o app em segundo plano.
 function agendarChecagem(ms) {
   clearTimeout(S.tChk);
-  const casoAberto = /#\/caso\/[0-9a-f-]{36}/.test(location.hash) && document.visibilityState === 'visible';
-  S.tChk = setTimeout(async () => { try { await checarMensagens(); } finally { agendarChecagem(); } }, ms != null ? ms : (casoAberto ? 15000 : 30000));
+  const visivel = document.visibilityState === 'visible';
+  const casoAberto = visivel && /#\/caso\/[0-9a-f-]{36}/.test(location.hash);
+  S.tChk = setTimeout(async () => { try { await checarMensagens(); } finally { agendarChecagem(); } }, ms != null ? ms : (casoAberto ? 20000 : visivel ? 60000 : 180000));
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') agendarChecagem(1500); });
 window.addEventListener('hashchange', () => { if (/#\/caso\/[0-9a-f-]{36}/.test(location.hash)) agendarChecagem(4000); });
