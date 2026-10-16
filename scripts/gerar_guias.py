@@ -7,7 +7,7 @@ style=IDX[IDX.index('<style>'):IDX.index('</style>')+8]
 header=IDX[IDX.index('<header class="top">'):IDX.index('</header>')+9]
 tail=IDX[IDX.index('<footer>'):]
 # --- Menu da área do investidor ---
-INV_SLUGS=['comprar-imovel-em-leilao-checklist-do-edital','riscos-de-comprar-imovel-em-leilao','iptu-e-condominio-imovel-arrematado-quem-paga','arrematei-imovel-ocupado-desocupacao','leilao-judicial-ou-extrajudicial-diferencas']
+INV_SLUGS=['comprar-imovel-em-leilao-checklist-do-edital','riscos-de-comprar-imovel-em-leilao','iptu-e-condominio-imovel-arrematado-quem-paga','arrematei-imovel-ocupado-desocupacao']  # leilao-judicial-ou-extrajudicial-diferencas passou à área do devedor (penhora e leilão judicial)
 GI=[g for s in INV_SLUGS for g in G if g['slug']==s]
 _nav0=header[header.index('<nav aria-label="Seções">'):header.index('<button class="menu-btn"')]
 _INV_NAV=('<nav aria-label="Área do investidor">\n'
@@ -30,7 +30,7 @@ _INV_PAN=('<ul class="wrap">\n'
   '      <li><a href="/sobre/">Sobre o advogado</a></li>\n'
   '      <li><a href="/">Tem imóvel em risco? Área do devedor</a></li>\n    </ul>')
 header_inv=(header.replace(_nav0,_INV_NAV).replace(_pan0,_INV_PAN)
-  .replace('<span class="brand-tag">Leilão de<br>imóveis</span>','<span class="brand-tag">Para<br>investidores</span>')
+  .replace('<span class="brand-tag">Dívidas, garantias<br>e leilões de imóveis</span>','<span class="brand-tag">Para<br>investidores</span>')
   .replace('href="#inicio" aria-label="FCE Advogados, início"','href="/investidor/" aria-label="FCE Advogados, área do investidor"'))
 _NAVCSS=IDX[IDX.index('.top nav a[aria-current="page"]'):IDX.index('.top nav a{white-space:nowrap}')]
 ART_CSS='''<style>
@@ -82,6 +82,14 @@ ART_CSS='''<style>
 .vei-fases li::before{content:counter(f);position:absolute;left:0;top:0;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--ink);color:var(--bg);font:700 .95rem var(--display);display:flex;align-items:center;justify-content:center}
 .vei-fases b{display:block;font-family:var(--display)}.vei-fases span{color:var(--muted)}
 .vei-faq details{border-bottom:1px solid var(--line);padding:.9rem 0}.vei-faq summary{font-weight:600;cursor:pointer}.vei-faq p{margin:.6rem 0 0;color:var(--muted)}
+.ct-linha{display:grid;grid-template-columns:1fr 6.5rem;gap:.75rem}
+.eb-form textarea{font:inherit;font-weight:400;padding:.75rem .85rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;resize:vertical}
+.eb-form textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.sobre-foto{margin:0 0 1.5rem}.sobre-foto img{width:min(100%,18rem);height:auto;border-radius:8px;border:1px solid var(--line);display:block}
+.eb-form label[hidden]{display:none}
+.guia-cat{margin-top:2.5rem;padding-block:0}.guia-cat>p{color:var(--muted);margin:-.4rem 0 1rem}
+.guia-sec{margin-top:3rem;padding:1.5rem 0 0;border-top:1px solid var(--line)}
+.art .cards a.pg{border-left:3px solid var(--accent)}
 </style>'''
 def fix(s, tag):
     s=s.replace('href="#inicio"','href="/"')
@@ -152,6 +160,38 @@ ORG={"@id":"https://fceadvogados.com.br/#escritorio"}
 AUT={"@type":"Person","@id":"https://fceadvogados.com.br/sobre/#fabio","name":"Fábio de Castro Emerim","jobTitle":"Advogado","identifier":"OAB/RS 88.912","url":"https://fceadvogados.com.br/sobre/"}
 INV_BOX='<aside class="eb-box"><p class="eyebrow">Antes do lance</p><strong>Faça a conta e confira os riscos do imóvel</strong><p>A calculadora mostra até quanto vale dar de lance para ter o retorno que você quer. O guia gratuito traz os 20 pontos para conferir no edital, na matrícula e no processo.</p><p style="display:flex;flex-wrap:wrap;gap:.6rem;margin:0"><a class="btn btn-primary" href="/investidor/calculadora/">Calcular o lance máximo</a><a class="btn btn-ghost" href="/investidor/guia/?o=TAG">Baixar o guia gratuito</a><a class="btn btn-ghost" href="/investidor/#analise">Análise pré-lance</a></p></aside>'
 DEV_BOX='<aside class="eb-box"><p class="eyebrow">Imóvel em risco</p><strong>Veja quanto do seu imóvel está em jogo</strong><p>O simulador estima o patrimônio em risco em cada fase. O guia gratuito explica o caminho da intimação ao leilão, com checklist de documentos.</p><p style="display:flex;flex-wrap:wrap;gap:.6rem;margin:0"><a class="btn btn-primary" href="/calculadora/">Simular agora</a><a class="btn btn-ghost" href="/ebook/?o=TAG">Baixar o guia gratuito</a></p></aside>'
+CTA_B='<aside class="eb-box"><p class="eyebrow">Conversa inicial</p><strong>Quer entender a sua situação?</strong><p>Descreva o caso pelo formulário de contato ou pelo WhatsApp. O advogado responsável identifica a fase e os prazos e explica os caminhos possíveis.</p><p style="display:flex;flex-wrap:wrap;gap:.6rem;margin:0"><a class="btn btn-primary" href="/contato/?o=TAG">Explicar minha situação</a><a class="btn btn-ghost wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=home">Conversar pelo WhatsApp</a></p></aside>'
+ASSINATURA_B='<p class="crumb" style="margin-top:2rem">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Conteúdo informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021; não substitui a análise individual do caso e não representa promessa de resultado.</p>'
+REVISAO_B='2026-10-16'
+# Páginas de serviço e problemas jurídicos (núcleos B e penhora): (caminho, arquivo, title, description, nome, pai)
+PAGINAS_B=[
+ ('/imovel-em-garantia/','garantia/imovel-em-garantia.html','Imóvel dado em garantia de dívida: riscos e direitos | FCE Advogados','Imóvel em garantia de empréstimo, fiança ou aval: o que pode acontecer se a dívida não for paga, a proteção do bem de família e o que pode ser analisado.','Imóvel dado em garantia de dívida',None),
+ ('/imovel-em-garantia/divida-da-empresa/','garantia/divida-da-empresa.html','Casa em garantia de dívida da empresa: posso perder? | FCE Advogados','Deu a casa em garantia de empréstimo da empresa? Como a cobrança funciona na alienação fiduciária e na hipoteca, o bem de família e a recuperação judicial.','Casa em garantia de dívida da empresa','/imovel-em-garantia/'),
+ ('/imovel-em-garantia/fiador/','garantia/fiador.html','Fiador pode perder o único imóvel? O que diz a lei | FCE Advogados','Fiador de aluguel residencial ou comercial pode ter o imóvel penhorado? A Lei 8.009/90, o Tema 1.127 do STF, a exoneração da fiança e o que conferir.','Fiador pode perder o único imóvel?','/imovel-em-garantia/'),
+ ('/imovel-em-garantia/bem-de-familia/','garantia/bem-de-familia.html','Bem de família: quando o imóvel pode ser penhorado | FCE Advogados','A Lei 8.009/90 protege o imóvel residencial, com exceções: financiamento, IPTU, condomínio, hipoteca e fiança locatícia. Entenda cada uma e o que o STJ decide.','Bem de família','/imovel-em-garantia/'),
+ ('/imovel-em-garantia/execucao-contra-garantidor/','garantia/execucao-contra-garantidor.html','Execução contra fiador, avalista ou garantidor | FCE Advogados','Foi citado como fiador, avalista ou garantidor de uma dívida? Prazos, embargos, parcelamento, penhora de bens e o que pode ser discutido na execução.','Execução contra fiador, avalista ou garantidor','/imovel-em-garantia/'),
+ ('/imovel-em-garantia/responsabilidade-dos-socios/','garantia/responsabilidade-dos-socios.html','Sócio responde com bens pessoais por dívida da empresa? | FCE Advogados','Quando o patrimônio do sócio pode ser atingido por dívida da empresa: garantias assinadas, desconsideração da personalidade jurídica e o que a lei exige.','Responsabilidade dos sócios por dívida da empresa','/imovel-em-garantia/'),
+ ('/imovel-em-garantia/antes-de-assinar/','garantia/antes-de-assinar.html','Antes de dar o imóvel em garantia: o que conferir | FCE Advogados','Vai oferecer a casa em garantia de empréstimo ou de dívida da empresa? Os pontos do contrato que merecem atenção antes de assinar.','Antes de oferecer o imóvel em garantia','/imovel-em-garantia/'),
+ ('/penhora-de-imovel/','penhora.html','Imóvel penhorado por dívida: o que fazer | FCE Advogados','Seu imóvel foi penhorado em processo judicial? Como funcionam a penhora, a avaliação e o leilão judicial, os prazos e o que pode ser analisado.','Imóvel penhorado por dívida',None),
+]
+# Conexões temáticas exibidas no fim de cada guia
+RELACIONADOS={
+ 'o-banco-pode-leiloar-minha-casa':[('/imovel-em-garantia/bem-de-familia/','Bem de família: quando a lei protege o imóvel'),('/leilao/','Financiamento atrasado e leilão extrajudicial')],
+ 'alienacao-fiduciaria-fase-a-fase':[('/leilao/','Defesa do devedor na alienação fiduciária'),('/imovel-em-garantia/divida-da-empresa/','Imóvel em garantia de dívida da empresa')],
+ 'leilao-judicial-ou-extrajudicial-diferencas':[('/penhora-de-imovel/','Imóvel penhorado: avaliação e leilão judicial'),('/imovel-em-garantia/execucao-contra-garantidor/','Execução contra fiador, avalista ou garantidor')],
+ 'intimacao-do-cartorio-parcelas-atrasadas':[('/leilao/','Defesa do devedor na alienação fiduciária'),('/imovel-em-garantia/divida-da-empresa/','Imóvel em garantia de dívida da empresa')],
+ 'propriedade-consolidada-no-nome-do-banco':[('/suspensao-de-leilao/','Leilão marcado: quando cabe a suspensão'),('/leilao/','Defesa do devedor na alienação fiduciária')],
+ 'como-saber-se-meu-imovel-vai-a-leilao':[('/penhora-de-imovel/','Imóvel penhorado em processo judicial'),('/contato/','Explicar a sua situação ao escritório')],
+ 'direito-de-preferencia-recomprar-imovel-antes-do-leilao':[('/suspensao-de-leilao/','Leilão marcado: quando cabe a suspensão')],
+ 'imovel-leiloado-o-que-ainda-e-possivel':[('/guia/saldo-do-leilao-como-receber/','Como receber o saldo do leilão')],
+ 'saldo-do-leilao-como-receber':[('/imovel-em-garantia/divida-da-empresa/','Saldo remanescente nas garantias empresariais')],
+ 'purgacao-da-mora-apos-consolidacao-tema-1288':[('/guia/direito-de-preferencia-recomprar-imovel-antes-do-leilao/','Direito de preferência antes do 2º leilão')],
+ 'leilao-extrajudicial-caixa':[('/leilao/','Defesa do devedor na alienação fiduciária')],
+}
+def _rel(slug):
+    it=RELACIONADOS.get(slug)
+    if not it: return ''
+    return '<nav class="rel" aria-label="Temas relacionados"><p class="eyebrow">Temas relacionados</p><ul>'+''.join(f'<li><a href="{u}">{html.escape(t)}</a></li>' for u,t in it)+'</ul></nav>'
 _MB=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
 def _dbr(d):
     y,m,dd=map(int,d.split('-')); return f'{dd} de {_MB[m-1]} de {y}'
@@ -175,6 +215,7 @@ for g in G:
 {g["corpo"]}
       {(INV_BOX if inv else DEV_BOX).replace('TAG','guia-'+g['slug'][:40])}
       <p class="crumb">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Conteúdo informativo; não substitui a análise individual do caso.</p>
+      {_rel(g['slug'])}
       <nav class="rel" aria-label="Outros guias"><p class="eyebrow">{'Mais guias para quem compra em leilão' if inv else 'Outros guias'}</p><ul>{outros}<li><a href="{'/investidor/' if inv else '/guia/'}">{'Área do investidor: análise pré-lance' if inv else 'Todos os guias por situação'}</a></li></ul></nav>
     </div>
   </article>'''
@@ -184,23 +225,41 @@ for g in G:
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":u} for i,(n,u) in enumerate(bc+[(g["titulo"],url)])]}]}
     page(f'/guia/{g["slug"]}/index.html', g["seo"], g["desc"], url, body, ld, 'investidor-artigo' if inv else 'guia')
 _card=lambda g:f'<a href="/guia/{g["slug"]}/"><strong>{html.escape(g["titulo"])}</strong><span>{html.escape(g["desc"])}</span></a>'
-cards=('<h2>Para quem tem imóvel financiado em risco</h2><div class="cards">'+''.join(_card(g) for g in G if g['slug'] not in INV_SLUGS)+'</div><p style="margin-top:1rem"><a href="/calculadora/">Simule quanto do seu imóvel está em jogo</a> · <a href="/ebook/">Guia gratuito em PDF</a></p>'
-      +'<h2>Para quem quer comprar imóvel em leilão</h2><div class="cards">'+''.join(_card(g) for g in GI)+'</div><p style="margin-top:1rem"><a href="/investidor/calculadora/">Calculadora do lance máximo</a> · <a href="/investidor/guia/">Guia gratuito: 20 pontos antes do lance</a> · <a href="/investidor/">Análise pré-lance</a></p>')
+GS={g['slug']:g for g in G}
+def _pcard(u,t,d): return f'<a class="pg" href="{u}"><strong>{html.escape(t)}</strong><span>{html.escape(d)}</span></a>'
+PB={x[0]:x for x in PAGINAS_B}
+def _pb(u,d): return _pcard(u,PB[u][4],d)
+CATEGORIAS=[
+ ('Financiamento imobiliário','Parcelas atrasadas e os primeiros sinais de que o imóvel pode ir a leilão.',[GS['o-banco-pode-leiloar-minha-casa'],GS['como-saber-se-meu-imovel-vai-a-leilao'],GS['leilao-extrajudicial-caixa']],[]),
+ ('Alienação fiduciária','Como funciona a cobrança pelo cartório e as regras de cada estado.',[GS['alienacao-fiduciaria-fase-a-fase'],GS['intimacao-do-cartorio-parcelas-atrasadas'],GS['alienacao-fiduciaria-no-rio-grande-do-sul'],GS['leilao-extrajudicial-em-sao-paulo']],[_pcard('/leilao/','Defesa do devedor na alienação fiduciária','O que o escritório analisa em cada fase do procedimento.')]),
+ ('Consolidação da propriedade','Quando o imóvel passa para o nome do credor na matrícula.',[GS['propriedade-consolidada-no-nome-do-banco'],GS['purgacao-da-mora-apos-consolidacao-tema-1288']],[]),
+ ('Leilão extrajudicial','Datas, direito de preferência e suspensão do leilão.',[GS['direito-de-preferencia-recomprar-imovel-antes-do-leilao']],[_pcard('/suspensao-de-leilao/','Suspensão de leilão de imóvel','Quando a suspensão pode ser pedida e o que precisa ser demonstrado.')]),
+ ('Direitos após o leilão','O que ainda pode ser verificado depois da venda.',[GS['imovel-leiloado-o-que-ainda-e-possivel'],GS['saldo-do-leilao-como-receber']],[]),
+ ('Penhora e execução','Imóvel penhorado em processo judicial e leilão determinado pelo juiz.',[GS['leilao-judicial-ou-extrajudicial-diferencas']],[_pb('/penhora-de-imovel/','Penhora, avaliação, leilão judicial e os prazos de defesa.'),_pb('/imovel-em-garantia/execucao-contra-garantidor/','Prazos depois da citação e o que pode ser discutido.')]),
+ ('Garantias empresariais','Quando o imóvel pessoal garante uma dívida da empresa.',[],[_pb('/imovel-em-garantia/','As diferenças entre alienação fiduciária, hipoteca, fiança e aval.'),_pb('/imovel-em-garantia/divida-da-empresa/','O que acontece quando a empresa atrasa.'),_pb('/imovel-em-garantia/responsabilidade-dos-socios/','Quando o patrimônio do sócio pode ser atingido.'),_pb('/imovel-em-garantia/antes-de-assinar/','O que conferir no contrato antes da assinatura.'),_pcard('/empresario/','Guia gratuito para empresários (PDF)','Imóvel dado em garantia de empréstimo da empresa.')]),
+ ('Fiança e bem de família','A proteção do imóvel residencial e a situação do fiador.',[],[_pb('/imovel-em-garantia/fiador/','O que a lei e o STF dizem sobre o fiador de locação.'),_pb('/imovel-em-garantia/bem-de-familia/','A regra, as exceções e o que o STJ tem decidido.')]),
+]
+_usados={g['slug'] for c in CATEGORIAS for g in c[2]}
+_falta=[g for g in G if g['slug'] not in INV_SLUGS and g['slug'] not in _usados]
+if _falta: CATEGORIAS[0][2].extend(_falta)  # guia novo ainda sem categoria aparece em Financiamento imobiliário
+cards=''.join(f'<section class="guia-cat" aria-labelledby="cat-{i}"><h2 id="cat-{i}">{n}</h2><p>{d}</p><div class="cards">'+''.join(extra)+''.join(_card(g) for g in gs)+'</div></section>' for i,(n,d,gs,extra) in enumerate(CATEGORIAS))
+cards+=('<section class="guia-sec"><h2>Para quem compra imóvel em leilão</h2><p style="color:var(--muted)">Conteúdos para arrematantes e investidores.</p><ul>'+''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for g in GI)+'<li><a href="/investidor/">Análise jurídica antes do lance</a></li></ul></section>'
+      +'<p style="margin-top:1.5rem"><a href="/calculadora/">Simule quanto do seu imóvel está em jogo</a> · <a href="/ebook/">Guia gratuito em PDF: parcelas atrasadas</a></p>')
 body=f'''  <article class="art">
     <div class="wrap">
       <p class="crumb"><a href="/">Início</a> › Guias</p>
-      <p class="eyebrow">Leilão de imóveis</p>
-      <h1>Guias sobre leilão de imóveis e alienação fiduciária</h1>
-      <p class="lead">Explicações em linguagem simples para cada fase: da intimação do cartório à desocupação do imóvel arrematado.</p>
+      <p class="eyebrow">Dívidas, garantias e leilões de imóveis</p>
+      <h1>Guias jurídicos sobre imóveis ameaçados por dívidas</h1>
+      <p class="lead">Explicações em linguagem simples, organizadas por situação: do financiamento atrasado ao leilão, das garantias empresariais à penhora. A sequência da alienação fiduciária é intimação, consolidação, leilão, direito de preferência e o que ainda é possível depois.</p>
       {cards}
     </div>
   </article>'''
-ld={"@context":"https://schema.org","@type":"CollectionPage","name":"Guias sobre leilão de imóveis","url":"https://fceadvogados.com.br/guia/","publisher":ORG}
-page('/guia/index.html','Guias sobre leilão de imóveis e alienação fiduciária | FCE Advogados','Guias da FCE Advogados sobre intimação do cartório, consolidação da propriedade, leilão extrajudicial e desocupação de imóvel arrematado.','https://fceadvogados.com.br/guia/',body,ld,'guia')
+ld={"@context":"https://schema.org","@type":"CollectionPage","name":"Guias sobre dívidas, garantias e leilões de imóveis","url":"https://fceadvogados.com.br/guia/","publisher":ORG}
+page('/guia/index.html','Guias sobre dívidas, garantias e leilões de imóveis | FCE Advogados','Guias por situação: financiamento atrasado, alienação fiduciária, consolidação, leilão, penhora, garantias empresariais, fiança e bem de família.','https://fceadvogados.com.br/guia/',body,ld,'guia')
 SOBRE=open(SITE+'/content/sobre.html',encoding='utf-8').read()
 ldp={"@context":"https://schema.org","@graph":[{"@type":"ProfilePage","url":"https://fceadvogados.com.br/sobre/","mainEntity":{"@id":"https://fceadvogados.com.br/sobre/#fabio"}},
- {"@type":"Person","@id":"https://fceadvogados.com.br/sobre/#fabio","name":"Fábio de Castro Emerim","jobTitle":"Advogado","identifier":"OAB/RS 88.912","image":"https://fceadvogados.com.br/img/fabio.jpg","worksFor":ORG,"url":"https://fceadvogados.com.br/sobre/","sameAs":["https://www.linkedin.com/in/fabioemerimadv"],"knowsAbout":["Leilão de imóveis","Alienação fiduciária","Lei 9.514/97","Execução civil","Execução fiscal","Direito tributário"],"hasCredential":{"@type":"EducationalOccupationalCredential","credentialCategory":"Inscrição profissional","name":"OAB/RS 88.912","recognizedBy":{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}},"memberOf":[{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}],"hasOccupation":[{"@type":"Occupation","name":"Advogado"},{"@type":"Occupation","name":"Procurador Municipal"}],"address":{"@type":"PostalAddress","addressLocality":"Novo Hamburgo","addressRegion":"RS","addressCountry":"BR"}}]}
-page('/sobre/index.html','Fábio de Castro Emerim, advogado (OAB/RS 88.912) | FCE Advogados','Fábio de Castro Emerim, advogado em Novo Hamburgo/RS, sócio da FCE Advogados: leilão de imóveis e alienação fiduciária, execução civil desde 2013 e fiscal desde 2017.','https://fceadvogados.com.br/sobre/',SOBRE,ldp,'sobre')
+ {"@type":"Person","@id":"https://fceadvogados.com.br/sobre/#fabio","name":"Fábio de Castro Emerim","jobTitle":"Advogado","identifier":"OAB/RS 88.912","image":"https://fceadvogados.com.br/img/fabio.jpg","worksFor":ORG,"url":"https://fceadvogados.com.br/sobre/","sameAs":["https://www.linkedin.com/in/fabioemerimadv"],"knowsAbout":["Dívidas e garantias imobiliárias","Alienação fiduciária","Leilão de imóveis","Fiança","Bem de família","Penhora de imóvel","Execução civil"],"hasCredential":{"@type":"EducationalOccupationalCredential","credentialCategory":"Inscrição profissional","name":"OAB/RS 88.912","recognizedBy":{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}},"memberOf":[{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}],"hasOccupation":[{"@type":"Occupation","name":"Advogado"}],"address":{"@type":"PostalAddress","addressLocality":"Novo Hamburgo","addressRegion":"RS","addressCountry":"BR"}}]}
+page('/sobre/index.html','Fábio Emerim: dívidas, garantias e leilões de imóveis | FCE Advogados','Fábio de Castro Emerim (OAB/RS 88.912), sócio da FCE Advogados: dívidas, garantias e leilões de imóveis. Execução civil desde 2013 e fiscal desde 2017.','https://fceadvogados.com.br/sobre/',SOBRE,ldp,'sobre')
 # blog
 import datetime
 MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
@@ -245,7 +304,7 @@ page('/blog/index.html','Blog sobre leilão de imóveis e alienação fiduciári
 # e-book e privacidade
 EB=open(SITE+'/content/ebook.html',encoding='utf-8').read()
 lde={"@context":"https://schema.org","@type":"WebPage","name":"Guia gratuito: parcelas atrasadas do imóvel financiado","url":"https://fceadvogados.com.br/ebook/","publisher":ORG,"author":AUT}
-page('/ebook/index.html','Guia gratuito: parcelas atrasadas do imóvel financiado (PDF) | FCE Advogados','Baixe grátis o guia em PDF sobre parcelas atrasadas e alienação fiduciária: da intimação do cartório ao leilão, com checklist de documentos.','https://fceadvogados.com.br/ebook/',EB,lde,'ebook')
+page('/ebook/index.html','Guia grátis: parcelas atrasadas do imóvel financiado | FCE Advogados','Baixe grátis o guia em PDF sobre parcelas atrasadas e alienação fiduciária: da intimação do cartório ao leilão, com checklist de documentos.','https://fceadvogados.com.br/ebook/',EB,lde,'ebook')
 OB='''  <article class="art">
     <div class="wrap">
       <p class="eyebrow">Pronto</p>
@@ -262,7 +321,7 @@ page('/ebook/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download 
 # guia do empresario
 EM=open(SITE+'/content/empresario.html',encoding='utf-8').read()
 ldm={"@context":"https://schema.org","@type":"WebPage","name":"Guia gratuito para empresários: imóvel dado em garantia","url":"https://fceadvogados.com.br/empresario/","publisher":ORG,"author":AUT}
-page('/empresario/index.html','Imóvel em garantia de empréstimo da empresa: guia gratuito (PDF) | FCE Advogados','Deu a sede, o galpão ou a casa em garantia de empréstimo da empresa? Guia gratuito sobre o que acontece se as parcelas atrasarem: cartório, aditivos e leilão.','https://fceadvogados.com.br/empresario/',EM,ldm,'empresario')
+page('/empresario/index.html','Imóvel em garantia da empresa: guia gratuito (PDF) | FCE Advogados','Deu a sede, o galpão ou a casa em garantia de empréstimo da empresa? Guia gratuito sobre o que acontece se as parcelas atrasarem: cartório, aditivos e leilão.','https://fceadvogados.com.br/empresario/',EM,ldm,'empresario')
 OBM=OB.replace('/ebook/fce-guia-parcelas-atrasadas.pdf','/empresario/fce-guia-imovel-em-garantia.pdf').replace('comece pelo capítulo 2, “A linha do tempo”','comece pelo capítulo 3, “A linha do tempo”')
 page('/empresario/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito para empresários sobre imóvel dado em garantia.','https://fceadvogados.com.br/empresario/obrigado/',OBM,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'empresario-obrigado','<meta name="robots" content="noindex">')
 # area do investidor
@@ -273,7 +332,7 @@ ldi={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Compra
 page('/investidor/index.html','Advogado para comprar imóvel em leilão: análise pré-lance | FCE Advogados','Análise jurídica antes do lance e assessoria na compra de imóvel em leilão: edital, matrícula, dívidas, ocupação, riscos e a conta completa. Todo o Brasil.','https://fceadvogados.com.br/investidor/',IV,ldi,'investidor')
 IG=open(SITE+'/content/investidor-guia.html',encoding='utf-8').read()
 ldg={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Guia gratuito: 20 pontos para conferir antes do lance","url":"https://fceadvogados.com.br/investidor/guia/","publisher":ORG,"author":AUT},_bci(("Investidores","https://fceadvogados.com.br/investidor/"),("Guia gratuito","https://fceadvogados.com.br/investidor/guia/"))]}
-page('/investidor/guia/index.html','Guia gratuito: 20 pontos antes do lance no leilão de imóveis (PDF) | FCE Advogados','Baixe grátis o checklist do investidor em leilão de imóveis: edital, matrícula, dívidas, ocupação, riscos de anulação e a conta completa antes do lance.','https://fceadvogados.com.br/investidor/guia/',IG,ldg,'investidor-guia')
+page('/investidor/guia/index.html','Guia: 20 pontos antes do lance em leilão (PDF) | FCE Advogados','Baixe grátis o checklist do investidor em leilão de imóveis: edital, matrícula, dívidas, ocupação, riscos de anulação e a conta completa antes do lance.','https://fceadvogados.com.br/investidor/guia/',IG,ldg,'investidor-guia')
 OBI=OB.replace('/ebook/fce-guia-parcelas-atrasadas.pdf','/investidor/guia/fce-guia-investidor-20-pontos.pdf').replace('Se preferir, comece pelo capítulo 2, “A linha do tempo”, e pelo quadro “Onde você está agora?”, na última parte.','O checklist dos 20 pontos está numa página só, no final: salve e use em cada imóvel. Para analisar um imóvel específico, veja a <a href="/investidor/">análise pré-lance</a>.')
 page('/investidor/guia/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito para investidores em leilão de imóveis.','https://fceadvogados.com.br/investidor/guia/obrigado/',OBI,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'investidor-obrigado','<meta name="robots" content="noindex">')
 PR=open(SITE+'/content/privacidade.html',encoding='utf-8').read()
@@ -384,12 +443,13 @@ ldc={"@context":"https://schema.org","@type":"CollectionPage","name":"Advogado p
 page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade (RS e SP) | FCE Advogados','Atendimento em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, Canoas e São Paulo, presencial na Região Metropolitana e online em todo o Brasil.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
 # paginas feitas a mao (calculadoras): mesmo rodape e menu do resto do site
 _FCSS=IDX[IDX.index('footer .flinks{'):IDX.index('footer .aviso{')]
-for _p,_hd,_tg in (('/calculadora/index.html',None,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
+for _p,_hd,_tg in (('/calculadora/index.html',header,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
     _s=open(SITE+_p,encoding='utf-8').read()
     _s=_s[:_s.index('<footer>')]+tail[:tail.index('</footer>')+9].replace('href="#','href="/#')+_s[_s.index('</footer>')+9:]
     if _hd:
         _h=fix(_hd,_tg).replace('href="/investidor/calculadora/">','href="/investidor/calculadora/" aria-current="page">',1)
         _s=_s[:_s.index('<header class="top">')]+_h+_s[_s.index('</header>')+9:]
+    if '.menu-panel li.mp-k{' not in _s and '.menu-panel li.mp-k{' in IDX: _s=_s.replace('</style>',IDX[IDX.index('.menu-panel li.mp-k{'):IDX.index('}',IDX.index('.menu-panel li.mp-k{'))+1]+'\n</style>',1)
     if 'footer .flinks{' not in _s: _s=_s.replace('footer .aviso{',_FCSS+'footer .aviso{',1)
     _MB=tail[tail.index('<div class="mbar">'):tail.index('</div>',tail.index('<div class="mbar">'))+6]
     _MBCSS=IDX[IDX.index('/* Barra fixa no celular */'):IDX.index('/* Topo no celular')]
@@ -416,10 +476,31 @@ def _servico(path, title, desc, nome, content, tag):
       {"@type":"FAQPage","mainEntity":fq},
       _bci((nome,url))]}
     page(path+'index.html', title, desc, url, H, ld, tag)
-_servico('/leilao/','Advogado para leilão de imóvel financiado: defesa do devedor | FCE Advogados','Parcelas atrasadas, intimação do cartório ou leilão marcado? Defesa do devedor na alienação fiduciária: análise do procedimento, suspensão do leilão, preferência e saldo.','Defesa do devedor na alienação fiduciária','leilao.html','leilao')
-_servico('/suspensao-de-leilao/','Suspensão de leilão de imóvel: como funciona o pedido urgente | FCE Advogados','Leilão do imóvel marcado? O pedido judicial de suspensão: quando cabe, o que precisa provar, se exige depósito, prazos e o que acontece depois da liminar.','Suspensão de leilão de imóvel','suspensao.html','suspensao')
+_servico('/leilao/','Leilão de imóvel financiado: defesa do devedor | FCE Advogados','Parcelas atrasadas, intimação do cartório ou leilão marcado? Defesa do devedor na alienação fiduciária: procedimento, suspensão, preferência e saldo.','Defesa do devedor na alienação fiduciária','leilao.html','leilao')
+_servico('/suspensao-de-leilao/','Suspensão de leilão de imóvel: quando é possível pedir | FCE Advogados','Leilão do imóvel marcado? O pedido judicial de suspensão: quando cabe, o que precisa provar, se exige depósito, prazos e o que acontece depois da liminar.','Suspensão de leilão de imóvel','suspensao.html','suspensao')
+# páginas novas: núcleo de garantias e penhora
+_MESES_B=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
+def _dbr_b(d):
+    y,m,dd=map(int,d.split('-')); return f'{dd} de {_MESES_B[m-1]} de {y}'
+def _pagina(path, arquivo, title, desc, nome, pai):
+    url='https://fceadvogados.com.br'+path
+    H=open(SITE+'/content/'+arquivo,encoding='utf-8').read()
+    tag=path.strip('/').replace('/','-')[:40]
+    H=H.replace('{{CTA}}',CTA_B.replace('TAG',tag)).replace('{{ASSINATURA}}',ASSINATURA_B).replace('{{REVISADO}}',f'<p class="revisado">Revisado por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), em <time datetime="{REVISAO_B}">{_dbr_b(REVISAO_B)}</time>.</p>')
+    fq=[{"@type":"Question","name":html.unescape(m.group(1)),"acceptedAnswer":{"@type":"Answer","text":html.unescape(re.sub('<[^>]+>','',m.group(2)))}} for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',H,re.S)]
+    itens=((PB[pai][4],'https://fceadvogados.com.br'+pai),) if pai else ()
+    grafo=[{"@type":"WebPage","name":nome,"description":desc,"url":url,"inLanguage":"pt-BR","publisher":ORG,"author":AUT,"dateModified":REVISAO_B},
+      _bci(*(itens+((nome,url),)))]
+    if fq: grafo.append({"@type":"FAQPage","mainEntity":fq})
+    if not pai: grafo.append({"@type":"Service","name":nome,"serviceType":nome,"provider":ORG,"areaServed":{"@type":"Country","name":"Brasil"},"url":url})
+    page(path+'index.html', title, desc, url, H, {"@context":"https://schema.org","@graph":grafo}, tag)
+for _x in PAGINAS_B: _pagina(*_x)
+CT=open(SITE+'/content/contato.html',encoding='utf-8').read()
+page('/contato/index.html','Contato: explique a sua situação | FCE Advogados','Descreva a situação do seu imóvel: financiamento atrasado, garantia, fiança ou penhora. O escritório retorna pelo WhatsApp. Atendimento em todo o Brasil.','https://fceadvogados.com.br/contato/',CT,{"@context":"https://schema.org","@graph":[{"@type":"ContactPage","name":"Contato","url":"https://fceadvogados.com.br/contato/","publisher":ORG},_bci(("Contato","https://fceadvogados.com.br/contato/"))]},'contato')
+CO=open(SITE+'/content/contato-obrigado.html',encoding='utf-8').read()
+page('/contato/obrigado/index.html','Contato recebido | FCE Advogados','Recebemos o seu relato. O escritório retorna pelo WhatsApp informado.','https://fceadvogados.com.br/contato/obrigado/',CO,{"@context":"https://schema.org","@type":"WebPage","name":"Contato recebido"},'contato-obrigado','<meta name="robots" content="noindex">')
 # sitemap
-urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/leilao/','https://fceadvogados.com.br/suspensao-de-leilao/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/leilao-de-imoveis/']+[f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/' for c in CID]+['https://fceadvogados.com.br/privacidade/']
+urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/leilao/','https://fceadvogados.com.br/suspensao-de-leilao/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+[f'https://fceadvogados.com.br{x[0]}' for x in PAGINAS_B]+['https://fceadvogados.com.br/contato/']+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/leilao-de-imoveis/']+[f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/' for c in CID]+['https://fceadvogados.com.br/privacidade/']
 import subprocess as _sp
 _HOJE=_d.strftime('%Y-%m-%d')
 def _lastmod(u):
@@ -440,6 +521,8 @@ def _lastmod(u):
     elif rel=='investidor/guia': cand=['content/investidor-guia.html']
     elif rel=='leilao': cand=['content/leilao.html']
     elif rel=='suspensao-de-leilao': cand=['content/suspensao.html']
+    elif ('/'+rel+'/') in [x[0] for x in PAGINAS_B]: cand=['content/'+[x[1] for x in PAGINAS_B if x[0]=='/'+rel+'/'][0]]
+    elif rel=='contato': cand=['content/contato.html']
     else: cand=[rel+'/index.html']
     f=cand[0]
     try:
@@ -456,10 +539,11 @@ NF='''  <article class="art">
       <h1>Esta página não existe</h1>
       <p class="lead">O endereço pode ter sido digitado errado ou a página mudou de lugar. Veja abaixo os caminhos mais procurados.</p>
       <div class="cards">
-        <a href="/leilao/"><strong>Imóvel financiado em risco</strong><span>Defesa do devedor na alienação fiduciária: intimação, consolidação, leilão.</span></a>
+        <a href="/leilao/"><strong>Financiamento atrasado</strong><span>Defesa do devedor na alienação fiduciária: intimação, consolidação, leilão.</span></a>
         <a href="/guia/"><strong>Guias por situação</strong><span>Explicações em linguagem simples para cada fase.</span></a>
-        <a href="/calculadora/"><strong>Calculadora</strong><span>Quanto do seu imóvel está em jogo em cada fase.</span></a>
-        <a href="/investidor/"><strong>Comprar imóvel em leilão</strong><span>Análise pré-lance e assessoria na arrematação.</span></a>
+        <a href="/contato/"><strong>Contato</strong><span>Explique a sua situação ao escritório.</span></a>
+        <a href="/imovel-em-garantia/"><strong>Imóvel dado em garantia</strong><span>Casa em garantia de dívida da empresa, fiança e bem de família.</span></a>
+        <a href="/penhora-de-imovel/"><strong>Imóvel penhorado</strong><span>Penhora, avaliação e leilão judicial.</span></a>
         <a href="/blog/"><strong>Blog</strong><span>Novidades e alertas sobre leilão de imóveis.</span></a>
         <a href="/"><strong>Página inicial</strong><span>Comece pelo início.</span></a>
       </div>
@@ -472,6 +556,7 @@ print('ok')
 
 import re
 IDX2=open(SITE+'/index.html',encoding='utf-8').read()
-lis=''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for g in G)
+DESTAQUE=['como-saber-se-meu-imovel-vai-a-leilao','intimacao-do-cartorio-parcelas-atrasadas','propriedade-consolidada-no-nome-do-banco','direito-de-preferencia-recomprar-imovel-antes-do-leilao','o-banco-pode-leiloar-minha-casa','saldo-do-leilao-como-receber']
+lis=''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for sl in DESTAQUE for g in G if g['slug']==sl)+''.join(f'<li><a href="{x[0]}">{html.escape(x[4])}</a></li>' for x in PAGINAS_B if x[0] in ('/imovel-em-garantia/bem-de-familia/','/imovel-em-garantia/fiador/','/penhora-de-imovel/'))
 IDX2=re.sub(r'<ul class="guias-list">.*?</ul>','<ul class="guias-list">'+lis+'</ul>',IDX2,1,flags=re.S)
 open(SITE+'/index.html','w',encoding='utf-8').write(IDX2)
