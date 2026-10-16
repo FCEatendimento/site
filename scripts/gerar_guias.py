@@ -7,7 +7,7 @@ style=IDX[IDX.index('<style>'):IDX.index('</style>')+8]
 header=IDX[IDX.index('<header class="top">'):IDX.index('</header>')+9]
 tail=IDX[IDX.index('<footer>'):]
 # --- Menu da área do investidor ---
-INV_SLUGS=['comprar-imovel-em-leilao-checklist-do-edital','riscos-de-comprar-imovel-em-leilao','iptu-e-condominio-imovel-arrematado-quem-paga','arrematei-imovel-ocupado-desocupacao','leilao-judicial-ou-extrajudicial-diferencas']
+INV_SLUGS=['comprar-imovel-em-leilao-checklist-do-edital','riscos-de-comprar-imovel-em-leilao','iptu-e-condominio-imovel-arrematado-quem-paga','arrematei-imovel-ocupado-desocupacao']  # leilao-judicial-ou-extrajudicial-diferencas passou à área do devedor (penhora e leilão judicial)
 GI=[g for s in INV_SLUGS for g in G if g['slug']==s]
 _nav0=header[header.index('<nav aria-label="Seções">'):header.index('<button class="menu-btn"')]
 _INV_NAV=('<nav aria-label="Área do investidor">\n'
@@ -30,7 +30,7 @@ _INV_PAN=('<ul class="wrap">\n'
   '      <li><a href="/sobre/">Sobre o advogado</a></li>\n'
   '      <li><a href="/">Tem imóvel em risco? Área do devedor</a></li>\n    </ul>')
 header_inv=(header.replace(_nav0,_INV_NAV).replace(_pan0,_INV_PAN)
-  .replace('<span class="brand-tag">Leilão de<br>imóveis</span>','<span class="brand-tag">Para<br>investidores</span>')
+  .replace('<span class="brand-tag">Dívidas, garantias<br>e leilões de imóveis</span>','<span class="brand-tag">Para<br>investidores</span>')
   .replace('href="#inicio" aria-label="FCE Advogados, início"','href="/investidor/" aria-label="FCE Advogados, área do investidor"'))
 _NAVCSS=IDX[IDX.index('.top nav a[aria-current="page"]'):IDX.index('.top nav a{white-space:nowrap}')]
 ART_CSS='''<style>
@@ -200,7 +200,7 @@ page('/guia/index.html','Guias sobre leilão de imóveis e alienação fiduciár
 SOBRE=open(SITE+'/content/sobre.html',encoding='utf-8').read()
 ldp={"@context":"https://schema.org","@graph":[{"@type":"ProfilePage","url":"https://fceadvogados.com.br/sobre/","mainEntity":{"@id":"https://fceadvogados.com.br/sobre/#fabio"}},
  {"@type":"Person","@id":"https://fceadvogados.com.br/sobre/#fabio","name":"Fábio de Castro Emerim","jobTitle":"Advogado","identifier":"OAB/RS 88.912","image":"https://fceadvogados.com.br/img/fabio.jpg","worksFor":ORG,"url":"https://fceadvogados.com.br/sobre/","sameAs":["https://www.linkedin.com/in/fabioemerimadv"],"knowsAbout":["Leilão de imóveis","Alienação fiduciária","Lei 9.514/97","Execução civil","Execução fiscal","Direito tributário"],"hasCredential":{"@type":"EducationalOccupationalCredential","credentialCategory":"Inscrição profissional","name":"OAB/RS 88.912","recognizedBy":{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}},"memberOf":[{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}],"hasOccupation":[{"@type":"Occupation","name":"Advogado"},{"@type":"Occupation","name":"Procurador Municipal"}],"address":{"@type":"PostalAddress","addressLocality":"Novo Hamburgo","addressRegion":"RS","addressCountry":"BR"}}]}
-page('/sobre/index.html','Fábio de Castro Emerim, advogado (OAB/RS 88.912) | FCE Advogados','Fábio de Castro Emerim, advogado em Novo Hamburgo/RS, sócio da FCE Advogados: leilão de imóveis e alienação fiduciária, execução civil desde 2013 e fiscal desde 2017.','https://fceadvogados.com.br/sobre/',SOBRE,ldp,'sobre')
+page('/sobre/index.html','Fábio Emerim: dívidas, garantias e leilões de imóveis | FCE Advogados','Fábio de Castro Emerim (OAB/RS 88.912), sócio da FCE Advogados: dívidas, garantias e leilões de imóveis. Execução civil desde 2013 e fiscal desde 2017.','https://fceadvogados.com.br/sobre/',SOBRE,ldp,'sobre')
 # blog
 import datetime
 MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
@@ -384,12 +384,13 @@ ldc={"@context":"https://schema.org","@type":"CollectionPage","name":"Advogado p
 page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade (RS e SP) | FCE Advogados','Atendimento em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, Canoas e São Paulo, presencial na Região Metropolitana e online em todo o Brasil.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
 # paginas feitas a mao (calculadoras): mesmo rodape e menu do resto do site
 _FCSS=IDX[IDX.index('footer .flinks{'):IDX.index('footer .aviso{')]
-for _p,_hd,_tg in (('/calculadora/index.html',None,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
+for _p,_hd,_tg in (('/calculadora/index.html',header,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
     _s=open(SITE+_p,encoding='utf-8').read()
     _s=_s[:_s.index('<footer>')]+tail[:tail.index('</footer>')+9].replace('href="#','href="/#')+_s[_s.index('</footer>')+9:]
     if _hd:
         _h=fix(_hd,_tg).replace('href="/investidor/calculadora/">','href="/investidor/calculadora/" aria-current="page">',1)
         _s=_s[:_s.index('<header class="top">')]+_h+_s[_s.index('</header>')+9:]
+    if '.menu-panel li.mp-k{' not in _s and '.menu-panel li.mp-k{' in IDX: _s=_s.replace('</style>',IDX[IDX.index('.menu-panel li.mp-k{'):IDX.index('}',IDX.index('.menu-panel li.mp-k{'))+1]+'\n</style>',1)
     if 'footer .flinks{' not in _s: _s=_s.replace('footer .aviso{',_FCSS+'footer .aviso{',1)
     _MB=tail[tail.index('<div class="mbar">'):tail.index('</div>',tail.index('<div class="mbar">'))+6]
     _MBCSS=IDX[IDX.index('/* Barra fixa no celular */'):IDX.index('/* Topo no celular')]
@@ -416,8 +417,8 @@ def _servico(path, title, desc, nome, content, tag):
       {"@type":"FAQPage","mainEntity":fq},
       _bci((nome,url))]}
     page(path+'index.html', title, desc, url, H, ld, tag)
-_servico('/leilao/','Advogado para leilão de imóvel financiado: defesa do devedor | FCE Advogados','Parcelas atrasadas, intimação do cartório ou leilão marcado? Defesa do devedor na alienação fiduciária: análise do procedimento, suspensão do leilão, preferência e saldo.','Defesa do devedor na alienação fiduciária','leilao.html','leilao')
-_servico('/suspensao-de-leilao/','Suspensão de leilão de imóvel: como funciona o pedido urgente | FCE Advogados','Leilão do imóvel marcado? O pedido judicial de suspensão: quando cabe, o que precisa provar, se exige depósito, prazos e o que acontece depois da liminar.','Suspensão de leilão de imóvel','suspensao.html','suspensao')
+_servico('/leilao/','Leilão de imóvel financiado: defesa do devedor | FCE Advogados','Parcelas atrasadas, intimação do cartório ou leilão marcado? Defesa do devedor na alienação fiduciária: procedimento, suspensão, preferência e saldo.','Defesa do devedor na alienação fiduciária','leilao.html','leilao')
+_servico('/suspensao-de-leilao/','Suspensão de leilão de imóvel: quando é possível pedir | FCE Advogados','Leilão do imóvel marcado? O pedido judicial de suspensão: quando cabe, o que precisa provar, se exige depósito, prazos e o que acontece depois da liminar.','Suspensão de leilão de imóvel','suspensao.html','suspensao')
 # sitemap
 urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/leilao/','https://fceadvogados.com.br/suspensao-de-leilao/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/leilao-de-imoveis/']+[f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/' for c in CID]+['https://fceadvogados.com.br/privacidade/']
 import subprocess as _sp
@@ -456,10 +457,10 @@ NF='''  <article class="art">
       <h1>Esta página não existe</h1>
       <p class="lead">O endereço pode ter sido digitado errado ou a página mudou de lugar. Veja abaixo os caminhos mais procurados.</p>
       <div class="cards">
-        <a href="/leilao/"><strong>Imóvel financiado em risco</strong><span>Defesa do devedor na alienação fiduciária: intimação, consolidação, leilão.</span></a>
+        <a href="/leilao/"><strong>Financiamento atrasado</strong><span>Defesa do devedor na alienação fiduciária: intimação, consolidação, leilão.</span></a>
         <a href="/guia/"><strong>Guias por situação</strong><span>Explicações em linguagem simples para cada fase.</span></a>
         <a href="/calculadora/"><strong>Calculadora</strong><span>Quanto do seu imóvel está em jogo em cada fase.</span></a>
-        <a href="/investidor/"><strong>Comprar imóvel em leilão</strong><span>Análise pré-lance e assessoria na arrematação.</span></a>
+        <a href="/#garantias"><strong>Imóvel dado em garantia</strong><span>Casa em garantia de dívida da empresa, fiança e penhora.</span></a>
         <a href="/blog/"><strong>Blog</strong><span>Novidades e alertas sobre leilão de imóveis.</span></a>
         <a href="/"><strong>Página inicial</strong><span>Comece pelo início.</span></a>
       </div>
