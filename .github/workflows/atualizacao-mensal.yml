@@ -28,5 +28,5 @@ jobs:
       - run: |
           git config user.name "FCE Site"
           git config user.email "atendimento@fceadvogados.com.br"
-          git add -A guia blog sobre ebook empresario investidor privacidade veiculo index.html sitemap.xml
+          git add -A guia blog sobre ebook empresario investidor privacidade veiculo leilao suspensao-de-leilao leilao-de-imoveis calculadora imovel-em-garantia penhora-de-imovel contato 404.html index.html sitemap.xml
           git diff --cached --quiet || (git commit -m "Guias: atualizados em $(date +%m/%Y)" && git pull --rebase && git push)

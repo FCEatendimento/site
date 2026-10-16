@@ -1,0 +1,94 @@
+  <article class="art eb">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › Contato</p>
+      <div class="eb-grid">
+        <div class="eb-int">
+          <p class="eyebrow">Contato</p>
+          <h1>Explique a sua situação ao escritório</h1>
+          <p class="lead">Conte, em poucas linhas, o que está acontecendo com o imóvel. O advogado responsável lê o relato, identifica a fase e os prazos e retorna pelo WhatsApp para combinar os próximos passos.</p>
+          <p>Se preferir, você também pode <a class="wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=home">conversar diretamente pelo WhatsApp</a>.</p>
+        </div>
+        <div class="eb-det">
+          <h2>O que acontece depois</h2>
+          <ol>
+            <li>O escritório recebe o seu relato e confere a fase do procedimento e os prazos informados.</li>
+            <li>O retorno é feito pelo WhatsApp informado, em horário comercial. Quando há leilão marcado, a leitura do caso é priorizada.</li>
+            <li>Se for o caso, é agendada uma consulta, por vídeo ou presencial em Novo Hamburgo/RS. Os honorários são informados por escrito antes de qualquer providência.</li>
+          </ol>
+          <h2>Para o primeiro contato</h2>
+          <ul>
+            <li>Não é preciso enviar documentos agora. Eles serão pedidos na conversa, se forem necessários.</li>
+            <li>Evite incluir no relato números de documentos, dados bancários ou informações de saúde.</li>
+            <li>O preenchimento não cria vínculo de contratação nem garante a aceitação do caso.</li>
+          </ul>
+          <h2>Atendimento</h2>
+          <p>WhatsApp (51) 99206-8037 · atendimento@fceadvogados.com.br<br>Rua Araguaia, 509, Jardim Mauá, Novo Hamburgo/RS<br>Online em todo o Brasil ou presencial em Novo Hamburgo/RS, mediante agendamento.</p>
+        </div>
+        <form class="eb-form" id="triagem" method="post" action="https://emerim.app.n8n.cloud/webhook/fce-contato">
+          <h2>Formulário de contato</h2>
+          <p class="eb-erro" id="eb-erro" role="alert" hidden>Confira os campos: nome, WhatsApp com DDD, cidade, estado e a autorização são obrigatórios.</p>
+          <label>Nome<input name="nome" required autocomplete="name" maxlength="120"></label>
+          <label>WhatsApp com DDD<input name="whatsapp" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20"></label>
+          <div class="ct-linha">
+            <label>Cidade<input name="cidade" required autocomplete="address-level2" maxlength="80"></label>
+            <label>Estado
+              <select name="uf" required>
+                <option value="">UF</option>
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+              </select>
+            </label>
+          </div>
+          <label>Qual é a situação?
+            <select name="tipo" required>
+              <option value="">Escolha uma opção</option>
+              <option value="financiamento">Financiamento do imóvel atrasado ou leilão extrajudicial</option>
+              <option value="garantia">Imóvel dado em garantia de dívida (inclusive da empresa)</option>
+              <option value="fianca">Sou fiador de contrato de locação</option>
+              <option value="penhora">Imóvel penhorado ou execução judicial</option>
+              <option value="arrematante">Comprei ou quero comprar imóvel em leilão</option>
+              <option value="veiculo">Veículo financiado</option>
+              <option value="outro">Outra situação</option>
+            </select>
+          </label>
+          <label>Há algum prazo correndo?
+            <select name="prazo" id="ct-prazo" required>
+              <option value="">Escolha uma opção</option>
+              <option value="leilao">Sim, há leilão marcado</option>
+              <option value="prazo">Sim, recebi intimação ou citação com prazo</option>
+              <option value="nao">Não que eu saiba</option>
+              <option value="naosei">Não sei</option>
+            </select>
+          </label>
+          <label id="ct-data" hidden>Data do leilão <span>(se souber)</span><input name="data_leilao" type="date"></label>
+          <label>Conte brevemente o que está acontecendo <span>(opcional)</span><textarea name="descricao" rows="4" maxlength="800" placeholder="Ex.: recebi uma intimação do cartório na semana passada e o imóvel é a casa onde moro."></textarea></label>
+          <input type="text" name="site" tabindex="-1" autocomplete="off" class="eb-hp" aria-hidden="true">
+          <input type="hidden" name="origem" value="direto">
+          <input type="hidden" name="pagina" value="">
+          <input type="hidden" name="utm_source"><input type="hidden" name="utm_medium"><input type="hidden" name="utm_campaign"><input type="hidden" name="utm_content"><input type="hidden" name="utm_term"><input type="hidden" name="gclid"><input type="hidden" name="fbclid">
+          <label class="eb-ok"><input type="checkbox" name="aceite" value="sim" required> <span>Autorizo a FCE Advogados a usar estes dados para responder ao meu contato, conforme a <a href="/privacidade/">Política de Privacidade</a>.</span></label>
+          <button class="btn btn-primary" type="submit">Enviar para o escritório</button>
+          <p class="eb-nota">Os dados são usados somente para responder ao seu contato e ficam com o escritório e seus fornecedores de tecnologia, como descrito na política de privacidade. Você pode pedir a exclusão a qualquer momento.</p>
+        </form>
+      </div>
+    </div>
+  </article>
+  <script>
+  (function(){
+    var f=document.getElementById('triagem'); if(!f) return;
+    var q=new URLSearchParams(location.search), mem={};
+    try{mem=JSON.parse(sessionStorage.getItem('fce_utm')||'{}')||{};}catch(e){}
+    ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid'].forEach(function(k){var v=q.get(k)||mem[k]||''; if(f.elements[k]) f.elements[k].value=String(v).slice(0,150);});
+    var o=q.get('o')||[f.elements.utm_source.value,f.elements.utm_medium.value,f.elements.utm_campaign.value].filter(Boolean).join('/')||(document.referrer&&new URL(document.referrer).hostname!==location.hostname?('ref:'+new URL(document.referrer).hostname):'direto');
+    f.elements.origem.value=o.slice(0,70);
+    var pg=''; try{pg=sessionStorage.getItem('fce_ultima_pagina')||'';}catch(e){}
+    if(!pg&&document.referrer){try{var r=new URL(document.referrer); if(r.hostname===location.hostname) pg=r.pathname;}catch(e){}}
+    f.elements.pagina.value=(pg||'/contato/').slice(0,200);
+    if(q.get('erro')) document.getElementById('eb-erro').hidden=false;
+    var pr=document.getElementById('ct-prazo'), dt=document.getElementById('ct-data');
+    pr.addEventListener('change',function(){dt.hidden=pr.value!=='leilao';});
+    function ev(n){try{window.dataLayer=window.dataLayer||[];dataLayer.push({event:n,tipo:f.elements.tipo.value||'',prazo:pr.value||''});}catch(e){}}
+    var iniciou=false;
+    f.addEventListener('focusin',function(){if(!iniciou){iniciou=true;ev('fce_triagem_inicio');}});
+    f.addEventListener('submit',function(){ev('fce_triagem_envio');});
+  })();
+  </script>

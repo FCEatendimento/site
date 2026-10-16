@@ -43,7 +43,10 @@
 
   // Eventos
   function meta(evento, dados) { if (pixelOk && window.fbq) fbq('track', evento, dados || {}); }
+  // Camada de eventos (dataLayer): nomes estáveis para um futuro GA4/GTM, sem dados pessoais.
+  function camada(evento) { try { window.dataLayer.push({ event: evento, pagina: location.pathname }); } catch (e) {} }
   function conversao(tipo) {
+    camada(tipo === 'whatsapp' ? 'fce_whatsapp_clique' : (tipo === 'contato' ? 'fce_triagem_conclusao' : 'fce_lead_' + tipo));
     if (CONV[tipo]) gtag('event', 'conversion', { send_to: CONV[tipo], transport_type: 'beacon' });
     if (tipo === 'whatsapp') meta('Contact');
     else meta('Lead', { content_name: tipo });
@@ -56,7 +59,8 @@
   if (/\/obrigado\/$/.test(location.pathname)) {
     var k = 'fce_conv_' + location.pathname;
     var ja = false; try { ja = sessionStorage.getItem(k) === '1'; sessionStorage.setItem(k, '1'); } catch (e) {}
-    if (!ja) conversao('guia');
+    // /contato/obrigado/ = triagem concluída (sem rótulo de conversão do Google Ads próprio); demais = download de guia
+    if (!ja) conversao(/^\/contato\//.test(location.pathname) ? 'contato' : 'guia');
   }
 
   // Aviso de cookies
