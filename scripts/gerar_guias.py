@@ -374,7 +374,7 @@ CID=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/conten
 CIDN={c['slug']:c for c in CID}
 for c in CID:
     url=f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/'
-    nh=c['slug']=='novo-hamburgo'; sp=c['uf']=='SP'
+    nh=c['slug']=='novo-hamburgo'; sp=c['uf']!='RS'  # fora do RS: atendimento só online
     onde='no escritório, na Rua Araguaia, 509, Jardim Mauá' if nh else ('por videochamada' if sp else 'por videochamada ou presencialmente no escritório em Novo Hamburgo')
     faq=[
       ('Onde fica o escritório?' if nh else 'Preciso ir ao escritório em Novo Hamburgo?',
@@ -429,7 +429,7 @@ for c in CID:
   </article>'''
     ld={"@context":"https://schema.org","@graph":[
       {"@type":"WebPage","name":c.get("h1",f'Advogado para leilão de imóveis em {c["nome"]}'),"url":url,"inLanguage":"pt-BR","publisher":ORG,"author":AUT},
-      {"@type":"Service","serviceType":"Advocacia em leilão de imóveis e alienação fiduciária","provider":ORG,"areaServed":{"@type":"City","name":c["nome"],"containedInPlace":{"@type":"State","name":"Rio Grande do Sul" if c["uf"]=="RS" else "São Paulo"}},"url":url},
+      {"@type":"Service","serviceType":"Advocacia em leilão de imóveis e alienação fiduciária","provider":ORG,"areaServed":{"@type":"City","name":c["nome"],"containedInPlace":{"@type":"State","name":{"RS":"Rio Grande do Sul","SP":"São Paulo","SC":"Santa Catarina","PR":"Paraná","MT":"Mato Grosso","MS":"Mato Grosso do Sul"}.get(c["uf"],c["uf"])}},"url":url},
       {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faq]},
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Atendimento por cidade","item":"https://fceadvogados.com.br/leilao-de-imoveis/"},{"@type":"ListItem","position":3,"name":c["nome"],"item":url}]}]}
     page(f'/leilao-de-imoveis/{c["slug"]}/index.html', c['seo'], c['desc'], url, body, ld, 'cidade-'+c['slug'])
@@ -439,13 +439,13 @@ body=f'''  <article class="art">
       <p class="crumb"><a href="/">Início</a> › Atendimento por cidade</p>
       <p class="eyebrow">Leilão de imóveis</p>
       <h1>Advogado para leilão de imóveis: atendimento por cidade</h1>
-      <p class="lead">O escritório fica em Novo Hamburgo/RS e atende presencialmente na Região Metropolitana de Porto Alegre e por videochamada em todo o Brasil, com foco no Rio Grande do Sul e em São Paulo. Escolha a sua cidade para ver como funciona o caminho do leilão aí.</p>
+      <p class="lead">O escritório fica em Novo Hamburgo/RS e atende presencialmente na Região Metropolitana de Porto Alegre e por videochamada em todo o Brasil, com páginas para capitais e cidades do Rio Grande do Sul, de Santa Catarina, do Paraná, de São Paulo, de Mato Grosso e de Mato Grosso do Sul. Escolha a sua cidade para ver como funciona o caminho do leilão aí.</p>
       <div class="cards">{cards}</div>
       <p style="margin-top:1.5rem">Não encontrou a sua cidade? O atendimento online funciona do mesmo jeito: a conversa começa pelo WhatsApp, a consulta é por vídeo e os processos são eletrônicos.</p>
     </div>
   </article>'''
 ldc={"@context":"https://schema.org","@type":"CollectionPage","name":"Advogado para leilão de imóveis: atendimento por cidade","url":"https://fceadvogados.com.br/leilao-de-imoveis/","publisher":ORG}
-page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade (RS e SP) | FCE Advogados','Atendimento em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, Canoas e São Paulo, presencial na Região Metropolitana e online em todo o Brasil.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
+page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade | FCE Advogados','Atendimento em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, São Paulo, Florianópolis, Curitiba, Cuiabá e Campo Grande. Presencial na Região Metropolitana de Porto Alegre e online em todo o Brasil.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
 # paginas feitas a mao (calculadoras): mesmo rodape e menu do resto do site
 _FCSS=IDX[IDX.index('footer .flinks{'):IDX.index('footer .aviso{')]
 for _p,_hd,_tg in (('/calculadora/index.html',header,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
