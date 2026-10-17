@@ -7,7 +7,7 @@ style=IDX[IDX.index('<style>'):IDX.index('</style>')+8]
 header=IDX[IDX.index('<header class="top">'):IDX.index('</header>')+9]
 tail=IDX[IDX.index('<footer>'):]
 # --- Menu da área do investidor ---
-INV_SLUGS=['comprar-imovel-em-leilao-checklist-do-edital','riscos-de-comprar-imovel-em-leilao','iptu-e-condominio-imovel-arrematado-quem-paga','arrematei-imovel-ocupado-desocupacao']  # leilao-judicial-ou-extrajudicial-diferencas passou à área do devedor (penhora e leilão judicial)
+INV_SLUGS=['comprar-imovel-em-leilao-checklist-do-edital','riscos-de-comprar-imovel-em-leilao','iptu-e-condominio-imovel-arrematado-quem-paga','arrematei-imovel-ocupado-desocupacao','arrematacao-carta-registro-matricula','antigo-dono-pede-anulacao-do-leilao','arrematei-e-nao-consigo-pagar-o-lance']  # leilao-judicial-ou-extrajudicial-diferencas passou à área do devedor (penhora e leilão judicial)
 GI=[g for s in INV_SLUGS for g in G if g['slug']==s]
 _nav0=header[header.index('<nav aria-label="Seções">'):header.index('<button class="menu-btn"')]
 _INV_NAV=('<nav aria-label="Área do investidor">\n'

@@ -279,6 +279,12 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .hero2-text .prova{font-size:.95rem;color:var(--ink);border-left:3px solid var(--accent);padding-left:.75rem;max-width:34rem}
 @media (max-width:900px){.hero2{padding-block:1rem 2rem}.hero2 .wrap{grid-template-columns:1fr;gap:1rem}.hero2-text{gap:.6rem;padding-top:0}.hero2-text .eyebrow,.hero2-text .ctas{display:none}.hero2-text .lead{font-size:1.02rem}.hero2-text .prova{font-size:.88rem}.tri{padding:1.1rem 1rem 1.25rem}.tri-head{margin-bottom:.8rem;padding-right:2.5rem}.tri-head p{font-size:.9rem}.tri-prog{margin-bottom:.75rem}.tri-op{min-height:48px;padding:.65rem .9rem}.hero2 h1{font-size:1.32rem}.hero2-text .lead{font-size:.98rem;line-height:1.45}.hero2-text .prova{font-size:.84rem;line-height:1.4}.tri-head h2{font-size:1.15rem}.tri-head p{font-size:.86rem}.tri-n{display:none}.tri-step{gap:.65rem}}
 .so-cel{display:none}
+.tri-tipo{display:flex;flex-wrap:wrap;gap:.5rem;margin:.1rem 0 .35rem}
+.tri-tb{flex:1 1 10rem;min-height:44px;padding:.55rem .9rem;border-radius:999px;border:1px solid var(--t-line);background:var(--t-op);color:var(--t-ink);font:600 .92rem/1.2 var(--display);cursor:pointer}
+.tri-tb[aria-pressed="true"]{background:#F2C200;color:#0E1A2B;border-color:#F2C200}
+.tri-tb:hover{border-color:#F2C200}.tri-tb:focus-visible{outline:3px solid #F2C200;outline-offset:2px}
+.tri-tipo-msg{margin:0;font-size:.85rem;color:#F2C200;min-height:0}
+.tri-tipo-msg:empty{display:none}
 @media (max-width:900px){.so-desk{display:none}.so-cel{display:inline}}
 .tri{--t-bg:#0E1A2B;--t-ink:#F4F4F1;--t-muted:#B8BEC8;--t-line:rgba(255,255,255,.16);--t-op:rgba(255,255,255,.04);
   position:relative;overflow:hidden;background:var(--t-bg);color:var(--t-ink);border-radius:12px;padding:clamp(1.25rem,3.5vw,2rem);
@@ -466,7 +472,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
             <a href="/imovel-em-garantia/">Imóvel dado em garantia, fiança ou aval</a>
             <a href="/penhora-de-imovel/">Penhora, condomínio, IPTU ou ITR</a>
             <a href="/veiculo/">Busca e apreensão de carro ou máquina</a>
-            <a href="/investidor/">Comprar imóvel em leilão</a>
+            <a href="/investidor/">Arrematei um imóvel em leilão</a>
           </div>
         </div>
       </div>
@@ -746,25 +752,27 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     ['fianca','Fiança ou aval',''],
     ['veiculo','Busca e apreensão de carro ou máquina','veículo ou equipamento financiado'],
     ['condominio','Condomínio atrasado',''],
-    ['iptu','IPTU',''],
-    ['itr','ITR','imóvel rural'],
+    ['imposto','IPTU ou ITR','imposto do imóvel urbano ou rural'],
     ['penhora','Outra dívida com penhora do imóvel',''],
-    ['comprar','Quero comprar imóvel em leilão','']
+    ['arrematante','Arrematei um imóvel em leilão','']
   ];
   var FISCAL=[['cobranca','Recebi cobrança, notificação ou protesto'],['processo','Há processo ou recebi citação'],['penhora','O imóvel foi penhorado'],['leilao','O leilão já está marcado']];
   var S={
     financiamento:[['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','Estou com parcelas atrasadas'],['intimacao','Recebi intimação do cartório'],['consolidado','A propriedade foi consolidada no nome do banco'],['leilao','O leilão já está marcado']],
     garantia:[['assinar','Ainda vou assinar o contrato ou um aditivo'],['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','A empresa atrasou as parcelas'],['citado','Recebi notificação, intimação ou citação'],['leilao','Há penhora ou leilão marcado']],
     fianca:[['assinar','Vão me pedir para ser fiador ou avalista'],['cobranca','Estão me cobrando a dívida de outra pessoa'],['citado','Fui citado em processo'],['penhora','Meu imóvel foi penhorado']],
-    condominio:FISCAL, iptu:FISCAL, itr:FISCAL,
+    condominio:FISCAL, iptu:FISCAL, itr:FISCAL, imposto:FISCAL,
     bancaria:[['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','Está atrasada ou meu nome foi negativado'],['judicial','Há cobrança judicial ou recebi citação'],['penhora','Houve penhora ou bloqueio'],['leilao','O leilão já está marcado']],
     veiculo:[['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','Estou com parcelas atrasadas'],['notificacao','Recebi notificação do banco ou do cartório'],['apreendido','O veículo ou a máquina já foi apreendido']],
     penhora:[['processo','Recebi citação em execução'],['penhora','O imóvel foi penhorado'],['avaliacao','O imóvel foi avaliado'],['leilao','O leilão já está marcado']],
-    comprar:[['avaliando','Estou avaliando um imóvel de leilão'],['lance','Quero saber quanto ofertar'],['arrematei','Já arrematei um imóvel']]
+    arrematante:[['ocupado','O imóvel está ocupado / preciso da desocupação'],['dividas','Dívidas de IPTU ou condomínio anteriores'],['carta','Demora na carta de arrematação ou no registro'],['anulacao','O antigo dono contesta ou pede a anulação do leilão'],['matricula','Problemas com a matrícula ou a documentação'],['pagamento','Dificuldade para pagar o lance ou financiar']]
   };
   var W=[['pf','Pessoa física'],['empresario','Empresário(a) ou sócio(a)'],['empresa','Empresa (CNPJ)'],['rural','Produtor(a) rural'],['garantidor','Fiador(a) ou avalista de outra pessoa'],['familiar','Familiar ajudando alguém']];
   var G=[['manter','Continuar com meu imóvel ou bem'],['tempo','Ganhar tempo para me organizar'],['negociar','Negociar um valor que eu consiga pagar'],['entender','Entender meus direitos antes de decidir'],['proteger','Proteger minha família ou minha empresa']];
-  var GI=[['seguranca','Comprar com segurança'],['custo','Saber o custo real da compra'],['riscos','Entender os riscos antes do lance']];
+  var GI=[['posse','Tomar posse do imóvel'],['documentacao','Regularizar a documentação'],['dividas','Resolver as dívidas anteriores'],['entender','Entender meus direitos antes de decidir']];
+  var DX={iptu:['iptu','IPTU (imóvel urbano)'],itr:['itr','ITR (imóvel rural)']};
+  function dnome(k){return DX[k]||nome(D,k);}
+  function GQ(){return st.d==='arrematante'?GI:G;}
   var CONDO='/penhora-de-imovel/divida-de-condominio/', IPTU='/penhora-de-imovel/iptu/', ITR='/penhora-de-imovel/itr/', PEN='/penhora-de-imovel/', SUSP='/suspensao-de-leilao/', BF='/imovel-em-garantia/bem-de-familia/';
   // [destino, título, texto, prazo, link extra]
   var R={
@@ -807,9 +815,12 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     'penhora.penhora':[PEN+'#analise','Imóvel penhorado','Depois da penhora vêm a avaliação e o leilão judicial. A proteção do bem de família e o valor da avaliação estão entre os pontos a analisar.',1],
     'penhora.avaliacao':[PEN+'#prazos','Avaliação do imóvel penhorado','A avaliação define a base do leilão. Se o valor parecer baixo, ele pode ser questionado no processo, dentro do prazo.',1],
     'penhora.leilao':[PEN+'#pagar','Leilão judicial marcado','Com data marcada, o tempo é curto. Pagar a dívida antes da arrematação e falhas nas intimações são pontos a avaliar.',1,[SUSP,'Suspensão de leilão']],
-    'comprar.avaliando':['/investidor/','Análise antes do lance','Edital, matrícula, dívidas do imóvel e ocupação definem o risco e o custo real da compra.',0],
-    'comprar.lance':['/investidor/calculadora/','Quanto ofertar no leilão','A conta do lance máximo inclui comissão, impostos, dívidas, desocupação e reforma. A calculadora ajuda a estimar antes de decidir.',0],
-    'comprar.arrematei':['/guia/arrematei-imovel-ocupado-desocupacao/','Imóvel arrematado','Depois da arrematação vêm a carta ou o registro, as dívidas anteriores e, se o imóvel estiver ocupado, a desocupação.',0]
+    'arrematante.ocupado':['/guia/arrematei-imovel-ocupado-desocupacao/','Imóvel arrematado ocupado','A desocupação segue caminhos diferentes no leilão judicial e no extrajudicial, e muitas vezes começa por uma tentativa de acordo por escrito. O documento da compra e o registro são o ponto de partida.',0],
+    'arrematante.dividas':['/guia/iptu-e-condominio-imovel-arrematado-quem-paga/','Dívidas anteriores do imóvel arrematado','Quem responde pelo IPTU e pelo condomínio anteriores depende do tipo de dívida, do edital e do tipo de leilão. Conferir antes de pagar evita assumir o que não é seu.',0],
+    'arrematante.carta':['/guia/arrematacao-carta-registro-matricula/#carta','Demora na carta de arrematação ou no registro','A carta ou a escritura dependem de pagamentos, prazos e, às vezes, de pedidos pendentes no processo. Os comprovantes e o andamento mostram onde está o atraso.',0],
+    'arrematante.anulacao':['/guia/antigo-dono-pede-anulacao-do-leilao/','O antigo dono quer anular o leilão','A lei dá estabilidade à arrematação, mas prevê hipóteses de invalidação. Quem arrematou deve acompanhar a ação e se defender no prazo.',1],
+    'arrematante.matricula':['/guia/arrematacao-carta-registro-matricula/#matricula','Problemas na matrícula ou na documentação','Penhoras e averbações anteriores, divergências de área e exigências do cartório são comuns. Algumas se resolvem com documentos; outras, com pedido ao juízo.',0],
+    'arrematante.pagamento':['/guia/arrematei-e-nao-consigo-pagar-o-lance/','Dificuldade para pagar o lance ou financiar','O edital define prazos, multas e o que acontece com o atraso. Agir antes do vencimento costuma abrir mais caminhos.',1]
   };
   var WL={
     empresario:['Como empresário ou sócio, vale entender também até onde vai a responsabilidade do seu patrimônio pessoal e dos demais sócios.',['/imovel-em-garantia/responsabilidade-dos-socios/','Responsabilidade dos sócios']],
@@ -824,12 +835,12 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     negociar:'Negociar costuma ser um caminho possível, e chegar à conversa sabendo o valor correto e os seus direitos faz diferença. Cada caso depende da análise dos documentos.',
     entender:'Entender seus direitos antes de decidir é um bom começo. A página do seu caso explica a fase em linguagem simples, e a análise dos documentos mostra o que se aplica a você.',
     proteger:'Proteger a família ou a empresa é a prioridade de muita gente nessa situação. Há regras sobre bem de família e sobre a responsabilidade de cada um, e cada caso depende da análise dos documentos.',
-    seguranca:'Comprar em leilão pode ser um bom negócio quando os riscos são conhecidos antes do lance.',
-    custo:'Com a conta completa, que inclui comissão, impostos, dívidas e desocupação, o lance deixa de ser um palpite.',
-    riscos:'Ler o edital e a matrícula antes do lance é o que separa uma boa compra de uma surpresa.'
+    posse:'Tomar posse do que você comprou é um objetivo legítimo. Entender o caminho da desocupação e do registro ajuda a evitar custos e atrasos. Cada caso depende da análise dos documentos.',
+    documentacao:'Regularizar a documentação é o que transforma a arrematação em propriedade registrada. As exigências costumam ter solução, e cada caso depende da análise dos documentos.',
+    dividas:'Antes de pagar qualquer dívida anterior, vale saber quem realmente responde por ela. O edital e o tipo de leilão mudam essa resposta. Cada caso depende da análise dos documentos.'
   };
   var st={d:'',s:'',w:'',g:'',p:1};
-  try{var sv=JSON.parse(sessionStorage.getItem('fce_tri')||'null'); if(sv&&sv.p&&('w' in sv)) st=sv;}catch(e){}
+  try{var sv=JSON.parse(sessionStorage.getItem('fce_tri')||'null'); if(sv&&sv.p&&('w' in sv)&&(!sv.d||S[sv.d])) st=sv;}catch(e){}
   function salvar(){try{sessionStorage.setItem('fce_tri',JSON.stringify(st));}catch(e){}}
   function ev(n,o){try{if(window.gtag)gtag('event',n,o);}catch(e){}}
   function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -850,7 +861,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     var urg=r[3];
     var mais=[]; if(r[4])mais.push(r[4]); if(wl&&wl[1]&&wl[1][0]!==r[0]&&!(r[4]&&r[4][0]===wl[1][0]))mais.push(wl[1]);
     var wa=WA+'?c=site&p='+encodeURIComponent(st.d==='bancaria'?'divida-bancaria':slug(r[0]))+'&d='+st.d+'&s='+st.s+'&quem='+st.w+'&quer='+st.g;
-    var resumo=nome(D,st.d)[1]+' · '+nome(S[st.d],st.s)[1];
+    var resumo=dnome(st.d)[1]+' · '+nome(S[st.d],st.s)[1];
     var h='<div class="tri-res"><p class="tri-pre">'+esc(resumo)+'</p><h3 tabindex="-1">'+esc(r[1])+'</h3>'+(GL[st.g]?'<p class="tri-acolhe">'+esc(GL[st.g])+'</p>':'')+'<p>'+esc(r[2])+'</p>'+(wl?'<p>'+esc(wl[0])+'</p>':'')+
       (urg?'<p class="tri-prz">Situações com prazo pedem análise o quanto antes. Se tiver o documento, já pode enviar pelo WhatsApp.</p>':'')+
       '<div class="tri-acts"><a class="btn btn-primary" href="'+(r[0]==='/contato/'?'/contato/?o=triagem':r[0])+'" data-tri="pagina">'+(r[0]==='/contato/'?'Explicar meu caso pelo formulário':'Ver a página do meu caso')+'</a>'+
@@ -863,10 +874,14 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
   }
   function render(focar){
     var h;
-    if(st.p===1)h=pergunta(1,'Qual é a dívida?',D,st.d,true);
+    if(st.p===1)h=pergunta(1,'Qual é a dívida?',D,(st.d==='iptu'||st.d==='itr')?'imposto':st.d,true);
+    else if(st.p===2&&(st.d==='imposto'||st.d==='iptu'||st.d==='itr')){
+      h=pergunta(2,'Qual imposto e em que pé está?',FISCAL,st.s,false);
+      h=h.replace('<ul class="tri-ops','<div class="tri-tipo" role="group" aria-label="Tipo de imóvel"><button type="button" class="tri-tb" data-t="iptu" aria-pressed="'+(st.d==='iptu')+'">Imóvel urbano (IPTU)</button><button type="button" class="tri-tb" data-t="itr" aria-pressed="'+(st.d==='itr')+'">Imóvel rural (ITR)</button></div><p class="tri-tipo-msg" id="tri-tipo-msg" aria-live="polite"></p><ul class="tri-ops');
+    }
     else if(st.p===2)h=pergunta(2,'Em que pé está?',S[st.d]||[],st.s,false);
     else if(st.p===3)h=pergunta(3,'Quem é você?',W,st.w,true);
-    else if(st.p===4)h=pergunta(4,'O que você mais gostaria que acontecesse?',st.d==='comprar'?GI:G,st.g,false);
+    else if(st.p===4)h=pergunta(4,'O que você mais gostaria que acontecesse?',GQ(),st.g,false);
     else h=resultado();
     box.innerHTML=h; marcar(Math.min(st.p,4)); salvar();
     var av=document.getElementById('tri-aviso'); if(av)av.textContent=st.p>4?'Resultado: '+((R[st.d+'.'+st.s]||[])[1]||''):'Pergunta '+st.p+' de 4';
@@ -879,15 +894,17 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       var alvo=box.querySelector('.tri-salvar'); if(!alvo||!window.FCEA)return;
       alvo.innerHTML=FCEA.formulario('Salvar minha análise');
       var r0=R[st.d+'.'+st.s]||[], cr=st.s==='leilao'||st.s==='apreendido';
-      FCEA.ligar(alvo.querySelector('form'),function(){return {ferramenta:'triagem',d:st.d,s:st.s,quem:st.w,quer:st.g,destino:r0[0]||'',destino_titulo:r0[1]||'',divida:(nome(D,st.d)||['',''])[1],
-        urg:cr?'CRITICA':(r0[3]?'ALTA':'NORMAL'),perfil:st.d==='comprar'?'ARREMATANTE':'DEVEDOR',
-        itens:[{p:'Dívida',r:(nome(D,st.d)||['',''])[1]},{p:'Situação',r:(nome(S[st.d]||[],st.s)||['',''])[1]},{p:'Quem é você',r:(nome(W,st.w)||['',''])[1]},{p:'O que gostaria',r:(nome(st.d==='comprar'?GI:G,st.g)||['',''])[1]}].filter(function(x){return x.r;})};},
+      FCEA.ligar(alvo.querySelector('form'),function(){return {ferramenta:'triagem',d:st.d,s:st.s,quem:st.w,quer:st.g,destino:r0[0]||'',destino_titulo:r0[1]||'',divida:(dnome(st.d)||['',''])[1],
+        urg:cr?'CRITICA':(r0[3]?'ALTA':'NORMAL'),perfil:st.d==='arrematante'?'ARREMATANTE':'DEVEDOR',
+        itens:[{p:'Dívida',r:(dnome(st.d)||['',''])[1]},{p:'Situação',r:(nome(S[st.d]||[],st.s)||['',''])[1]},{p:'Quem é você',r:(nome(W,st.w)||['',''])[1]},{p:'O que gostaria',r:(nome(GQ(),st.g)||['',''])[1]}].filter(function(x){return x.r;})};},
         st.d==='bancaria'?'divida-bancaria':slug(r0[0]||'/'));
       var t=alvo.querySelector('.fa-t'); if(t)t.focus(); ev('triagem_salvar_abrir',{}); return;
     }
     if(b.dataset.a==='recomecar'){st={d:'',s:'',w:'',g:'',p:1};render(true);ev('triagem_recomecar',{});return;}
+    if(b.dataset.t){st.d=b.dataset.t;render(false);var tb=box.querySelector('.tri-tb[data-t="'+st.d+'"]');if(tb)tb.focus();ev('triagem_tipo',{tipo:st.d});return;}
     var v=b.dataset.v; if(!v)return;
-    if(st.p===1){if(st.d!==v){st.s='';st.g='';}st.d=v;}
+    if(st.p===2&&st.d==='imposto'){var m=document.getElementById('tri-tipo-msg');if(m)m.textContent='Escolha antes: imóvel urbano (IPTU) ou rural (ITR).';var t0=box.querySelector('.tri-tb');if(t0)t0.focus();return;}
+    if(st.p===1){var cur=(st.d==='iptu'||st.d==='itr')?'imposto':st.d;if(cur!==v){st.s='';st.g='';st.d=v;}}
     else if(st.p===2){st.s=v;}
     else if(st.p===3){st.w=v;}
     else if(st.p===4){st.g=v;}
