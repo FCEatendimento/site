@@ -195,6 +195,8 @@ RELACIONADOS={
  'purgacao-da-mora-apos-consolidacao-tema-1288':[('/guia/direito-de-preferencia-recomprar-imovel-antes-do-leilao/','Direito de preferência antes do 2º leilão')],
  'leilao-extrajudicial-caixa':[('/leilao/','Defesa do devedor na alienação fiduciária')],
 }
+for _g in G:
+    if _g.get('relacionados') and _g['slug'] not in RELACIONADOS: RELACIONADOS[_g['slug']]=[tuple(x) for x in _g['relacionados']]
 def _rel(slug):
     it=RELACIONADOS.get(slug)
     if not it: return ''
@@ -218,9 +220,9 @@ for g in G:
       <h1>{html.escape(g["titulo"])}</h1>
       <p class="lead">{g["lead"]}</p>
       <p class="revisado">Revisado por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), em <time datetime="{g.get('atualizado',g.get('data','2026-10-03'))}">{_dbr(g.get('atualizado',g.get('data','2026-10-03')))}</time>.</p>
-{'' if inv else _fases(g['slug'])}
+{'' if (inv or not g.get('fases', g.get('categoria') in (None,'Financiamento imobiliário','Alienação fiduciária','Consolidação da propriedade','Leilão extrajudicial','Direitos após o leilão'))) else _fases(g['slug'])}
 {g["corpo"]}
-      {(INV_BOX if inv else DEV_BOX).replace('TAG','guia-'+g['slug'][:40])}
+      {(CTA_B.replace('p=home','p=guia-'+g['slug'][:40]) if g.get('cta')=='b' else (INV_BOX if inv else DEV_BOX)).replace('TAG','guia-'+g['slug'][:40])}
       <p class="crumb">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Conteúdo informativo; não substitui a análise individual do caso.</p>
       {_rel(g['slug'])}
       <nav class="rel" aria-label="Outros guias"><p class="eyebrow">{'Mais guias para quem compra em leilão' if inv else 'Outros guias'}</p><ul>{outros}<li><a href="{'/investidor/' if inv else '/guia/'}">{'Área do investidor: análise pré-lance' if inv else 'Todos os guias por situação'}</a></li></ul></nav>
@@ -230,6 +232,8 @@ for g in G:
     ld={"@context":"https://schema.org","@graph":[
       {"@type":"Article","headline":g["titulo"],"description":g["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":g.get("data","2026-10-03"),"dateModified":g.get("atualizado",g.get("data","2026-10-03")),"image":"https://fceadvogados.com.br/img/og-fce.jpg"},
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":u} for i,(n,u) in enumerate(bc+[(g["titulo"],url)])]}]}
+    _fq=[{"@type":"Question","name":html.unescape(re.sub('<[^>]+>','',m.group(1))),"acceptedAnswer":{"@type":"Answer","text":html.unescape(re.sub('<[^>]+>','',m.group(2)))}} for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',g["corpo"],re.S)]
+    if _fq: ld["@graph"].append({"@type":"FAQPage","mainEntity":_fq})
     page(f'/guia/{g["slug"]}/index.html', g["seo"], g["desc"], url, body, ld, 'investidor-artigo' if inv else 'guia')
 _card=lambda g:f'<a href="/guia/{g["slug"]}/"><strong>{html.escape(g["titulo"])}</strong><span>{html.escape(g["desc"])}</span></a>'
 GS={g['slug']:g for g in G}
@@ -495,7 +499,9 @@ def _pagina(path, arquivo, title, desc, nome, pai):
     H=open(SITE+'/content/'+arquivo,encoding='utf-8').read()
     tag=path.strip('/').replace('/','-')[:40]
     REVISAO_B=REVISAO_PAG.get(path, globals()['REVISAO_B'])
-    H=H.replace('{{CTA}}',CTA_B.replace('TAG',tag)).replace('{{ASSINATURA}}',ASSINATURA_B).replace('{{REVISADO}}',f'<p class="revisado">Revisado por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), em <time datetime="{REVISAO_B}">{_dbr_b(REVISAO_B)}</time>.</p>')
+    _gl=[g for g in G if any(x[0]==path for x in (g.get('relacionados') or []))]
+    _gn=('<nav class="rel" aria-label="Guias sobre este tema"><p class="eyebrow">Guias sobre este tema</p><ul>'+''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for g in _gl)+'</ul></nav>\n      ') if _gl else ''
+    H=H.replace('{{CTA}}',CTA_B.replace('TAG',tag)).replace('{{ASSINATURA}}',_gn+ASSINATURA_B).replace('{{REVISADO}}',f'<p class="revisado">Revisado por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), em <time datetime="{REVISAO_B}">{_dbr_b(REVISAO_B)}</time>.</p>')
     fq=[{"@type":"Question","name":html.unescape(m.group(1)),"acceptedAnswer":{"@type":"Answer","text":html.unescape(re.sub('<[^>]+>','',m.group(2)))}} for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',H,re.S)]
     itens=((PB[pai][4],'https://fceadvogados.com.br'+pai),) if pai else ()
     grafo=[{"@type":"WebPage","name":nome,"description":desc,"url":url,"inLanguage":"pt-BR","publisher":ORG,"author":AUT,"dateModified":REVISAO_B},
