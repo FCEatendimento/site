@@ -242,7 +242,7 @@ CATEGORIAS=[
 _usados={g['slug'] for c in CATEGORIAS for g in c[2]}
 _falta=[g for g in G if g['slug'] not in INV_SLUGS and g['slug'] not in _usados]
 _NOMES={c[0].lower():c for c in CATEGORIAS}
-for _g in _falta: _NOMES.get(str(_g.get('categoria') or _g.get('eyebrow') or '').strip().lower(),CATEGORIAS[0])[2].append(_g)  # guia novo vai para a categoria do JSON (campo categoria ou eyebrow); sem correspondência, Financiamento imobiliário
+for _g in _falta: _NOMES.get(str(_g.get('categoria') or _g.get('eyebrow') or '').split('·')[0].strip().lower(),CATEGORIAS[0])[2].append(_g)  # guia novo vai para a categoria do JSON (campo categoria ou eyebrow); sem correspondência, Financiamento imobiliário
 cards=''.join(f'<section class="guia-cat" aria-labelledby="cat-{i}"><h2 id="cat-{i}">{n}</h2><p>{d}</p><div class="cards">'+''.join(extra)+''.join(_card(g) for g in gs)+'</div></section>' for i,(n,d,gs,extra) in enumerate(CATEGORIAS))
 cards+=('<section class="guia-sec"><h2>Para quem compra imóvel em leilão</h2><p style="color:var(--muted)">Conteúdos para arrematantes e investidores.</p><ul>'+''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for g in GI)+'<li><a href="/investidor/">Análise jurídica antes do lance</a></li></ul></section>'
       +'<p style="margin-top:1.5rem"><a href="/calculadora/">Simule quanto do seu imóvel está em jogo</a> · <a href="/ebook/">Guia gratuito em PDF: parcelas atrasadas</a></p>')
