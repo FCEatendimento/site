@@ -163,6 +163,7 @@ DEV_BOX='<aside class="eb-box"><p class="eyebrow">Imóvel em risco</p><strong>Ve
 CTA_B='<aside class="eb-box"><p class="eyebrow">Conversa inicial</p><strong>Quer entender a sua situação?</strong><p>Descreva o caso pelo formulário de contato ou pelo WhatsApp. O advogado responsável identifica a fase e os prazos e explica os caminhos possíveis.</p><p style="display:flex;flex-wrap:wrap;gap:.6rem;margin:0"><a class="btn btn-primary" href="/contato/?o=TAG">Explicar minha situação</a><a class="btn btn-ghost wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=home">Conversar pelo WhatsApp</a></p></aside>'
 ASSINATURA_B='<p class="crumb" style="margin-top:2rem">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Conteúdo informativo, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021; não substitui a análise individual do caso e não representa promessa de resultado.</p>'
 REVISAO_B='2026-10-16'
+REVISAO_PAG={'/penhora-de-imovel/divida-de-condominio/':'2026-10-17','/penhora-de-imovel/iptu/':'2026-10-17','/penhora-de-imovel/itr/':'2026-10-17','/penhora-de-imovel/':'2026-10-17'}
 # Páginas de serviço e problemas jurídicos (núcleos B e penhora): (caminho, arquivo, title, description, nome, pai)
 PAGINAS_B=[
  ('/imovel-em-garantia/','garantia/imovel-em-garantia.html','Imóvel dado em garantia de dívida: riscos e direitos | FCE Advogados','Imóvel em garantia de empréstimo, fiança ou aval: o que pode acontecer se a dívida não for paga, a proteção do bem de família e o que pode ser analisado.','Imóvel dado em garantia de dívida',None),
@@ -173,6 +174,9 @@ PAGINAS_B=[
  ('/imovel-em-garantia/responsabilidade-dos-socios/','garantia/responsabilidade-dos-socios.html','Sócio responde com bens pessoais por dívida da empresa? | FCE Advogados','Quando o patrimônio do sócio pode ser atingido por dívida da empresa: garantias assinadas, desconsideração da personalidade jurídica e o que a lei exige.','Responsabilidade dos sócios por dívida da empresa','/imovel-em-garantia/'),
  ('/imovel-em-garantia/antes-de-assinar/','garantia/antes-de-assinar.html','Antes de dar o imóvel em garantia: o que conferir | FCE Advogados','Vai oferecer a casa em garantia de empréstimo ou de dívida da empresa? Os pontos do contrato que merecem atenção antes de assinar.','Antes de oferecer o imóvel em garantia','/imovel-em-garantia/'),
  ('/penhora-de-imovel/','penhora.html','Imóvel penhorado por dívida: o que fazer | FCE Advogados','Seu imóvel foi penhorado em processo judicial? Como funcionam a penhora, a avaliação e o leilão judicial, os prazos e o que pode ser analisado.','Imóvel penhorado por dívida',None),
+ ('/penhora-de-imovel/divida-de-condominio/','garantia/condominio.html','Dívida de condomínio: o imóvel pode ser penhorado? | FCE Advogados','Condomínio atrasado pode levar à penhora até do único imóvel. Como funciona a execução, prazos, prescrição de 5 anos, multa de 2%, parcelamento e acordo.','Dívida de condomínio e penhora do imóvel','/penhora-de-imovel/'),
+ ('/penhora-de-imovel/iptu/','garantia/iptu.html','Dívida de IPTU: execução fiscal e penhora do imóvel | FCE Advogados','IPTU atrasado pode levar à penhora do imóvel, mesmo o de moradia. Execução fiscal, prescrição, embargos, exceção de pré-executividade e parcelamento.','Dívida de IPTU e execução fiscal','/penhora-de-imovel/'),
+ ('/penhora-de-imovel/itr/','garantia/itr.html','Dívida de ITR: execução fiscal do imóvel rural | FCE Advogados','ITR atrasado: execução fiscal da Fazenda Nacional, penhora da área rural, pequena gleba, áreas excluídas do cálculo, prescrição e transação tributária.','Dívida de ITR do imóvel rural','/penhora-de-imovel/'),
 ]
 # Conexões temáticas exibidas no fim de cada guia
 RELACIONADOS={
@@ -235,7 +239,7 @@ CATEGORIAS=[
  ('Consolidação da propriedade','Quando o imóvel passa para o nome do credor na matrícula.',[GS['propriedade-consolidada-no-nome-do-banco'],GS['purgacao-da-mora-apos-consolidacao-tema-1288']],[]),
  ('Leilão extrajudicial','Datas, direito de preferência e suspensão do leilão.',[GS['direito-de-preferencia-recomprar-imovel-antes-do-leilao']],[_pcard('/suspensao-de-leilao/','Suspensão de leilão de imóvel','Quando a suspensão pode ser pedida e o que precisa ser demonstrado.')]),
  ('Direitos após o leilão','O que ainda pode ser verificado depois da venda.',[GS['imovel-leiloado-o-que-ainda-e-possivel'],GS['saldo-do-leilao-como-receber']],[]),
- ('Penhora e execução','Imóvel penhorado em processo judicial e leilão determinado pelo juiz.',[GS['leilao-judicial-ou-extrajudicial-diferencas']],[_pb('/penhora-de-imovel/','Penhora, avaliação, leilão judicial e os prazos de defesa.'),_pb('/imovel-em-garantia/execucao-contra-garantidor/','Prazos depois da citação e o que pode ser discutido.')]),
+ ('Penhora e execução','Imóvel penhorado em processo judicial e leilão determinado pelo juiz.',[GS['leilao-judicial-ou-extrajudicial-diferencas']],[_pb('/penhora-de-imovel/','Penhora, avaliação, leilão judicial e os prazos de defesa.'),_pb('/imovel-em-garantia/execucao-contra-garantidor/','Prazos depois da citação e o que pode ser discutido.'),_pb('/penhora-de-imovel/divida-de-condominio/','Condomínio atrasado, execução e a penhora da própria unidade.'),_pb('/penhora-de-imovel/iptu/','Execução fiscal do município, prescrição e defesa.'),_pb('/penhora-de-imovel/itr/','ITR do imóvel rural, pequena gleba e negociação com a Fazenda Nacional.')]),
  ('Garantias empresariais','Quando o imóvel pessoal garante uma dívida da empresa.',[],[_pb('/imovel-em-garantia/','As diferenças entre alienação fiduciária, hipoteca, fiança e aval.'),_pb('/imovel-em-garantia/divida-da-empresa/','O que acontece quando a empresa atrasa.'),_pb('/imovel-em-garantia/responsabilidade-dos-socios/','Quando o patrimônio do sócio pode ser atingido.'),_pb('/imovel-em-garantia/antes-de-assinar/','O que conferir no contrato antes da assinatura.'),_pcard('/empresario/','Guia gratuito para empresários (PDF)','Imóvel dado em garantia de empréstimo da empresa.')]),
  ('Fiança e bem de família','A proteção do imóvel residencial e a situação do fiador.',[],[_pb('/imovel-em-garantia/fiador/','O que a lei e o STF dizem sobre o fiador de locação.'),_pb('/imovel-em-garantia/bem-de-familia/','A regra, as exceções e o que o STJ tem decidido.')]),
 ]
@@ -487,6 +491,7 @@ def _pagina(path, arquivo, title, desc, nome, pai):
     url='https://fceadvogados.com.br'+path
     H=open(SITE+'/content/'+arquivo,encoding='utf-8').read()
     tag=path.strip('/').replace('/','-')[:40]
+    REVISAO_B=REVISAO_PAG.get(path, globals()['REVISAO_B'])
     H=H.replace('{{CTA}}',CTA_B.replace('TAG',tag)).replace('{{ASSINATURA}}',ASSINATURA_B).replace('{{REVISADO}}',f'<p class="revisado">Revisado por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), em <time datetime="{REVISAO_B}">{_dbr_b(REVISAO_B)}</time>.</p>')
     fq=[{"@type":"Question","name":html.unescape(m.group(1)),"acceptedAnswer":{"@type":"Answer","text":html.unescape(re.sub('<[^>]+>','',m.group(2)))}} for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',H,re.S)]
     itens=((PB[pai][4],'https://fceadvogados.com.br'+pai),) if pai else ()
@@ -545,6 +550,7 @@ NF='''  <article class="art">
         <a href="/contato/"><strong>Contato</strong><span>Explique a sua situação ao escritório.</span></a>
         <a href="/imovel-em-garantia/"><strong>Imóvel dado em garantia</strong><span>Casa em garantia de dívida da empresa, fiança e bem de família.</span></a>
         <a href="/penhora-de-imovel/"><strong>Imóvel penhorado</strong><span>Penhora, avaliação e leilão judicial.</span></a>
+        <a href="/penhora-de-imovel/divida-de-condominio/"><strong>Dívida de condomínio, IPTU ou ITR</strong><span>Quando a dívida do próprio imóvel leva à penhora.</span></a>
         <a href="/blog/"><strong>Blog</strong><span>Novidades e alertas sobre leilão de imóveis.</span></a>
         <a href="/"><strong>Página inicial</strong><span>Comece pelo início.</span></a>
       </div>
@@ -558,6 +564,6 @@ print('ok')
 import re
 IDX2=open(SITE+'/index.html',encoding='utf-8').read()
 DESTAQUE=['como-saber-se-meu-imovel-vai-a-leilao','intimacao-do-cartorio-parcelas-atrasadas','propriedade-consolidada-no-nome-do-banco','direito-de-preferencia-recomprar-imovel-antes-do-leilao','o-banco-pode-leiloar-minha-casa','saldo-do-leilao-como-receber']
-lis=''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for sl in DESTAQUE for g in G if g['slug']==sl)+''.join(f'<li><a href="{x[0]}">{html.escape(x[4])}</a></li>' for x in PAGINAS_B if x[0] in ('/imovel-em-garantia/bem-de-familia/','/imovel-em-garantia/fiador/','/penhora-de-imovel/'))
+lis=''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for sl in DESTAQUE for g in G if g['slug']==sl)+''.join(f'<li><a href="{x[0]}">{html.escape(x[4])}</a></li>' for x in PAGINAS_B if x[0] in ('/imovel-em-garantia/bem-de-familia/','/imovel-em-garantia/fiador/','/penhora-de-imovel/','/penhora-de-imovel/divida-de-condominio/','/penhora-de-imovel/iptu/'))
 IDX2=re.sub(r'<ul class="guias-list">.*?</ul>','<ul class="guias-list">'+lis+'</ul>',IDX2,1,flags=re.S)
 open(SITE+'/index.html','w',encoding='utf-8').write(IDX2)
