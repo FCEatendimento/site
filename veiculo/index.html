@@ -324,6 +324,20 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .guia-cat{margin-top:2.5rem;padding-block:0}.guia-cat>p{color:var(--muted);margin:-.4rem 0 1rem}
 .guia-sec{margin-top:3rem;padding:1.5rem 0 0;border-top:1px solid var(--line)}
 .art .cards a.pg{border-left:3px solid var(--accent)}
+.frase-fabio{margin:1.4rem 0 1.8rem;padding:1rem 1.2rem;border-left:4px solid var(--accent);background:var(--surface);border-radius:0 8px 8px 0}
+.frase-fabio p{font:600 1.15rem/1.45 var(--display);margin:0 0 .5rem!important;color:var(--ink)}
+.frase-fabio footer{font-size:.9rem;color:var(--muted);border:0;padding:0;margin:0;background:none;display:block}
+.caso{padding-block:clamp(2rem,5vw,3rem)}
+.caso-box{max-width:calc(var(--read) + 4rem);margin-inline:auto;padding:clamp(1.4rem,4vw,2.2rem);border-radius:10px;background:#0E1A2B;color:#fff;border-top:4px solid #F2C200}
+.caso-box h2{margin:0 0 .9rem;font-size:clamp(1.35rem,3vw,1.75rem);color:#fff;text-transform:none}
+.caso-box p,.caso-box li{color:#E6E9EE;line-height:1.6}
+.caso-box p{margin:0 0 .9rem}
+.caso-box .caso-dest{font-family:var(--display);font-weight:700;color:#F2C200;font-size:1.08rem}
+.caso-box ul{margin:.2rem 0 1rem;padding-left:1.2rem;display:grid;gap:.35rem}
+.caso-box .caso-acoes{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.2rem;margin:1.2rem 0 0}
+.caso-box .btn-primary{background:#F2C200;color:#0E1A2B;border-color:#F2C200}
+.caso-box .caso-sec{color:#E6E9EE;font-size:.95rem;text-decoration:underline;text-underline-offset:3px}
+.caso-box a:focus-visible{outline:3px solid #F2C200;outline-offset:3px}
 </style>
 <script src="/js/medicao.js" defer></script>
 </head>
@@ -429,17 +443,265 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     </div>
   </article>
 
-  <section class="final">
+  <section class="art" style="padding-block:0 1rem"><div class="wrap"><nav class="rel" aria-label="Guias sobre este tema"><p class="eyebrow">Guias sobre este tema</p><ul><li><a href="/guia/busca-e-apreensao-veiculo-maquina-prazos/">Busca e apreensão de veículo ou máquina: os prazos depois da apreensão</a></li><li><a href="/parcelas-em-dia/#veiculo">Parcelas em dia, mas sem conseguir pagar as próximas</a></li></ul></nav></div></section>
+  <section class="caso" aria-labelledby="caso-t">
     <div class="wrap">
-      <div class="box">
-        <div>
-          <h2>Conte o que está acontecendo</h2>
-          <p>Pelo WhatsApp, a qualquer hora. Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.</p>
-        </div>
-        <a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=veiculo">Conversar pelo WhatsApp</a>
+      <div class="caso-box">
+        <h2 id="caso-t">A lei é o ponto de partida. O que decide é o seu caso.</h2>
+        <p>Agora você conhece as regras gerais. Mas o desfecho de um caso depende de detalhes que nenhum guia mostra: a notificação, o contrato e as datas da apreensão.</p>
+        <p class="caso-dest">Advocacia, para nós, é buscar a saída e pensar fora da caixa — não só repetir o que está na lei.</p>
+        <p>Só a análise dos seus documentos mostra:</p>
+        <ul><li>se cada passo da cobrança foi feito do jeito certo;</li><li>quanto tempo você realmente tem para cada providência;</li><li>quais caminhos fazem sentido para você: negociar, discutir, ganhar tempo ou se organizar.</li></ul>
+        <p>Na consulta, o Dr. Fábio lê os seus documentos e mostra o que existe de concreto no seu caso — inclusive o que não vale a pena tentar.</p>
+        <p class="caso-acoes"><a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=veiculo">Quero entender o meu caso →</a><a class="caso-sec" href="/#triagem">ou salve sua análise</a></p>
       </div>
     </div>
   </section>
+</main>
+
+<footer>— Dr. Fábio de Castro Emerim</footer></blockquote>
+        <ul class="compromissos">
+          <li><strong>Explicação clara.</strong> Você entende o que está acontecendo, sem juridiquês.</li>
+          <li><strong>Análise pelo advogado responsável.</strong> O seu caso não passa de mão em mão.</li>
+          <li><strong>Franqueza sobre riscos e prazos.</strong> Sem promessas de resultado.</li>
+          <li><strong>Sigilo.</strong> A sua situação fica entre você e o escritório.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="localizacao">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Onde estamos</p>
+        <h2>Localização do escritório</h2>
+      </div>
+      <div class="local">
+        <div class="info">
+          <address><strong>FCE Advogados</strong><br>Rua Araguaia, 509, Jardim Mauá<br>Novo Hamburgo/RS · CEP 93548-350</address>
+          <p>A consulta pode ser presencial, aqui no escritório, ou online, por vídeo, para clientes de qualquer cidade.</p>
+          <div class="ctas"><a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Rua+Araguaia%2C+509%2C+Jardim+Mau%C3%A1%2C+Novo+Hamburgo+RS" target="_blank" rel="noopener">Abrir no Google Maps</a></div>
+        </div>
+        <div class="mapa">
+          <button type="button" class="mapa-btn" data-src="https://www.google.com/maps?q=Rua+Araguaia,+509,+Jardim+Mau%C3%A1,+Novo+Hamburgo+-+RS&amp;output=embed" aria-label="Carregar o mapa do Google com a localização do escritório"><span>Rua Araguaia, 509, Jardim Mauá<br>Novo Hamburgo/RS</span><strong>Ver no mapa</strong></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="guias" class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Para entender o seu caso</p>
+        <h2>Conteúdos para entender o seu caso</h2>
+        <p>Explicações em linguagem simples sobre financiamento atrasado, leilão, garantias, fiança e penhora. <a href="/guia/">Ver a central de guias</a>.</p>
+      </div>
+      <ul class="guias-list"><li><a href="/guia/como-saber-se-meu-imovel-vai-a-leilao/">Como saber se o meu imóvel foi ou vai a leilão</a></li><li><a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Recebi intimação do cartório por parcelas atrasadas: o que fazer</a></li><li><a href="/guia/propriedade-consolidada-no-nome-do-banco/">Propriedade consolidada no nome do banco: ainda dá para reverter?</a></li><li><a href="/guia/direito-de-preferencia-recomprar-imovel-antes-do-leilao/">Direito de preferência: como recomprar o imóvel antes do segundo leilão</a></li><li><a href="/guia/o-banco-pode-leiloar-minha-casa/">O banco pode leiloar a minha casa? Quando pode, quando não pode</a></li><li><a href="/guia/saldo-do-leilao-como-receber/">Sobrou dinheiro no leilão do meu imóvel: como receber o saldo</a></li><li><a href="/imovel-em-garantia/fiador/">Fiador pode perder o único imóvel?</a></li><li><a href="/imovel-em-garantia/bem-de-familia/">Bem de família</a></li><li><a href="/penhora-de-imovel/">Imóvel penhorado por dívida</a></li><li><a href="/penhora-de-imovel/divida-de-condominio/">Dívida de condomínio e penhora do imóvel</a></li><li><a href="/penhora-de-imovel/iptu/">Dívida de IPTU e execução fiscal</a></li></ul>
+      <aside class="ebook-cta"><img src="/img/ebook-capa.jpg" alt="Capa do guia em PDF Parcelas atrasadas do imóvel financiado" width="84" height="119" loading="lazy"><div><strong>Guia gratuito em PDF: parcelas atrasadas do imóvel financiado</strong><p>Da intimação do cartório ao leilão, com o que ainda é possível fazer em cada fase, um checklist de documentos e os erros mais comuns.</p><a class="btn btn-primary" href="/ebook/?o=site-home">Baixar o guia gratuito</a></div></aside>
+    </div>
+  </section>
+
+  <section id="perguntas">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Dúvidas comuns</p>
+        <h2>Perguntas frequentes</h2>
+      </div>
+      <div class="faq">
+        <details><summary>Ainda dá para fazer algo depois da consolidação?</summary><p>Depende do caso. A consolidação não encerra todas as possibilidades, mas o que cabe em cada situação só pode ser dito depois de analisar a intimação, a matrícula e o edital.</p></details>
+        <details><summary>O leilão já tem data. Vale a pena procurar um advogado agora?</summary><p>Sim. Com a data marcada, os prazos ficam curtos, e ter os documentos em mãos agiliza a análise do caso.</p></details>
+        <details><summary>O atendimento é só online?</summary><p>Não. A conversa começa pelo WhatsApp, e a consulta pode ser por vídeo ou presencial, no escritório em Novo Hamburgo/RS. O formato online permite atender pessoas de qualquer cidade.</p></details>
+        <details><summary>Preciso ter todos os documentos para começar?</summary><p>Não. Comece com o que tiver. Durante o atendimento indicamos o que falta e onde conseguir, como a matrícula atualizada no cartório.</p></details>
+        <details><summary>Dei meu imóvel em garantia de um empréstimo da empresa. Posso perdê-lo?</summary><p>Pode, se a dívida não for paga e a garantia for executada. Antes disso, costumam ser analisados o tipo de garantia, o contrato, se o imóvel é a residência da família e a fase da cobrança. O que cabe em cada caso só pode ser dito depois de ver os documentos.</p></details>
+        <details><summary>Sou fiador de um contrato de locação. Posso perder o meu único imóvel?</summary><p>A Lei 8.009/90 prevê a fiança em contrato de locação como exceção à proteção do bem de família, e o Supremo Tribunal Federal considerou válida essa penhora tanto na locação residencial quanto na comercial (Tema 1.127). Ainda assim, há pontos a verificar, como a validade da fiança, o seu prazo e o valor efetivamente cobrado.</p></details>
+        <details><summary>Vocês atendem quem comprou imóvel em leilão?</summary><p>Sim. O escritório também atende arrematantes, por exemplo quando o antigo proprietário questiona o leilão ou quando o imóvel está ocupado.</p></details>
+              <details><summary>Quanto tempo leva do atraso até o leilão?</summary><p>Depende do contrato e do ritmo do banco e do cartório. Entre a intimação, a consolidação e os leilões costumam passar alguns meses, mas cada etapa tem prazos próprios e curtos. Por isso vale buscar orientação já na primeira intimação.</p></details>
+        <details><summary>O banco pode leiloar o imóvel sem me avisar?</summary><p>Não. A lei exige a intimação do devedor para pagar e a comunicação das datas dos leilões. Falhas nessas comunicações estão entre os pontos que costumam ser analisados.</p></details>
+        <details><summary>Já paguei boa parte do financiamento. Posso perder o imóvel mesmo assim?</summary><p>Sim, a alienação fiduciária permite o leilão mesmo com grande parte paga. Mas, se o imóvel for vendido por mais do que a dívida e as despesas, a diferença pertence ao antigo dono, e até o segundo leilão existe o direito de preferência para recomprá-lo.</p></details>
+        <details><summary>É possível suspender o leilão?</summary><p>Em alguns casos, sim, por meio de uma ação judicial, quando há irregularidades no procedimento ou na cobrança. Se cabe no seu caso depende da análise dos documentos e das datas.</p></details>
+        <details><summary>Moro em outra cidade ou estado. Vocês atendem?</summary><p>Sim. A consulta e o acompanhamento podem ser feitos por vídeo e por WhatsApp, e os documentos são enviados digitalmente.</p></details>
+        <details><summary>Depois do leilão, preciso sair do imóvel na hora?</summary><p>Não de imediato. Quem arrematou precisa pedir a desocupação, de forma negociada ou judicial, e há prazos para isso. Esse período também é usado para verificar a regularidade do leilão e o eventual saldo.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" id="contato">
+    <div class="wrap">
+      <div class="box">
+        <div>
+          <h2>Explique a sua situação ao escritório</h2>
+          <p>Pelo WhatsApp, a qualquer hora. Se tiver a intimação, o contrato ou o edital, já pode enviar. O caso é analisado pelo advogado responsável, com sigilo.</p>
+        </div>
+        <div class="final-ctas"><a class="btn btn-primary" href="/contato/?o=home">Enviar pelo formulário</a><a class="btn btn-ghost wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p=veiculo">Conversar pelo WhatsApp</a></div>
+      </div>
+    </div>
+  </section>
+<script>
+/* Guia de triagem da home: 3 perguntas que levam à página do caso */
+(function(){
+  var box=document.getElementById('tri-corpo'); if(!box) return;
+  var prog=document.querySelectorAll('#triagem .tri-prog li');
+  var WA='https://emerim.app.n8n.cloud/webhook/fce-wa';
+  var D=[
+    ['financiamento','Financiamento do imóvel','alienação fiduciária com banco'],
+    ['bancaria','Dívida bancária','empréstimo, cédula de crédito, cheque especial, cartão'],
+    ['garantia','Imóvel em garantia de dívida da empresa',''],
+    ['fianca','Fiança ou aval',''],
+    ['veiculo','Busca e apreensão de carro ou máquina','veículo ou equipamento financiado'],
+    ['condominio','Condomínio atrasado',''],
+    ['iptu','IPTU',''],
+    ['itr','ITR','imóvel rural'],
+    ['penhora','Outra dívida com penhora do imóvel',''],
+    ['comprar','Quero comprar imóvel em leilão','']
+  ];
+  var FISCAL=[['cobranca','Recebi cobrança, notificação ou protesto'],['processo','Há processo ou recebi citação'],['penhora','O imóvel foi penhorado'],['leilao','O leilão já está marcado']];
+  var S={
+    financiamento:[['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','Estou com parcelas atrasadas'],['intimacao','Recebi intimação do cartório'],['consolidado','A propriedade foi consolidada no nome do banco'],['leilao','O leilão já está marcado']],
+    garantia:[['assinar','Ainda vou assinar o contrato ou um aditivo'],['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','A empresa atrasou as parcelas'],['citado','Recebi notificação, intimação ou citação'],['leilao','Há penhora ou leilão marcado']],
+    fianca:[['assinar','Vão me pedir para ser fiador ou avalista'],['cobranca','Estão me cobrando a dívida de outra pessoa'],['citado','Fui citado em processo'],['penhora','Meu imóvel foi penhorado']],
+    condominio:FISCAL, iptu:FISCAL, itr:FISCAL,
+    bancaria:[['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','Está atrasada ou meu nome foi negativado'],['judicial','Há cobrança judicial ou recebi citação'],['penhora','Houve penhora ou bloqueio'],['leilao','O leilão já está marcado']],
+    veiculo:[['emdia','Parcelas em dia, mas sei que não vou conseguir pagar as próximas'],['atraso','Estou com parcelas atrasadas'],['notificacao','Recebi notificação do banco ou do cartório'],['apreendido','O veículo ou a máquina já foi apreendido']],
+    penhora:[['processo','Recebi citação em execução'],['penhora','O imóvel foi penhorado'],['avaliacao','O imóvel foi avaliado'],['leilao','O leilão já está marcado']],
+    comprar:[['avaliando','Estou avaliando um imóvel de leilão'],['lance','Quero saber quanto ofertar'],['arrematei','Já arrematei um imóvel']]
+  };
+  var W=[['pf','Pessoa física'],['empresario','Empresário(a) ou sócio(a)'],['empresa','Empresa (CNPJ)'],['rural','Produtor(a) rural'],['garantidor','Fiador(a) ou avalista de outra pessoa'],['familiar','Familiar ajudando alguém']];
+  var G=[['manter','Continuar com meu imóvel ou bem'],['tempo','Ganhar tempo para me organizar'],['negociar','Negociar um valor que eu consiga pagar'],['entender','Entender meus direitos antes de decidir'],['proteger','Proteger minha família ou minha empresa']];
+  var GI=[['seguranca','Comprar com segurança'],['custo','Saber o custo real da compra'],['riscos','Entender os riscos antes do lance']];
+  var CONDO='/penhora-de-imovel/divida-de-condominio/', IPTU='/penhora-de-imovel/iptu/', ITR='/penhora-de-imovel/itr/', PEN='/penhora-de-imovel/', SUSP='/suspensao-de-leilao/', BF='/imovel-em-garantia/bem-de-familia/';
+  // [destino, título, texto, prazo, link extra]
+  var R={
+    'financiamento.emdia':['/parcelas-em-dia/#imovel','Parcelas em dia, mas com dificuldade à frente','Antes do atraso há mais opções: renegociar com o banco, revisar o contrato e entender o que acontece se as parcelas atrasarem. Planejar agora costuma evitar a intimação do cartório.',0],
+    'financiamento.atraso':['/guia/como-saber-se-meu-imovel-vai-a-leilao/','Parcelas atrasadas no financiamento','Na alienação fiduciária, o atraso pode levar o banco a pedir a intimação pelo cartório. Antes disso, o contrato, o extrato da dívida e as tentativas de negociação já fazem diferença.',0],
+    'financiamento.intimacao':['/guia/intimacao-do-cartorio-parcelas-atrasadas/','Intimação do cartório','A intimação abre o prazo de 15 dias para pagar as parcelas vencidas e os encargos. A forma como ela foi feita e o valor cobrado estão entre os pontos que costumam ser analisados.',1],
+    'financiamento.consolidado':['/guia/propriedade-consolidada-no-nome-do-banco/','Propriedade consolidada no nome do banco','Depois do registro da consolidação, o 1º leilão deve acontecer em até 60 dias. Ainda há pontos a verificar, como as intimações feitas e a preferência do antigo dono para recomprar até o 2º leilão.',1],
+    'financiamento.leilao':[SUSP,'Leilão marcado do imóvel financiado','Com data marcada, o tempo é curto. A análise do edital, das intimações e da matrícula mostra se há fundamento para algum pedido antes da data.',1],
+    'garantia.assinar':['/imovel-em-garantia/antes-de-assinar/','Antes de assinar a garantia','O valor garantido, o prazo, o vencimento antecipado e a participação do cônjuge mudam o risco do seu imóvel. Conferir antes de assinar costuma evitar problemas depois.',0],
+    'garantia.emdia':['/parcelas-em-dia/#empresa','A empresa ainda paga, mas o caixa aperta','Antes do atraso, dá para entender o que o contrato prevê, avaliar uma renegociação e saber como a garantia seria cobrada. Agir antes costuma abrir mais opções.',0],
+    'garantia.atraso':['/imovel-em-garantia/divida-da-empresa/','A empresa atrasou e o imóvel está em garantia','O caminho depende do tipo de garantia: na alienação fiduciária, a cobrança pode seguir pelo cartório; na hipoteca, pela Justiça. O contrato mostra qual é o caso.',0],
+    'garantia.citado':['/imovel-em-garantia/execucao-contra-garantidor/','Cobrança contra quem deu a garantia','Notificações, intimações e citações abrem prazos. É o momento de reunir o contrato, os aditivos e os documentos recebidos.',1],
+    'garantia.leilao':[SUSP,'Penhora ou leilão do imóvel dado em garantia','Com penhora ou leilão marcado, o tempo é curto. O tipo de garantia e a fase do procedimento definem o que ainda pode ser discutido.',1,[PEN,'Penhora e leilão judicial']],
+    'fianca.assinar':['/imovel-em-garantia/antes-de-assinar/','Antes de ser fiador ou avalista','Fiança e aval têm regras diferentes, e a outorga do cônjuge e o imóvel envolvido pesam. Vale entender o alcance antes de assinar.',0],
+    'fianca.cobranca':['/imovel-em-garantia/fiador/','Cobrança como fiador ou avalista','Quem garante responde nos limites do que assinou. O contrato, os aditivos e a forma da cobrança são o ponto de partida.',0],
+    'fianca.citado':['/imovel-em-garantia/execucao-contra-garantidor/','Processo contra o fiador ou avalista','A citação abre prazo para a defesa. Reúna o contrato, os aditivos e os documentos do processo.',1],
+    'fianca.penhora':[BF,'Imóvel do fiador penhorado','A proteção do bem de família tem exceções, e a fiança em locação é uma delas. O tipo de contrato e o uso do imóvel definem o que pode ser discutido.',1],
+    'condominio.cobranca':[CONDO,'Condomínio atrasado','A cota condominial pode ser cobrada em execução com base no próprio título. Antes disso, conferir o cálculo e negociar costuma ser o melhor momento.',0],
+    'condominio.processo':[CONDO,'Execução de condomínio','Na execução, o prazo para pagar é de 3 dias e o dos embargos, de 15 dias. O parcelamento previsto no Código de Processo Civil também depende de prazo.',1],
+    'condominio.penhora':[CONDO,'Imóvel penhorado por condomínio','A dívida de condomínio é uma das exceções à proteção do bem de família. A avaliação e as intimações do leilão são pontos a acompanhar.',1],
+    'condominio.leilao':[CONDO,'Leilão por dívida de condomínio','Com data marcada, o tempo é curto. Pagamento, acordo ou falhas no procedimento são caminhos a avaliar antes da data.',1,[SUSP,'Suspensão de leilão']],
+    'iptu.cobranca':[IPTU,'IPTU atrasado','O débito pode ser inscrito em dívida ativa e protestado. Conferir os valores, a prescrição e os parcelamentos disponíveis é o primeiro passo.',0],
+    'iptu.processo':[IPTU,'Execução fiscal de IPTU','Na execução fiscal, os embargos dependem de garantia e têm prazo de 30 dias. Algumas questões podem ser levadas por exceção de pré-executividade.',1],
+    'iptu.penhora':[IPTU,'Imóvel penhorado por IPTU','O IPTU é uma das exceções à proteção do bem de família. A avaliação e as intimações do leilão são pontos a acompanhar.',1],
+    'iptu.leilao':[IPTU,'Leilão por dívida de IPTU','Com data marcada, o tempo é curto. Pagamento, parcelamento ou falhas no procedimento são caminhos a avaliar antes da data.',1,[SUSP,'Suspensão de leilão']],
+    'itr.cobranca':[ITR,'ITR em atraso','O ITR é um imposto federal, e a dívida pode ser inscrita em dívida ativa da União. Conferir os valores e as opções de parcelamento ou transação é o primeiro passo.',0],
+    'itr.processo':[ITR,'Execução fiscal de ITR','Na execução fiscal, os embargos dependem de garantia e têm prazo de 30 dias. Algumas questões podem ser levadas por exceção de pré-executividade.',1],
+    'itr.penhora':[ITR,'Imóvel rural penhorado por ITR','A proteção da pequena propriedade rural tem limites quando a dívida é do próprio imóvel. Cada caso precisa ser analisado com os documentos.',1],
+    'itr.leilao':[ITR,'Leilão por dívida de ITR','Com data marcada, o tempo é curto. Pagamento, parcelamento ou falhas no procedimento são caminhos a avaliar antes da data.',1,[SUSP,'Suspensão de leilão']],
+    'bancaria.emdia':['/parcelas-em-dia/#bancaria','Dívida bancária em dia, mas com dificuldade à frente','Antes do atraso, conferir o contrato, os juros e as condições de renegociação costuma abrir mais opções. O escritório atua quando há um bem, como imóvel, veículo ou máquina, ou patrimônio em risco. A análise mostra se esse é o seu caso.',0],
+    'bancaria.atraso':['/divida-bancaria/','Dívida bancária atrasada ou nome negativado','O atraso e a negativação, por si só, nem sempre colocam um bem em risco. O escritório atua quando há um bem, como imóvel, veículo ou máquina, ou patrimônio em risco. A análise mostra se esse é o seu caso.',0],
+    'bancaria.judicial':['/divida-bancaria/execucao/','Cobrança judicial de dívida bancária','A citação abre prazo para pagar ou apresentar defesa, e o contrato e o cálculo cobrado são o ponto de partida. Se houver imóvel ou outro bem envolvido, a análise precisa ser feita logo.',1],
+    'bancaria.penhora':['/divida-bancaria/execucao/#bloqueio','Penhora ou bloqueio por dívida bancária','Depois da penhora ou do bloqueio, há prazos para discutir o que foi atingido e o valor cobrado. A proteção do bem de família e de valores impenhoráveis entra na análise.',1],
+    'bancaria.leilao':[SUSP,'Leilão por dívida bancária','Com data marcada, o tempo é curto. O tipo de garantia e as intimações feitas definem o que ainda pode ser discutido antes da data.',1,['/divida-bancaria/execucao/','Execução de dívida bancária']],
+    'veiculo.emdia':['/parcelas-em-dia/#veiculo','Parcelas do veículo em dia, mas com dificuldade à frente','Antes do atraso, é possível conferir o contrato, os juros cobrados e as condições de renegociação. Agir cedo costuma evitar a notificação e a busca e apreensão.',0],
+    'veiculo.atraso':['/veiculo/notificacao-do-banco-financiamento-de-veiculo-atrasado/','Parcelas do veículo ou da máquina atrasadas','Com o atraso, o banco pode notificar e pedir a busca e apreensão, na Justiça ou pelo cartório. O contrato e os comprovantes ajudam a avaliar a revisão dos juros e a negociação.',0],
+    'veiculo.notificacao':['/veiculo/notificacao-do-banco-financiamento-de-veiculo-atrasado/','Notificação do banco','A notificação costuma anteceder o pedido de busca e apreensão. É o momento de reunir o contrato, os comprovantes e a própria notificação.',1],
+    'veiculo.apreendido':['/veiculo/carro-apreendido-o-que-fazer/','Veículo ou máquina apreendido','Depois da apreensão, os prazos para pagar ou apresentar defesa são curtos. Os documentos do processo ou do cartório mostram em que fase o caso está.',1],
+    'penhora.processo':[PEN+'#processo','Citação em execução','A citação abre prazo para pagar ou apresentar defesa. Reúna os documentos do processo e o título cobrado.',1],
+    'penhora.penhora':[PEN+'#analise','Imóvel penhorado','Depois da penhora vêm a avaliação e o leilão judicial. A proteção do bem de família e o valor da avaliação estão entre os pontos a analisar.',1],
+    'penhora.avaliacao':[PEN+'#prazos','Avaliação do imóvel penhorado','A avaliação define a base do leilão. Se o valor parecer baixo, ele pode ser questionado no processo, dentro do prazo.',1],
+    'penhora.leilao':[PEN+'#pagar','Leilão judicial marcado','Com data marcada, o tempo é curto. Pagar a dívida antes da arrematação e falhas nas intimações são pontos a avaliar.',1,[SUSP,'Suspensão de leilão']],
+    'comprar.avaliando':['/investidor/','Análise antes do lance','Edital, matrícula, dívidas do imóvel e ocupação definem o risco e o custo real da compra.',0],
+    'comprar.lance':['/investidor/calculadora/','Quanto ofertar no leilão','A conta do lance máximo inclui comissão, impostos, dívidas, desocupação e reforma. A calculadora ajuda a estimar antes de decidir.',0],
+    'comprar.arrematei':['/guia/arrematei-imovel-ocupado-desocupacao/','Imóvel arrematado','Depois da arrematação vêm a carta ou o registro, as dívidas anteriores e, se o imóvel estiver ocupado, a desocupação.',0]
+  };
+  var WL={
+    empresario:['Como empresário ou sócio, vale entender também até onde vai a responsabilidade do seu patrimônio pessoal e dos demais sócios.',['/imovel-em-garantia/responsabilidade-dos-socios/','Responsabilidade dos sócios']],
+    empresa:['A contratação pode ser feita em nome da empresa, pelo CNPJ, com a qualificação de quem a representa.',null],
+    rural:['No imóvel rural, a área, o uso da terra e o ITR também entram na análise.',[ITR,'ITR do imóvel rural']],
+    garantidor:['Quem garante a dívida de outra pessoa responde nos limites do que assinou. O contrato e os aditivos mostram esse limite.',['/imovel-em-garantia/fiador/','Fiança e aval']],
+    familiar:['Você pode conversar com o escritório em nome do seu familiar. Depois, a pessoa envolvida participa da análise e assina os documentos.',null]
+  };
+  var GL={
+    manter:'Você não está sozinho nisso. Em muitas situações existem caminhos para discutir o caso, e o primeiro passo é entender exatamente em que fase ele está. Cada caso depende da análise dos documentos.',
+    tempo:'Querer tempo para se organizar é legítimo. Conhecer os prazos de cada fase ajuda a decidir com calma o que fazer primeiro. Cada caso depende da análise dos documentos.',
+    negociar:'Negociar costuma ser um caminho possível, e chegar à conversa sabendo o valor correto e os seus direitos faz diferença. Cada caso depende da análise dos documentos.',
+    entender:'Entender seus direitos antes de decidir é um bom começo. A página do seu caso explica a fase em linguagem simples, e a análise dos documentos mostra o que se aplica a você.',
+    proteger:'Proteger a família ou a empresa é a prioridade de muita gente nessa situação. Há regras sobre bem de família e sobre a responsabilidade de cada um, e cada caso depende da análise dos documentos.',
+    seguranca:'Comprar em leilão pode ser um bom negócio quando os riscos são conhecidos antes do lance.',
+    custo:'Com a conta completa, que inclui comissão, impostos, dívidas e desocupação, o lance deixa de ser um palpite.',
+    riscos:'Ler o edital e a matrícula antes do lance é o que separa uma boa compra de uma surpresa.'
+  };
+  var st={d:'',s:'',w:'',g:'',p:1};
+  try{var sv=JSON.parse(sessionStorage.getItem('fce_tri')||'null'); if(sv&&sv.p&&('w' in sv)) st=sv;}catch(e){}
+  function salvar(){try{sessionStorage.setItem('fce_tri',JSON.stringify(st));}catch(e){}}
+  function ev(n,o){try{if(window.gtag)gtag('event',n,o);}catch(e){}}
+  function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function nome(lista,k){for(var i=0;i<lista.length;i++)if(lista[i][0]===k)return lista[i];return null;}
+  function marcar(p){for(var i=0;i<prog.length;i++)prog[i].className=i<p?'on':'';}
+  function foco(sel){var el=box.querySelector(sel);if(el){el.focus({preventScroll:true});var r=el.getBoundingClientRect();if(r.top<70||r.top>window.innerHeight-120){window.scrollTo({top:window.scrollY+r.top-90,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}}}
+  function pergunta(n,txt,lista,atual,duas){
+    var h='<div class="tri-step"><p class="tri-n">Pergunta '+n+' de 4</p><h3 class="tri-q" tabindex="-1">'+txt+'</h3><ul class="tri-ops'+(duas?' duas':'')+'">';
+    lista.forEach(function(o){h+='<li><button type="button" class="tri-op" data-v="'+o[0]+'" aria-pressed="'+(o[0]===atual)+'">'+esc(o[1])+(o[2]?'<small>'+esc(o[2])+'</small>':'')+'</button></li>';});
+    h+='</ul><div class="tri-nav">'+(n>1?'<button type="button" class="tri-link" data-a="voltar">Voltar</button>':'<span></span>')+(n>1?'<button type="button" class="tri-link" data-a="recomecar">Recomeçar</button>':'')+'</div></div>';
+    return h;
+  }
+  function slug(path){return path.split('#')[0].replace(/^\/|\/$/g,'').replace(/\//g,'-')||'home';}
+  function resultado(){
+    var r=R[st.d+'.'+st.s]; if(r&&st.d==='bancaria'&&(st.s==='emdia'||st.s==='atraso')&&(st.w==='empresario'||st.w==='empresa'))r=[st.s==='emdia'?'/parcelas-em-dia/#empresa':'/imovel-em-garantia/divida-da-empresa/',r[1],'Quando a dívida é da empresa, os bens dados em garantia e o patrimônio dos sócios podem entrar na cobrança. Antes de qualquer atraso maior, vale entender o que o contrato prevê.',0,['/imovel-em-garantia/','Imóvel dado em garantia']];
+    if(!r){st={d:'',s:'',w:'',g:'',p:1};return pergunta(1,'Qual é a dívida?',D,'',true);}
+    var wl=WL[st.w]||null; if(wl&&st.w==='rural'&&st.d==='itr')wl=[wl[0],null];
+    var urg=r[3];
+    var mais=[]; if(r[4])mais.push(r[4]); if(wl&&wl[1]&&wl[1][0]!==r[0]&&!(r[4]&&r[4][0]===wl[1][0]))mais.push(wl[1]);
+    var wa=WA+'?c=site&p='+encodeURIComponent(st.d==='bancaria'?'divida-bancaria':slug(r[0]))+'&d='+st.d+'&s='+st.s+'&quem='+st.w+'&quer='+st.g;
+    var resumo=nome(D,st.d)[1]+' · '+nome(S[st.d],st.s)[1];
+    var h='<div class="tri-res"><p class="tri-pre">'+esc(resumo)+'</p><h3 tabindex="-1">'+esc(r[1])+'</h3>'+(GL[st.g]?'<p class="tri-acolhe">'+esc(GL[st.g])+'</p>':'')+'<p>'+esc(r[2])+'</p>'+(wl?'<p>'+esc(wl[0])+'</p>':'')+
+      (urg?'<p class="tri-prz">Situações com prazo pedem análise o quanto antes. Se tiver o documento, já pode enviar pelo WhatsApp.</p>':'')+
+      '<div class="tri-acts"><a class="btn btn-primary" href="'+(r[0]==='/contato/'?'/contato/?o=triagem':r[0])+'" data-tri="pagina">'+(r[0]==='/contato/'?'Explicar meu caso pelo formulário':'Ver a página do meu caso')+'</a>'+
+      '</div>'+
+      '<div class="tri-caso"><p class="tri-caso-t">A lei é o ponto de partida. O que decide é o seu caso.</p><p>Advocacia, para nós, é buscar a saída e pensar fora da caixa — não só repetir o que está na lei.</p><a class="btn btn-primary wa" href="'+wa+'">Quero entender o meu caso →</a></div>'+
+      '<div class="tri-mais">'+mais.map(function(m){return '<a href="'+m[0]+'">'+esc(m[1])+'</a>';}).join('')+(r[0]==='/contato/'?'':'<a href="/contato/?o=triagem">Explicar pelo formulário</a>')+'</div>'+
+      '<div class="tri-salvar"><p>Guarde este resultado: com um link pessoal você revê a linha do tempo da sua fase, a lista de documentos e envia documentos ao escritório.</p><button type="button" class="btn btn-ghost" data-a="salvar">Salvar minha análise</button></div>'+
+      '<div class="tri-nav"><button type="button" class="tri-link" data-a="voltar">Voltar</button><button type="button" class="tri-link" data-a="recomecar">Recomeçar</button></div></div>';
+    return h;
+  }
+  function render(focar){
+    var h;
+    if(st.p===1)h=pergunta(1,'Qual é a dívida?',D,st.d,true);
+    else if(st.p===2)h=pergunta(2,'Em que pé está?',S[st.d]||[],st.s,false);
+    else if(st.p===3)h=pergunta(3,'Quem é você?',W,st.w,true);
+    else if(st.p===4)h=pergunta(4,'O que você mais gostaria que acontecesse?',st.d==='comprar'?GI:G,st.g,false);
+    else h=resultado();
+    box.innerHTML=h; marcar(Math.min(st.p,4)); salvar();
+    var av=document.getElementById('tri-aviso'); if(av)av.textContent=st.p>4?'Resultado: '+((R[st.d+'.'+st.s]||[])[1]||''):'Pergunta '+st.p+' de 4';
+    if(focar)foco(st.p>4?'.tri-res h3':'.tri-q');
+  }
+  box.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b||!box.contains(b))return;
+    if(b.dataset.a==='voltar'){st.p=Math.max(1,st.p-1);render(true);return;}
+    if(b.dataset.a==='salvar'){
+      var alvo=box.querySelector('.tri-salvar'); if(!alvo||!window.FCEA)return;
+      alvo.innerHTML=FCEA.formulario('Salvar minha análise');
+      var r0=R[st.d+'.'+st.s]||[], cr=st.s==='leilao'||st.s==='apreendido';
+      FCEA.ligar(alvo.querySelector('form'),function(){return {ferramenta:'triagem',d:st.d,s:st.s,quem:st.w,quer:st.g,destino:r0[0]||'',destino_titulo:r0[1]||'',divida:(nome(D,st.d)||['',''])[1],
+        urg:cr?'CRITICA':(r0[3]?'ALTA':'NORMAL'),perfil:st.d==='comprar'?'ARREMATANTE':'DEVEDOR',
+        itens:[{p:'Dívida',r:(nome(D,st.d)||['',''])[1]},{p:'Situação',r:(nome(S[st.d]||[],st.s)||['',''])[1]},{p:'Quem é você',r:(nome(W,st.w)||['',''])[1]},{p:'O que gostaria',r:(nome(st.d==='comprar'?GI:G,st.g)||['',''])[1]}].filter(function(x){return x.r;})};},
+        st.d==='bancaria'?'divida-bancaria':slug(r0[0]||'/'));
+      var t=alvo.querySelector('.fa-t'); if(t)t.focus(); ev('triagem_salvar_abrir',{}); return;
+    }
+    if(b.dataset.a==='recomecar'){st={d:'',s:'',w:'',g:'',p:1};render(true);ev('triagem_recomecar',{});return;}
+    var v=b.dataset.v; if(!v)return;
+    if(st.p===1){if(st.d!==v){st.s='';st.g='';}st.d=v;}
+    else if(st.p===2){st.s=v;}
+    else if(st.p===3){st.w=v;}
+    else if(st.p===4){st.g=v;}
+    ev('triagem_passo',{passo:st.p,resposta:v});
+    st.p++; if(st.p===5)ev('triagem_resultado',{divida:st.d,status:st.s,quem:st.w,objetivo:st.g});
+    render(true);
+  });
+  render(false);
+})();
+</script>
+
 </main>
 
 <footer>

@@ -90,6 +90,20 @@ ART_CSS='''<style>
 .guia-cat{margin-top:2.5rem;padding-block:0}.guia-cat>p{color:var(--muted);margin:-.4rem 0 1rem}
 .guia-sec{margin-top:3rem;padding:1.5rem 0 0;border-top:1px solid var(--line)}
 .art .cards a.pg{border-left:3px solid var(--accent)}
+.frase-fabio{margin:1.4rem 0 1.8rem;padding:1rem 1.2rem;border-left:4px solid var(--accent);background:var(--surface);border-radius:0 8px 8px 0}
+.frase-fabio p{font:600 1.15rem/1.45 var(--display);margin:0 0 .5rem!important;color:var(--ink)}
+.frase-fabio footer{font-size:.9rem;color:var(--muted);border:0;padding:0;margin:0;background:none;display:block}
+.caso{padding-block:clamp(2rem,5vw,3rem)}
+.caso-box{max-width:calc(var(--read) + 4rem);margin-inline:auto;padding:clamp(1.4rem,4vw,2.2rem);border-radius:10px;background:#0E1A2B;color:#fff;border-top:4px solid #F2C200}
+.caso-box h2{margin:0 0 .9rem;font-size:clamp(1.35rem,3vw,1.75rem);color:#fff;text-transform:none}
+.caso-box p,.caso-box li{color:#E6E9EE;line-height:1.6}
+.caso-box p{margin:0 0 .9rem}
+.caso-box .caso-dest{font-family:var(--display);font-weight:700;color:#F2C200;font-size:1.08rem}
+.caso-box ul{margin:.2rem 0 1rem;padding-left:1.2rem;display:grid;gap:.35rem}
+.caso-box .caso-acoes{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.2rem;margin:1.2rem 0 0}
+.caso-box .btn-primary{background:#F2C200;color:#0E1A2B;border-color:#F2C200}
+.caso-box .caso-sec{color:#E6E9EE;font-size:.95rem;text-decoration:underline;text-underline-offset:3px}
+.caso-box a:focus-visible{outline:3px solid #F2C200;outline-offset:3px}
 </style>'''
 def fix(s, tag):
     s=s.replace('href="#inicio"','href="/"')
@@ -105,6 +119,65 @@ MES_ATUAL=_MESES[_d.month-1]+'/'+str(_d.year)  # 'Atualizado em' dos guias em PD
 def _marca(h, path):
     u=path[:-len('index.html')] if path.endswith('index.html') else path
     return h.replace(f'<a href="{u}">', f'<a href="{u}" aria-current="page">', 1)
+
+# Bloco final de conversão (aprovado pelo Dr. Fábio em 17/10/2026): guias e páginas de serviço
+_CASO_DET={
+ 'padrao':'o que está escrito no seu contrato, a data de cada intimação, se o credor cumpriu cada etapa como a lei exige e o que ainda cabe fazer no prazo que resta',
+ 'leilao':'a data de cada intimação e a do edital, se o credor cumpriu cada etapa como a lei exige e o que ainda cabe fazer no prazo que resta. É isso que mostra se o leilão pode ser discutido',
+ 'fianca':'o que você assinou, o que diz o contrato de locação e o que ainda cabe fazer no prazo que resta',
+ 'condominio':'o cálculo cobrado, cada etapa da execução e o que ainda cabe fazer no prazo que resta',
+ 'fiscal':'a certidão de dívida ativa, as datas e cada etapa da execução fiscal',
+ 'bancaria':'o contrato, as garantias e a forma como a cobrança foi feita',
+ 'veiculo':'a notificação, o contrato e as datas da apreensão',
+ 'garantia':'o que está escrito no contrato e nos aditivos, a garantia que você deu e se o credor cumpriu cada etapa como a lei exige',
+ 'penhora':'a data da citação e da penhora, a avaliação do bem e cada etapa da execução',
+}
+_GCAT={}
+for _g in G: _GCAT[_g['slug']]=str(_g.get('categoria') or _g.get('eyebrow') or '').split('·')[0].strip().lower()
+def _caso_tema(path):
+    s=path.lower()
+    for k,t in (('vou-atrasar','padrao'),('renegociar','padrao'),('condominio','condominio'),('iptu','fiscal'),('itr','fiscal'),('execucao-fiscal','fiscal'),('veiculo','veiculo'),('busca-e-apreensao','veiculo'),('sisbajud','bancaria'),('bancari','bancaria'),('cedula-de-credito','bancaria'),('fiador','fianca'),('fianca','fianca'),('avalista','garantia'),('suspensao-de-leilao','leilao'),('/leilao/','leilao'),('leilao-de-imoveis','leilao'),('penhor','penhora'),('execucao','penhora'),('imovel-em-garantia','garantia'),('garantia','garantia'),('hipoteca','garantia'),('parcelas-em-dia','padrao')):
+        if k in s: return t
+    m=re.match(r'/guia/([^/]+)/',path)
+    if m:
+        c=_GCAT.get(m.group(1),'')
+        if 'garantias' in c: return 'garantia'
+        if 'fiança' in c or 'fianca' in c: return 'fianca'
+        if 'penhora' in c: return 'penhora'
+        if c in ('financiamento imobiliário','alienação fiduciária','consolidação da propriedade','leilão extrajudicial','direitos após o leilão'): return 'leilao'
+    return 'padrao'
+_CASO_PREF=('/guia/','/imovel-em-garantia/','/penhora-de-imovel/','/divida-bancaria/','/parcelas-em-dia/','/leilao/','/suspensao-de-leilao/','/veiculo/','/leilao-de-imoveis/')
+def _caso_bloco(path, tag):
+    if path=='/guia/index.html' or not path.startswith(_CASO_PREF): return ''
+    m=re.match(r'/guia/([^/]+)/',path)
+    if m and m.group(1) in INV_SLUGS: return ''
+    p=('guia-'+m.group(1)[:40]) if m else tag
+    det=_CASO_DET[_caso_tema(path)]
+    return f'''  <section class="caso" aria-labelledby="caso-t">
+    <div class="wrap">
+      <div class="caso-box">
+        <h2 id="caso-t">A lei é o ponto de partida. O que decide é o seu caso.</h2>
+        <p>Agora você conhece as regras gerais. Mas o desfecho de um caso depende de detalhes que nenhum guia mostra: {det}.</p>
+        <p class="caso-dest">Advocacia, para nós, é buscar a saída e pensar fora da caixa — não só repetir o que está na lei.</p>
+        <p>Só a análise dos seus documentos mostra:</p>
+        <ul><li>se cada passo da cobrança foi feito do jeito certo;</li><li>quanto tempo você realmente tem para cada providência;</li><li>quais caminhos fazem sentido para você: negociar, discutir, ganhar tempo ou se organizar.</li></ul>
+        <p>Na consulta, o Dr. Fábio lê os seus documentos e mostra o que existe de concreto no seu caso — inclusive o que não vale a pena tentar.</p>
+        <p class="caso-acoes"><a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p={p}">Quero entender o meu caso →</a><a class="caso-sec" href="/#triagem">ou salve sua análise</a></p>
+      </div>
+    </div>
+  </section>'''
+def _final(tag):
+    return f'''  <section class="final">
+    <div class="wrap">
+      <div class="box">
+        <div>
+          <h2>Conte o que está acontecendo</h2>
+          <p>Pelo WhatsApp, a qualquer hora. {'Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.' if tag=='veiculo' else ('Se tiver o contrato, os aditivos ou a matrícula, já pode enviar.' if tag.startswith('empresario') else ('Se tiver o edital ou o link do leilão, já pode enviar.' if tag.startswith('investidor') else 'Se tiver a intimação, a matrícula ou o edital, já pode enviar.'))}</p>
+        </div>
+        <a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p={tag}">Conversar pelo WhatsApp</a>
+      </div>
+    </div>
+  </section>'''
 TEMA_JS='''<script>(function(){try{var t=localStorage.getItem("tema");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>'''
 def page(path, title, desc, canon, body, ld, tag, robots=''):
     body=body.replace('{{ATUALIZADO}}', MES_ATUAL)
@@ -139,17 +212,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
 
 <main id="inicio">
 {body}
-  <section class="final">
-    <div class="wrap">
-      <div class="box">
-        <div>
-          <h2>Conte o que está acontecendo</h2>
-          <p>Pelo WhatsApp, a qualquer hora. {'Se tiver a notificação, o auto de apreensão ou o contrato, já pode enviar.' if tag=='veiculo' else ('Se tiver o contrato, os aditivos ou a matrícula, já pode enviar.' if tag.startswith('empresario') else ('Se tiver o edital ou o link do leilão, já pode enviar.' if tag.startswith('investidor') else 'Se tiver a intimação, a matrícula ou o edital, já pode enviar.'))}</p>
-        </div>
-        <a class="btn btn-primary wa" href="https://emerim.app.n8n.cloud/webhook/fce-wa?c=site&amp;p={tag}">Conversar pelo WhatsApp</a>
-      </div>
-    </div>
-  </section>
+{(_caso_bloco(path,tag) or _final(tag))}
 </main>
 
 {fix(tail,tag)}
@@ -375,6 +438,7 @@ for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',
     faq.append({"@type":"Question","name":html.unescape(m.group(1)),"acceptedAnswer":{"@type":"Answer","text":html.unescape(m.group(2))}})
 ldv={"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Busca e apreensão de veículo financiado","url":"https://fceadvogados.com.br/veiculo/","publisher":ORG,"author":AUT},{"@type":"FAQPage","mainEntity":faq},
   {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Veículo","item":"https://fceadvogados.com.br/veiculo/"}]}]}
+VH+='\n  <section class="art" style="padding-block:0 1rem"><div class="wrap"><nav class="rel" aria-label="Guias sobre este tema"><p class="eyebrow">Guias sobre este tema</p><ul><li><a href="/guia/busca-e-apreensao-veiculo-maquina-prazos/">Busca e apreensão de veículo ou máquina: os prazos depois da apreensão</a></li><li><a href="/parcelas-em-dia/#veiculo">Parcelas em dia, mas sem conseguir pagar as próximas</a></li></ul></nav></div></section>'
 page('/veiculo/index.html','Busca e apreensão de veículo: defesa e revisional | FCE Advogados','Carro, moto, caminhão ou máquina financiados com parcelas atrasadas ou apreendidos? Defesa na busca e apreensão, na Justiça ou no cartório, e revisão dos juros.','https://fceadvogados.com.br/veiculo/',VH,ldv,'veiculo')
 # paginas por cidade (atendimento local)
 CID=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/content/cidades/*.json')],key=lambda c:c.get('ordem',99))

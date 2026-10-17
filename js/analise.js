@@ -277,11 +277,12 @@
       (lista.length ? '<ul class="ma-rec">' + lista.map(function (x) { return '<li><span>' + esc(x.nome) + '</span><small>' + esc(kb(x.tamanho)) + ', ' + esc(x.em) + '</small></li>'; }).join('') + '</ul>' : '<p class="ma-nota ma-rec0">Nenhum documento enviado ainda.</p>') +
       '<p class="ma-nota">Receber o documento não significa que ele já foi analisado. A análise acontece no atendimento. Evite enviar documentos de terceiros que não tenham relação com o caso.</p></section>';
 
-    h += '<section class="ma-sec ma-prox" aria-labelledby="ma-p"><h2 id="ma-p">Próximo passo</h2>' +
+    h += '<section class="ma-sec ma-prox caso-box" aria-labelledby="ma-p"><h2 id="ma-p">A lei é o ponto de partida. O que decide é o seu caso.</h2>' +
+      '<p class="caso-dest">Advocacia, para nós, é buscar a saída e pensar fora da caixa — não só repetir o que está na lei.</p>' +
       '<p>Fale com o escritório pelo WhatsApp: a mensagem já leva o código da análise, e o atendimento começa a partir das suas respostas, sem repetir perguntas.</p>' +
-      '<div class="fa-acts"><a class="btn btn-primary wa" href="' + wa + '">' + ICON_WA + 'Conversar pelo WhatsApp</a>' +
-      '<a class="btn btn-ghost" href="' + wa + '" data-consulta="1">Marcar uma consulta</a></div>' +
-      '<p class="ma-nota">A consulta é marcada pelo WhatsApp, com os horários livres da agenda. Os honorários são informados por escrito antes de qualquer providência.</p></section>';
+      '<p class="caso-acoes"><a class="btn btn-primary wa" href="' + wa + '">Quero entender o meu caso →</a>' +
+      '<a class="caso-sec" href="' + wa + '" data-consulta="1">Marcar uma consulta</a></p>' +
+      '<p>A consulta é marcada pelo WhatsApp, com os horários livres da agenda. Os honorários são informados por escrito antes de qualquer providência.</p></section>';
     box.innerHTML = h;
     var h1 = box.querySelector('h1'); if (h1) h1.focus({ preventScroll: true });
     ligarUp();
