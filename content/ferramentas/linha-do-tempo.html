@@ -1,0 +1,97 @@
+  <link rel="stylesheet" href="/css/ferramentas.css">
+  <article class="art">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › <a href="/ferramentas/">Ferramentas</a> › Linha do tempo</p>
+      <h1>Linha do tempo do imóvel financiado: em que fase você está?</h1>
+      <p class="lead">Marque o que já aconteceu com o seu financiamento. A ferramenta mostra a fase atual na alienação fiduciária, o que costuma vir depois e os prazos que a lei prevê para cada etapa.</p>
+
+      <form class="fx" id="tl-form" novalidate>
+        <fieldset>
+          <legend>O que já aconteceu?<small>Marque tudo o que se aplica. Se não tiver certeza de algum item, deixe sem marcar.</small></legend>
+          <label class="fx-op"><input type="checkbox" name="ev" value="atraso"> <span>Tenho parcelas atrasadas</span></label>
+          <label class="fx-op"><input type="checkbox" name="ev" value="intimacao"> <span>Recebi a intimação do cartório para pagar<small>Pode ter vindo por oficial do cartório, por carta ou, se não fui encontrado, por edital.</small></span></label>
+          <label class="fx-op"><input type="checkbox" name="ev" value="prazo"> <span>O prazo de 15 dias da intimação terminou sem pagamento</span></label>
+          <label class="fx-op"><input type="checkbox" name="ev" value="consolidado"> <span>A matrícula mostra a consolidação da propriedade no nome do banco</span></label>
+          <label class="fx-op"><input type="checkbox" name="ev" value="edital"> <span>Recebi aviso do leilão ou vi o edital publicado</span></label>
+          <label class="fx-op"><input type="checkbox" name="ev" value="leilao1"> <span>O 1º leilão já aconteceu, sem venda</span></label>
+          <label class="fx-op"><input type="checkbox" name="ev" value="leilao2"> <span>O 2º leilão já aconteceu</span></label>
+        </fieldset>
+        <div class="fx-nav"><button class="btn btn-primary" type="submit">Ver a minha fase</button></div>
+      </form>
+      <p class="fx-sr" id="tl-aviso" aria-live="polite"></p>
+      <div id="tl-res"></div>
+
+      <h2>Como ler a linha do tempo</h2>
+      <p>A sequência segue a Lei 9.514/1997, com a redação da Lei 14.711/2023: intimação para pagar em 15 dias (art. 26), consolidação da propriedade (art. 26, § 7º), 1º leilão em até 60 dias do registro da consolidação e 2º leilão nos 15 dias seguintes (art. 27). Até a data do 2º leilão, o antigo dono tem preferência para recomprar o imóvel (art. 27, § 2º-B).</p>
+      <p>A ferramenta não calcula prazos do seu caso. As datas dependem de quando cada ato foi feito e registrado, e a validade da intimação e dos avisos é um dos pontos que costumam ser conferidos na análise. Para entender cada fase em detalhes, leia o guia <a href="/guia/alienacao-fiduciaria-fase-a-fase/">alienação fiduciária fase a fase</a>.</p>
+      <p class="eb-nota">Material de apoio sem cadastro: <a href="/ebook/fce-guia-parcelas-atrasadas.pdf" data-guia="parcelas-atrasadas">guia em PDF sobre parcelas atrasadas do imóvel financiado</a>, com a linha do tempo completa e checklist de documentos.</p>
+      <p class="crumb" style="margin-top:2rem">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Ferramenta informativa, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. Não emite parecer, não calcula prazos do caso e não representa promessa de resultado: cada situação depende da análise dos documentos.</p>
+    </div>
+  </article>
+  <script src="/js/analise.js" defer></script>
+  <script>
+  document.addEventListener('DOMContentLoaded',function(){
+    var F=window.FCEA; if(!F) return;
+    var form=document.getElementById('tl-form'), res=document.getElementById('tl-res'), aviso=document.getElementById('tl-aviso');
+    var FASES=[
+      ['atraso','Parcelas atrasadas','Com o atraso, o banco pode pedir ao cartório de imóveis a intimação para pagamento. Ainda dá para negociar sem os custos da intimação.'],
+      ['intimacao','Intimação do cartório','A intimação abre o prazo de 15 dias para pagar as parcelas vencidas e as que vencerem até o pagamento, com encargos e despesas.'],
+      ['prazo','Prazo encerrado sem pagamento','Terminado o prazo, o banco pode pedir a consolidação da propriedade, depois de pagar o ITBI.'],
+      ['consolidado','Consolidação da propriedade','O imóvel passa ao nome do banco na matrícula. O 1º leilão deve acontecer em até 60 dias do registro.'],
+      ['edital','Leilão marcado','O devedor deve ser comunicado das datas, horários e locais dos leilões. Até o 2º leilão, o antigo dono tem preferência para recomprar o imóvel.'],
+      ['leilao1','1º leilão','O lance mínimo é o valor de avaliação previsto no contrato. Sem lance nesse valor, o 2º leilão acontece nos 15 dias seguintes.'],
+      ['leilao2','2º leilão','O lance mínimo passa a ter como referência a dívida e as despesas. Fora do financiamento habitacional, o banco pode aceitar lance menor, de pelo menos metade da avaliação.'],
+      ['depois','Depois do leilão','Se o lance superar a dívida e as despesas, a diferença deve ser entregue ao antigo dono. Depois vem a desocupação do imóvel.']
+    ];
+    var LINKS={
+      atraso:['/guia/como-saber-se-meu-imovel-vai-a-leilao/','Como saber se o imóvel vai a leilão'],
+      intimacao:['/guia/intimacao-do-cartorio-parcelas-atrasadas/','O que conferir na intimação do cartório'],
+      prazo:['/guia/purgacao-da-mora-apos-consolidacao-tema-1288/','Ainda dá para pagar depois do prazo?'],
+      consolidado:['/guia/propriedade-consolidada-no-nome-do-banco/','Propriedade consolidada no nome do banco'],
+      edital:['/suspensao-de-leilao/','Quando cabe pedir a suspensão do leilão'],
+      leilao1:['/guia/direito-de-preferencia-recomprar-imovel-antes-do-leilao/','Direito de preferência antes do 2º leilão'],
+      leilao2:['/guia/imovel-leiloado-o-que-ainda-e-possivel/','Imóvel leiloado: o que ainda é possível'],
+      depois:['/guia/saldo-do-leilao-como-receber/','Como receber o saldo do leilão']
+    };
+    var ROT={atraso:'Parcelas atrasadas',intimacao:'Intimação do cartório recebida',prazo:'Prazo de 15 dias encerrado',consolidado:'Consolidação na matrícula',edital:'Aviso ou edital do leilão',leilao1:'1º leilão realizado',leilao2:'2º leilão realizado'};
+    var marcados=[], idx=0;
+    function fase(){
+      marcados=[].slice.call(form.querySelectorAll('input[name=ev]:checked')).map(function(i){return i.value;});
+      idx=-1; FASES.forEach(function(f,i){ if(marcados.indexOf(f[0])>=0) idx=i; });
+      return idx;
+    }
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var i=fase();
+      if(i<0){
+        res.innerHTML='<div class="fx-res"><h2 tabindex="-1">Antes do atraso</h2><p>Se as parcelas ainda estão em dia, esta é a fase com mais opções: renegociar, revisar o contrato e planejar antes da intimação.</p><p><a href="/parcelas-em-dia/#imovel">Parcelas em dia, mas sem conseguir pagar as próximas</a></p></div>';
+        aviso.textContent='Nenhum item marcado.'; res.querySelector('h2').focus(); return;
+      }
+      var urg=i>=3, f=FASES[i], prox=FASES[i+1];
+      var h='<div class="fx-res"><p class="fx-base">Pelo que você marcou</p><h2 tabindex="-1">Você está na fase: '+F.esc(f[1])+'</h2>'+
+        (prox?'<p><strong>O que costuma vir depois:</strong> '+F.esc(prox[1].charAt(0).toLowerCase()+prox[1].slice(1))+'. '+F.esc(prox[2])+'</p>':'')+
+        (urg?'<p class="tri-prz" style="border-left:4px solid var(--accent);background:var(--accent-soft);padding:.7rem .9rem;border-radius:0 6px 6px 0;margin:0">Nesta fase os prazos são curtos. Se tiver a matrícula, a intimação ou o edital, vale enviar para análise o quanto antes.</p>':'')+
+        F.linha(FASES,i,{rotulo:'Fases da alienação fiduciária',links:LINKS})+
+        '<p class="fx-depende">Cada caso depende da análise dos documentos: a validade da intimação, as datas de registro e os avisos dos leilões mudam o que ainda pode ser discutido.</p>'+
+        '<div class="fa-acts"><a class="btn btn-primary" href="'+LINKS[f[0]][0]+'">Ler sobre esta fase</a><a class="btn btn-ghost wa" href="'+F.waLink('ferramentas-linha-do-tempo',{d:'financiamento'})+'">'+F.ICON_WA+'Conversar pelo WhatsApp</a></div>'+
+        '<div class="fa-convite"><button type="button" class="btn btn-ghost" data-salvar>Salvar na minha análise</button><span class="fx-base">Guarde esta linha do tempo e envie documentos ao escritório por um link pessoal.</span></div>'+
+        '</div>';
+      res.innerHTML=h; aviso.textContent='Resultado: '+f[1];
+      res.querySelector('h2').focus();
+      F.ev('ferramenta_resultado',{ferramenta:'linha-do-tempo',fase:f[0]});
+    });
+    res.addEventListener('click',function(e){
+      var b=e.target.closest('[data-salvar]'); if(!b) return;
+      var w=b.parentNode; w.outerHTML='<div id="tl-salvar"></div>';
+      var alvo=document.getElementById('tl-salvar'); alvo.innerHTML=F.formulario('Salvar na minha análise');
+      var S={atraso:'atraso',intimacao:'intimacao',prazo:'intimacao',consolidado:'consolidado',edital:'leilao',leilao1:'leilao',leilao2:'leilao',depois:'leilao'};
+      F.ligar(alvo.querySelector('form'),function(){
+        var f=FASES[idx];
+        return {ferramenta:'linha-do-tempo',d:'financiamento',s:S[f[0]],divida:'Financiamento do imóvel',destino:LINKS[f[0]][0],destino_titulo:LINKS[f[0]][1],
+          urg:idx>=4?'CRITICA':(idx>=1?'ALTA':'NORMAL'),perfil:'DEVEDOR',
+          itens:[{p:'Ferramenta',r:'Linha do tempo da alienação fiduciária'},{p:'Fase atual',r:f[1]},{p:'O que já aconteceu',r:marcados.map(function(m){return ROT[m];}).join('; ')}]};
+      },'ferramentas-linha-do-tempo');
+      alvo.querySelector('.fa-t').focus();
+    });
+  });
+  </script>

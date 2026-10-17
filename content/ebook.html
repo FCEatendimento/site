@@ -19,34 +19,15 @@
             <li>Acesso ao simulador: quanto do seu imóvel está em jogo em cada cenário</li>
           </ul>
         </div>
-        <form class="eb-form" id="baixar" method="post" action="https://emerim.app.n8n.cloud/webhook/fce-ebook">
-          <h2>Receba o guia gratuito</h2>
-          <p class="eb-erro" id="eb-erro" hidden>Confira os dados: nome, WhatsApp com DDD e a autorização são obrigatórios.</p>
-          <label>Nome<input name="nome" required autocomplete="name" maxlength="120"></label>
-          <label>WhatsApp com DDD<input name="whatsapp" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20"></label>
-          <label>E-mail (opcional)<input name="email" type="email" autocomplete="email" maxlength="160"></label>
-          <label>Em que situação você está?
-            <select name="situacao">
-              <option value="">Prefiro não dizer</option>
-              <option value="atraso">Parcelas atrasadas, sem intimação</option>
-              <option value="intimacao">Recebi intimação do cartório</option>
-              <option value="consolidado">A propriedade já está no nome do banco</option>
-              <option value="leilao">Já tem data de leilão</option>
-              <option value="arrematado">O imóvel já foi arrematado</option>
-              <option value="comprar">Quero comprar imóvel em leilão</option>
-              <option value="outro">Outra situação</option>
-            </select>
-          </label>
-          <input type="text" name="site" tabindex="-1" autocomplete="off" class="eb-hp" aria-hidden="true">
-          <input type="hidden" name="origem" id="eb-origem" value="direto">
-          <label class="eb-ok"><input type="checkbox" name="aceite" value="sim" required> <span>Autorizo a FCE Advogados a usar estes dados para enviar o guia e entrar em contato sobre o assunto, conforme a <a href="/privacidade/">Política de Privacidade</a>.</span></label>
-          <button class="btn btn-primary" type="submit">Receber o guia gratuito</button>
-          <p class="eb-nota">Seus dados ficam só com o escritório e você pode pedir a exclusão a qualquer momento.</p>
-        </form>
+        <aside class="eb-form" id="baixar" aria-labelledby="eb-dl">
+          <h2 id="eb-dl">Baixe o guia gratuito</h2>
+          <p>Download direto, sem cadastro. O PDF abre no navegador e pode ser salvo no celular ou no computador.</p>
+          <a class="btn btn-primary" href="/ebook/fce-guia-parcelas-atrasadas.pdf" data-guia="parcelas-atrasadas" download>Baixar o PDF</a>
+          <p class="eb-nota">Quer saber em que fase o seu caso está? A <a href="/ferramentas/linha-do-tempo/">linha do tempo</a> mostra a fase atual e o que costuma vir depois. Com o <a href="/#triagem">guia de 4 perguntas</a>, você salva a sua análise num link pessoal e envia documentos ao escritório.</p>
+          <p class="eb-nota">Veja também as <a href="/ferramentas/">ferramentas</a>: verificador de bem de família e checklist antes de assinar a garantia.</p>
+        </aside>
         <p class="eb-nota" style="grid-column:1/-1">É empresário e deu um imóvel em garantia de empréstimo da empresa? Veja o <a href="/empresario/?o=ebook">guia gratuito para empresários</a>.</p>
       </div>
     </div>
   </article>
-  <script>
-  (function(){var q=new URLSearchParams(location.search);var o=q.get('o')||[q.get('utm_source'),q.get('utm_medium'),q.get('utm_campaign')].filter(Boolean).join('/')||(document.referrer?('ref:'+new URL(document.referrer).hostname):'direto');document.getElementById('eb-origem').value=o.slice(0,80);if(q.get('erro'))document.getElementById('eb-erro').hidden=false;})();
-  </script>
+

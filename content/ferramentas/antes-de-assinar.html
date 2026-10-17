@@ -1,0 +1,76 @@
+  <link rel="stylesheet" href="/css/ferramentas.css">
+  <article class="art">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › <a href="/ferramentas/">Ferramentas</a> › Antes de assinar a garantia</p>
+      <h1>Antes de assinar a garantia: checklist para empresários</h1>
+      <p class="lead">Vai dar um imóvel em garantia, assinar como avalista ou fiador de um empréstimo da empresa? Responda as perguntas e veja os pontos que merecem atenção antes da assinatura.</p>
+
+      <form class="fx" id="aa-form" novalidate>
+        <div id="aa-perguntas"></div>
+        <p class="eb-erro" id="aa-erro" role="alert" hidden>Responda todas as perguntas. Se não souber, marque “Não sei”.</p>
+        <div class="fx-nav"><button class="btn btn-primary" type="submit">Ver os pontos de atenção</button></div>
+      </form>
+      <p class="fx-sr" id="aa-aviso" aria-live="polite"></p>
+      <div id="aa-res"></div>
+
+      <h2>Por que conferir antes</h2>
+      <p>Na alienação fiduciária, o atraso pode levar à intimação, à consolidação da propriedade e ao leilão em poucos meses, sem processo judicial (Lei 9.514/1997, arts. 26 e 27). No aval e na fiança, quem assina passa a responder com o próprio patrimônio, nos limites do que assinou. A autorização do cônjuge é exigida para dar imóvel em garantia e para prestar fiança ou aval, salvo no regime de separação absoluta de bens (Código Civil, art. 1.647).</p>
+      <p>Para os detalhes de cada cláusula, leia <a href="/imovel-em-garantia/antes-de-assinar/">antes de oferecer o imóvel em garantia</a> e <a href="/imovel-em-garantia/responsabilidade-dos-socios/">responsabilidade dos sócios por dívida da empresa</a>.</p>
+      <p class="crumb" style="margin-top:2rem">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Ferramenta informativa, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. Não substitui a leitura do contrato por um advogado e não representa promessa de resultado.</p>
+    </div>
+  </article>
+  <script src="/js/analise.js" defer></script>
+  <script>
+  document.addEventListener('DOMContentLoaded',function(){
+    var F=window.FCEA; if(!F) return;
+    // [chave, pergunta, explicação, resposta que acende o alerta ('sim'|'nao'), título do ponto, texto do ponto]
+    var Q=[
+      ['tipo','A garantia é alienação fiduciária do imóvel?','Na alienação fiduciária, a cobrança pode seguir pelo cartório, sem processo judicial.','sim','Alienação fiduciária: cobrança rápida','O atraso pode levar à intimação, à consolidação e ao leilão em poucos meses. Vale saber exatamente a partir de quando o atraso autoriza a cobrança.'],
+      ['moradia','O imóvel oferecido é onde você ou sua família moram?','','sim','A moradia da família entra na garantia','Ao dar o imóvel em garantia, a proteção do bem de família deixa de valer para essa dívida. Pergunte se há outro bem que poderia servir de garantia.'],
+      ['valor','Você sabe o valor total garantido, com juros, encargos e seguros?','','nao','Valor total garantido','Sem o custo efetivo total e o valor máximo garantido, fica difícil medir o risco. Peça a planilha e o CET por escrito.'],
+      ['futuras','A garantia vale só para este contrato, e não para dívidas futuras?','Algumas garantias cobrem outras operações com o mesmo banco, presentes ou futuras.','nao','Garantia que pode cobrir outras dívidas','Confira se o imóvel garante só esta operação. Garantias que alcançam dívidas futuras ampliam o risco sem nova assinatura.'],
+      ['vencimento','Você leu a cláusula de vencimento antecipado?','Ela define quando toda a dívida pode ser cobrada de uma vez.','nao','Vencimento antecipado','Atrasos, protestos ou mudanças na empresa podem tornar toda a dívida exigível de uma vez. Leia quais situações disparam a cláusula.'],
+      ['avalista','Além do imóvel, você vai assinar como avalista, fiador ou devedor solidário?','','sim','Responsabilidade pessoal além do imóvel','Como avalista, fiador ou devedor solidário, você responde com outros bens, e não só com o imóvel. Na fiança, veja se há renúncia ao benefício de ordem.'],
+      ['conjuge','O cônjuge ou companheiro(a) vai assinar a autorização?','','nao','Autorização do cônjuge','A lei exige a autorização do cônjuge para dar imóvel em garantia e para fiança ou aval, salvo na separação absoluta de bens. Sem ela, a garantia pode ser questionada, e o banco costuma exigir a assinatura.'],
+      ['avaliacao','O contrato informa o valor de avaliação do imóvel para leilão, e ele é compatível com o de mercado?','Na alienação fiduciária, esse valor serve de referência para o 1º leilão.','nao','Valor de avaliação para leilão','Uma avaliação baixa prejudica o proprietário se o imóvel for a leilão. Compare o valor do contrato com o de mercado.'],
+      ['caixa','A empresa consegue pagar as parcelas se o faturamento cair por alguns meses?','','nao','Fôlego de caixa','Se uma queda de faturamento já compromete as parcelas, vale rever o valor, o prazo ou a carência antes de assinar.'],
+      ['enderecos','Os endereços, telefones e e-mails do contrato estão corretos e atualizados?','Eles serão usados nas intimações.','nao','Dados para intimação','Endereços desatualizados podem fazer com que avisos importantes não cheguem a você. Confira todos antes de assinar.']
+    ];
+    var box=document.getElementById('aa-perguntas');
+    box.innerHTML=Q.map(function(q,i){
+      return '<fieldset><legend>'+(i+1)+'. '+F.esc(q[1])+(q[2]?'<small>'+F.esc(q[2])+'</small>':'')+'</legend><div class="fx-linha">'+
+        [['sim','Sim'],['nao','Não'],['naosei','Não sei']].map(function(o){return '<label class="fx-op"><input type="radio" name="'+q[0]+'" value="'+o[0]+'"> <span>'+o[1]+'</span></label>';}).join('')+'</div></fieldset>';
+    }).join('');
+    var form=document.getElementById('aa-form'), res=document.getElementById('aa-res'), erro=document.getElementById('aa-erro'), aviso=document.getElementById('aa-aviso');
+    var resp={}, pts=[];
+    var NOME={sim:'Sim',nao:'Não',naosei:'Não sei'};
+    form.addEventListener('submit',function(e){
+      e.preventDefault(); erro.hidden=true; resp={};
+      var falta=null;
+      Q.forEach(function(q){ var v=form.elements[q[0]].value; resp[q[0]]=v; if(!v&&!falta) falta=q[0]; });
+      if(falta){ erro.hidden=false; form.querySelector('input[name='+falta+']').focus(); return; }
+      pts=[];
+      Q.forEach(function(q){ var v=resp[q[0]]; if(v===q[3]) pts.push([q[4],q[5],1]); else if(v==='naosei') pts.push([q[4],'Você marcou “não sei”. '+q[5],0]); });
+      var titulo=pts.length?(pts.length===1?'1 ponto de atenção antes de assinar':pts.length+' pontos de atenção antes de assinar'):'Nenhum ponto de atenção pelas respostas';
+      res.innerHTML='<div class="fx-res"><p class="fx-base">Resumo das suas respostas</p><h2 tabindex="-1">'+F.esc(titulo)+'</h2>'+
+        (pts.length?'<ul class="fx-pontos">'+pts.map(function(p){return '<li'+(p[2]?' class="alto"':'')+'><strong>'+F.esc(p[0])+'</strong>'+F.esc(p[1])+'</li>';}).join('')+'</ul>':'<p>As respostas não indicam pontos críticos, mas o texto do contrato é que define o risco real.</p>')+
+        '<p class="fx-depende">Depende da análise: o contrato, os aditivos e a matrícula do imóvel mostram o alcance real da garantia.</p>'+
+        '<div class="fa-acts"><a class="btn btn-primary wa" href="'+F.waLink('ferramentas-antes-de-assinar',{d:'garantia',s:'assinar',quem:'empresario'})+'">'+F.ICON_WA+'Enviar a minuta pelo WhatsApp</a><a class="btn btn-ghost" href="/imovel-em-garantia/antes-de-assinar/">Ler sobre cada cláusula</a></div>'+
+        '<div class="fa-convite"><button type="button" class="btn btn-ghost" data-salvar>Salvar na minha análise</button><span class="fx-base">Guarde o resumo e envie a minuta do contrato ao escritório por um link pessoal.</span></div></div>';
+      aviso.textContent='Resultado: '+titulo; res.querySelector('h2').focus();
+      F.ev('ferramenta_resultado',{ferramenta:'antes-de-assinar',pontos:pts.length});
+    });
+    res.addEventListener('click',function(e){
+      var b=e.target.closest('[data-salvar]'); if(!b) return;
+      b.parentNode.outerHTML='<div id="aa-salvar"></div>';
+      var alvo=document.getElementById('aa-salvar'); alvo.innerHTML=F.formulario('Salvar na minha análise','Você recebe um link pessoal com o resumo das respostas, os pontos de atenção e um espaço para enviar a minuta do contrato ao escritório.');
+      F.ligar(alvo.querySelector('form'),function(){
+        var it=[{p:'Ferramenta',r:'Checklist antes de assinar a garantia'},{p:'Pontos de atenção',r:pts.length?pts.map(function(p){return p[0];}).join('; '):'Nenhum pelas respostas'}];
+        Q.forEach(function(q,i){ it.push({p:'P'+(i+1)+' '+q[1].replace(/\?$/,''),r:NOME[resp[q[0]]]}); });
+        return {ferramenta:'antes-de-assinar',d:'garantia',s:'assinar',quem:'empresario',divida:'Garantia antes de assinar',destino:'/imovel-em-garantia/antes-de-assinar/',destino_titulo:'Antes de oferecer o imóvel em garantia',
+          urg:'NORMAL',perfil:'DEVEDOR',itens:it.slice(0,14)};
+      },'ferramentas-antes-de-assinar');
+      alvo.querySelector('.fa-t').focus();
+    });
+  });
+  </script>

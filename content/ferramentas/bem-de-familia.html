@@ -1,0 +1,129 @@
+  <link rel="stylesheet" href="/css/ferramentas.css">
+  <article class="art">
+    <div class="wrap">
+      <p class="crumb"><a href="/">Início</a> › <a href="/ferramentas/">Ferramentas</a> › Bem de família</p>
+      <h1>O imóvel onde você mora pode ser penhorado? Verificador de bem de família</h1>
+      <p class="lead">Responda quatro perguntas e veja como a Lei 8.009/1990 trata situações parecidas com a sua: a regra de proteção, as exceções e o que os tribunais costumam decidir.</p>
+
+      <form class="fx" id="bf-form" novalidate>
+        <fieldset>
+          <legend>1. Como o imóvel é usado?</legend>
+          <label class="fx-op"><input type="radio" name="uso" value="moradia" required> <span>Moro nele, sozinho(a) ou com a família</span></label>
+          <label class="fx-op"><input type="radio" name="uso" value="alugado"> <span>Está alugado, e o aluguel ajuda a pagar a moradia ou o sustento da família</span></label>
+          <label class="fx-op"><input type="radio" name="uso" value="outro"> <span>Não é usado como moradia (comercial, terreno, casa de veraneio)</span></label>
+        </fieldset>
+        <fieldset>
+          <legend>2. A família tem outro imóvel residencial?</legend>
+          <label class="fx-op"><input type="radio" name="outros" value="nao" required> <span>Não, é o único</span></label>
+          <label class="fx-op"><input type="radio" name="outros" value="sim"> <span>Sim, há outro imóvel residencial</span></label>
+        </fieldset>
+        <fieldset>
+          <legend>3. Que dívida está sendo cobrada?</legend>
+          <label class="fx-op"><input type="radio" name="divida" value="financiamento" required> <span>Financiamento da compra ou da construção deste imóvel</span></label>
+          <label class="fx-op"><input type="radio" name="divida" value="condominio"> <span>IPTU ou condomínio deste imóvel</span></label>
+          <label class="fx-op"><input type="radio" name="divida" value="hipoteca"> <span>Dívida em que este imóvel foi dado em hipoteca</span></label>
+          <label class="fx-op"><input type="radio" name="divida" value="alienacao"> <span>Empréstimo em que este imóvel foi dado em alienação fiduciária</span></label>
+          <label class="fx-op"><input type="radio" name="divida" value="fianca"> <span>Fiança em contrato de aluguel</span></label>
+          <label class="fx-op"><input type="radio" name="divida" value="alimentos"> <span>Pensão alimentícia</span></label>
+          <label class="fx-op"><input type="radio" name="divida" value="comum"> <span>Outra dívida: banco, cartão, empresa, aval, fornecedor</span></label>
+        </fieldset>
+        <fieldset>
+          <legend>4. Em que pé está a cobrança?</legend>
+          <div class="fx-linha">
+            <label class="fx-op"><input type="radio" name="fase" value="cobranca" required> <span>Só cobrança</span></label>
+            <label class="fx-op"><input type="radio" name="fase" value="processo"> <span>Há processo</span></label>
+            <label class="fx-op"><input type="radio" name="fase" value="penhora"> <span>Já houve penhora</span></label>
+          </div>
+        </fieldset>
+        <p class="eb-erro" id="bf-erro" role="alert" hidden>Responda as quatro perguntas para ver a explicação.</p>
+        <div class="fx-nav"><button class="btn btn-primary" type="submit">Ver a explicação</button></div>
+      </form>
+      <p class="fx-sr" id="bf-aviso" aria-live="polite"></p>
+      <div id="bf-res"></div>
+
+      <h2>A regra e as exceções</h2>
+      <p>O imóvel residencial próprio do casal ou da entidade familiar não responde por dívidas, salvo nas hipóteses previstas na lei (Lei 8.009/1990, art. 1º). A proteção alcança também quem mora sozinho (Súmula 364 do STJ) e o único imóvel alugado cuja renda é usada na moradia ou no sustento da família (Súmula 486 do STJ).</p>
+      <p>As exceções estão no art. 3º: financiamento da construção ou da compra do próprio imóvel, pensão alimentícia, impostos e contribuições do imóvel (como IPTU; a jurisprudência inclui o condomínio), hipoteca oferecida como garantia real pelo casal ou pela entidade familiar, bem adquirido com produto de crime e fiança em contrato de locação. Sobre a fiança, o STJ admite a penhora do bem de família do fiador (Súmula 549), e o STF estendeu esse entendimento à locação comercial (Tema 1.127).</p>
+      <p>Quando a família tem vários imóveis usados como residência, a proteção recai sobre o de menor valor, salvo se outro tiver sido registrado como bem de família (art. 5º). Veja a explicação completa em <a href="/imovel-em-garantia/bem-de-familia/">bem de família: quando o imóvel pode ser penhorado</a>.</p>
+      <p class="eb-nota">Material de apoio sem cadastro: <a href="/ebook/fce-guia-parcelas-atrasadas.pdf" data-guia="parcelas-atrasadas">guia em PDF sobre parcelas atrasadas do imóvel financiado</a>.</p>
+      <p class="crumb" style="margin-top:2rem">Por <a href="/sobre/">Fábio de Castro Emerim</a>, advogado (OAB/RS 88.912), sócio da FCE Advogados (OAB/RS 15.656). Ferramenta informativa, conforme o Código de Ética e Disciplina da OAB e o Provimento 205/2021. A explicação é geral, não é parecer sobre o seu caso e não representa promessa de resultado.</p>
+    </div>
+  </article>
+  <script src="/js/analise.js" defer></script>
+  <script>
+  document.addEventListener('DOMContentLoaded',function(){
+    var F=window.FCEA; if(!F) return;
+    var form=document.getElementById('bf-form'), res=document.getElementById('bf-res'), erro=document.getElementById('bf-erro'), aviso=document.getElementById('bf-aviso');
+    var TXT={
+      uso:{moradia:'Moro no imóvel',alugado:'Imóvel alugado, com renda usada na moradia ou no sustento',outro:'Não é usado como moradia'},
+      outros:{nao:'É o único imóvel residencial',sim:'Há outro imóvel residencial'},
+      divida:{financiamento:'Financiamento do próprio imóvel',condominio:'IPTU ou condomínio do imóvel',hipoteca:'Imóvel dado em hipoteca',alienacao:'Imóvel dado em alienação fiduciária',fianca:'Fiança em contrato de aluguel',alimentos:'Pensão alimentícia',comum:'Outra dívida (banco, cartão, empresa, aval)'},
+      fase:{cobranca:'Só cobrança',processo:'Há processo',penhora:'Já houve penhora'}
+    };
+    var r={};
+    function pontos(){
+      var p=[], titulo, base=[];
+      if(r.uso==='outro'){
+        titulo='A proteção do bem de família, em regra, não alcança este imóvel';
+        p.push(['A lei protege o imóvel usado como residência','Imóveis comerciais, terrenos ou de veraneio, em regra, podem ser penhorados. Há discussões em casos específicos, como o imóvel em construção para moradia.',0]);
+        base.push('Lei 8.009/1990, art. 1º');
+      } else {
+        var exc={
+          financiamento:['Financiamento do próprio imóvel é exceção','A dívida contraída para comprar ou construir o imóvel pode levar à penhora dele, mesmo sendo a moradia (art. 3º, II).','art. 3º, II'],
+          condominio:['IPTU e condomínio do próprio imóvel são exceção','Impostos e contribuições do imóvel permitem a penhora (art. 3º, IV), e a jurisprudência aplica a mesma regra ao condomínio.','art. 3º, IV'],
+          hipoteca:['Hipoteca dada pela família é exceção','A lei permite a penhora quando o imóvel foi oferecido em hipoteca pelo casal ou pela entidade familiar (art. 3º, V). Quando a dívida é de terceiro, como a empresa, o STJ examina se ela beneficiou a família.','art. 3º, V'],
+          fianca:['Fiança em locação é exceção','O imóvel do fiador de contrato de aluguel pode ser penhorado (art. 3º, VII; Súmula 549 do STJ), inclusive na locação comercial (STF, Tema 1.127).','art. 3º, VII; Súmula 549 do STJ; STF, Tema 1.127'],
+          alimentos:['Pensão alimentícia é exceção','A dívida de alimentos permite a penhora do bem de família (art. 3º, III).','art. 3º, III']
+        }[r.divida];
+        if(r.divida==='alienacao'){
+          titulo='Na alienação fiduciária, a discussão é outra';
+          p.push(['O imóvel já é a garantia da dívida','Na alienação fiduciária, o banco é dono do imóvel até a quitação, e a cobrança pode seguir pelo cartório. A proteção do bem de família, em regra, não impede esse procedimento. O que costuma ser analisado é a forma da intimação, os valores e os prazos.',1]);
+          base.push('Lei 9.514/1997, arts. 26 e 27');
+        } else if(exc){
+          titulo='A dívida informada está entre as exceções da lei';
+          p.push([exc[0],exc[1],1]); base.push('Lei 8.009/1990, '+exc[2]);
+        } else {
+          titulo='Pela regra geral, a moradia da família é protegida';
+          p.push(['Dívidas comuns não alcançam o bem de família','Dívidas com banco, cartão, empresa, aval ou fornecedor, em regra, não autorizam a penhora do imóvel residencial (art. 1º), salvo se ele tiver sido dado em garantia.',0]);
+          base.push('Lei 8.009/1990, art. 1º');
+        }
+        if(r.uso==='alugado'){ p.push(['Imóvel alugado também pode ser protegido','O único imóvel residencial alugado continua impenhorável quando a renda é usada na moradia ou no sustento da família (Súmula 486 do STJ). É preciso demonstrar esse uso.',0]); base.push('Súmula 486 do STJ'); }
+        if(r.outros==='sim'){ p.push(['Com mais de um imóvel residencial, a proteção recai sobre um deles','A lei protege o imóvel de menor valor, salvo se outro tiver sido registrado como bem de família no cartório (art. 5º).',1]); base.push('art. 5º'); }
+        else p.push(['Quem mora sozinho também é protegido','A proteção alcança pessoas solteiras, separadas e viúvas (Súmula 364 do STJ).',0]);
+        if(r.uso==='moradia'||r.uso==='alugado') base.push('Súmula 364 do STJ');
+      }
+      if(r.fase==='penhora') p.push(['Já houve penhora','A impenhorabilidade pode ser alegada no próprio processo, com prova de que o imóvel é a moradia da família. Depois da penhora vêm a avaliação e o leilão, e os prazos correm.',1]);
+      else if(r.fase==='processo') p.push(['Há processo','A citação abre prazos. Reunir a matrícula e a prova de moradia, como contas e correspondências, ajuda a análise.',0]);
+      return {titulo:titulo,p:p,base:base};
+    }
+    form.addEventListener('submit',function(e){
+      e.preventDefault(); erro.hidden=true;
+      var f=form.elements; r={uso:f.uso.value,outros:f.outros.value,divida:f.divida.value,fase:f.fase.value};
+      var falta=['uso','outros','divida','fase'].filter(function(k){return !r[k];});
+      if(falta.length){ erro.hidden=false; var el=form.querySelector('input[name='+falta[0]+']'); if(el) el.focus(); return; }
+      var x=pontos();
+      res.innerHTML='<div class="fx-res"><p class="fx-base">Explicação geral para as respostas marcadas</p><h2 tabindex="-1">'+F.esc(x.titulo)+'</h2>'+
+        '<ul class="fx-pontos">'+x.p.map(function(i){return '<li'+(i[2]?' class="alto"':'')+'><strong>'+F.esc(i[0])+'</strong>'+F.esc(i[1])+'</li>';}).join('')+'</ul>'+
+        '<p class="fx-depende">Depende da análise: o uso real do imóvel, a origem da dívida, o contrato e a fase do processo mudam a conclusão.</p>'+
+        '<p class="fx-base">Base: '+F.esc(x.base.join('; '))+'.</p>'+
+        '<div class="fa-acts"><a class="btn btn-primary" href="/imovel-em-garantia/bem-de-familia/">Ler sobre bem de família</a><a class="btn btn-ghost wa" href="'+F.waLink('ferramentas-bem-de-familia')+'">'+F.ICON_WA+'Conversar pelo WhatsApp</a></div>'+
+        '<div class="fa-convite"><button type="button" class="btn btn-ghost" data-salvar>Salvar na minha análise</button><span class="fx-base">Guarde as respostas e envie a matrícula e outros documentos ao escritório por um link pessoal.</span></div></div>';
+      aviso.textContent='Resultado: '+x.titulo; res.querySelector('h2').focus();
+      F.ev('ferramenta_resultado',{ferramenta:'bem-de-familia',divida:r.divida});
+    });
+    res.addEventListener('click',function(e){
+      var b=e.target.closest('[data-salvar]'); if(!b) return;
+      b.parentNode.outerHTML='<div id="bf-salvar"></div>';
+      var alvo=document.getElementById('bf-salvar'); alvo.innerHTML=F.formulario('Salvar na minha análise');
+      var D={financiamento:'financiamento',condominio:'condominio',hipoteca:'garantia',alienacao:'garantia',fianca:'fianca',alimentos:'penhora',comum:'penhora'};
+      var S={cobranca:{fianca:'cobranca',condominio:'cobranca',garantia:'atraso',financiamento:'atraso',penhora:'processo'},processo:{fianca:'citado',condominio:'processo',garantia:'citado',financiamento:'intimacao',penhora:'processo'},penhora:{fianca:'penhora',condominio:'penhora',garantia:'leilao',financiamento:'consolidado',penhora:'penhora'}};
+      F.ligar(alvo.querySelector('form'),function(){
+        var d=D[r.divida]||'penhora';
+        return {ferramenta:'bem-de-familia',d:d,s:(S[r.fase]||{})[d]||'',divida:'Bem de família: '+TXT.divida[r.divida],destino:'/imovel-em-garantia/bem-de-familia/',destino_titulo:'Bem de família',
+          urg:r.fase==='penhora'?'ALTA':'NORMAL',perfil:'DEVEDOR',
+          itens:[{p:'Ferramenta',r:'Verificador de bem de família'},{p:'Uso do imóvel',r:TXT.uso[r.uso]},{p:'Outros imóveis',r:TXT.outros[r.outros]},{p:'Dívida',r:TXT.divida[r.divida]},{p:'Fase da cobrança',r:TXT.fase[r.fase]}]};
+      },'ferramentas-bem-de-familia');
+      alvo.querySelector('.fa-t').focus();
+    });
+  });
+  </script>
