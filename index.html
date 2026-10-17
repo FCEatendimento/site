@@ -335,6 +335,25 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .tri-caso a:focus-visible{outline:3px solid #F2C200;outline-offset:3px}
 .frase-fabio{margin:1.4rem 0;padding:1rem 1.2rem;border-left:4px solid var(--accent);background:var(--surface);border-radius:0 8px 8px 0}
 .frase-fabio p{font:600 1.15rem/1.45 var(--display);margin:0 0 .5rem;color:var(--ink)}
+.atalhos{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem}
+.atalhos a{display:inline-flex;align-items:center;gap:.4rem;min-height:40px;padding:.4rem .8rem;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:600 .86rem/1.2 var(--sans,inherit);text-decoration:none}
+.atalhos a:hover{border-color:var(--accent);background:var(--accent-soft)}
+.atalhos a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.atalhos svg{width:16px;height:16px;flex:none}
+@media (max-width:900px){.atalhos{flex-wrap:nowrap;gap:.35rem;margin-top:.55rem}.atalhos a{min-height:38px;padding:.35rem .6rem;font-size:.8rem;flex:1 1 0;justify-content:center;white-space:nowrap}.atalhos svg{width:14px;height:14px}}
+@media (max-width:420px){.hero2{padding-top:.75rem}.tri{padding-top:.9rem}.hero2-text .prova{font-size:.8rem}.atalhos{margin-top:.45rem}.atalhos a{min-height:36px;padding:.3rem .5rem}.tri-head{margin-bottom:.6rem}.tri-prog{margin-bottom:.55rem}}
+@media (max-width:360px){.atalhos a svg{display:none}}
+.fala{padding-block:clamp(1.75rem,4vw,3rem);background:var(--surface);border-bottom:1px solid var(--line)}
+.fala-in{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(1rem,3vw,2.25rem);align-items:center;max-width:62rem}
+.fala-foto{width:clamp(96px,14vw,150px);aspect-ratio:4/5;object-fit:cover;border-radius:8px;display:block;border:3px solid var(--accent)}
+.fala-txt{margin:0;position:relative}
+.fala-txt blockquote{margin:0;padding:0 0 0 clamp(1.6rem,3vw,2.4rem);position:relative;border:0;background:none}
+.fala-txt blockquote::before{content:"\201C";position:absolute;left:0;top:-.35em;font:800 clamp(3rem,6vw,4.5rem)/1 var(--display);color:var(--accent)}
+.fala-txt blockquote p{font:700 clamp(1.15rem,2.4vw,1.6rem)/1.35 var(--display);color:var(--ink);margin:0}
+.fala-txt figcaption{margin-top:.85rem;padding-left:clamp(1.6rem,3vw,2.4rem);display:grid;gap:.15rem;font-size:.9rem;color:var(--muted)}
+.fala-txt figcaption strong{color:var(--ink);font-size:1rem}
+@media (max-width:560px){.fala-in{grid-template-columns:1fr;justify-items:start}.fala-foto{width:96px}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .frase-fabio footer{font-size:.9rem;color:var(--muted);border:0;padding:0;margin:0;background:none;display:block}
 .tri-res .tri-acolhe{font:500 1.05rem/1.5 var(--body);color:var(--t-ink)}
 .deps{padding-block:clamp(1.75rem,4vw,3rem);border-bottom:1px solid var(--line)}
@@ -429,7 +448,13 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <div class="tri" id="triagem" aria-labelledby="tri-t">
         <div class="tri-head">
           <h2 id="tri-t">Escolha o que está tirando o seu sono</h2>
-          <p><span class="so-desk">Para não perder tempo: diga o que está acontecendo e o que você espera resolver. Mostramos o caminho certo para o seu caso.</span><span class="so-cel">Para não perder tempo: responda e veja o caminho certo para o seu caso.</span></p>
+          <p><span class="so-desk">Para não perder tempo: diga o que está acontecendo e o que você espera resolver. Mostramos o caminho certo para o seu caso.</span><span class="so-cel">Para não perder tempo, responda e veja o seu caminho:</span></p>
+          <nav class="atalhos" aria-label="Acesso rápido">
+            <a id="atalho-analise" href="#triagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Minha análise</a>
+            <a href="/calculadora/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h8"/></svg>Calculadora</a>
+            <a href="/ferramentas/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Ferramentas</a>
+          </nav>
+          <script>try{var _a=JSON.parse(localStorage.getItem('fce_analise')||'null');if(_a&&_a.t){var _e=document.getElementById('atalho-analise');_e.href='/minha-analise/#t='+encodeURIComponent(_a.t);_e.lastChild.nodeValue='Minha análise salva';}}catch(e){}</script>
         </div>
         <ol class="tri-prog" aria-hidden="true"><li class="on"></li><li></li><li></li><li></li></ol>
         <p class="tri-sr" id="tri-aviso" aria-live="polite"></p>
@@ -480,6 +505,17 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
           </figure>
       </div>
       <p class="deps-nota">Avaliações publicadas por clientes no Google, reproduzidas como foram escritas. Cada caso é único e as avaliações não representam promessa de resultado.</p>
+    </div>
+  </section>
+
+  <section class="fala" aria-labelledby="fala-t">
+    <div class="wrap fala-in">
+      <img class="fala-foto" loading="lazy" decoding="async" src="/img/fabio.jpg" alt="Fábio de Castro Emerim, advogado" width="720" height="900">
+      <figure class="fala-txt">
+        <h2 id="fala-t" class="sr-only">Palavra do advogado</h2>
+        <blockquote><p>“Acordo e vou pro trabalho todos os dias para buscar solução para casos difíceis, pensando e exercendo uma advocacia fora da caixa.”</p></blockquote>
+        <figcaption><strong>Dr. Fábio de Castro Emerim</strong><span>OAB/RS 88.912 · advogado responsável pela FCE Advogados · <a href="/sobre/">Conheça a trajetória</a></span></figcaption>
+      </figure>
     </div>
   </section>
 
@@ -603,7 +639,6 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
   <section id="sobre" class="band">
     <div class="wrap sobre">
       <div class="ficha">
-        <img class="foto" loading="lazy" decoding="async" src="/img/fabio.jpg" alt="Fábio de Castro Emerim, advogado" width="720" height="900">
         <div><span class="k">Advogado responsável</span><strong>Fábio de Castro Emerim</strong><span>OAB/RS 88.912</span></div>
         <div><span class="k">Experiência</span><span>Execuções cíveis desde 2013; contencioso tributário e execução fiscal desde 2017</span></div>
         <div><span class="k">Sociedade</span><span>Fabio de Castro Emerim Sociedade Individual de Advocacia · OAB/RS 15.656</span></div>
@@ -616,7 +651,6 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
         <p>Uma intimação do cartório, uma cobrança contra o fiador ou uma penhora costumam chegar em linguagem difícil e com prazos curtos. Quase sempre o imóvel é a casa da família ou um patrimônio construído com anos de trabalho. Quem nos procura costuma chegar sem saber por onde começar, e é justamente aí que o nosso trabalho começa.</p>
         <p>A FCE Advogados, com sede em Novo Hamburgo/RS e atendimento em todo o Brasil, dedica-se a dívidas, garantias e leilões de imóveis: a execução extrajudicial da alienação fiduciária, os imóveis dados em garantia de dívidas empresariais, a fiança, a penhora e os leilões judiciais. A experiência também com quem arremata ajuda a enxergar cada etapa do procedimento com mais precisão.</p>
         <p>À frente dos casos está o advogado Fábio de Castro Emerim. Desde 2013 ele atua na defesa de empresas e de pessoas físicas em execuções cíveis e, desde 2017, também em contencioso tributário e execução fiscal, áreas em que a penhora e o leilão judicial de imóveis fazem parte da rotina. É ele quem conduz a consulta, analisa os documentos e explica, em linguagem direta, em que ponto está o procedimento e quais caminhos a lei oferece para a sua situação. <a href="/sobre/">Conheça a trajetória do advogado</a>.</p>
-        <blockquote class="frase-fabio"><p>“Acordo e vou pro trabalho todos os dias para buscar solução para casos difíceis, pensando e exercendo uma advocacia fora da caixa.”</p><footer>— Dr. Fábio de Castro Emerim</footer></blockquote>
         <ul class="compromissos">
           <li><strong>Explicação clara.</strong> Você entende o que está acontecendo, sem juridiquês.</li>
           <li><strong>Análise pelo advogado responsável.</strong> O seu caso não passa de mão em mão.</li>

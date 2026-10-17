@@ -445,12 +445,12 @@ CID=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/conten
 CIDN={c['slug']:c for c in CID}
 for c in CID:
     url=f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/'
-    nh=c['slug']=='novo-hamburgo'; sp=c['uf']!='RS'  # fora do RS: atendimento só online
-    onde='no escritório, na Rua Araguaia, 509, Jardim Mauá' if nh else ('por videochamada' if sp else 'por videochamada ou presencialmente no escritório em Novo Hamburgo')
+    nh=c['slug']=='novo-hamburgo'; sp=c['uf']!='RS'  # fora do RS: online, presencial quando combinado
+    onde='no escritório, na Rua Araguaia, 509, Jardim Mauá' if nh else ('por videochamada ou, quando combinado com você, presencialmente' if sp else 'por videochamada ou presencialmente no escritório em Novo Hamburgo')
     faq=[
       ('Onde fica o escritório?' if nh else 'Preciso ir ao escritório em Novo Hamburgo?',
        'Na Rua Araguaia, 509, Jardim Mauá, Novo Hamburgo/RS. A consulta pode ser presencial ou por videochamada, como for melhor para você.' if nh else
-       ('Não. A conversa começa pelo WhatsApp e a consulta é por videochamada. Os documentos são enviados digitalmente e os processos são eletrônicos.' if sp else
+       ('Não é necessário. A conversa começa pelo WhatsApp e a consulta é por videochamada; quando combinado com o cliente, o atendimento também pode ser presencial. Os documentos são enviados digitalmente e os processos são eletrônicos.' if sp else
         'Não é obrigatório. A conversa começa pelo WhatsApp e a consulta pode ser por videochamada ou presencial, em Novo Hamburgo. Os documentos são enviados digitalmente.')),
       (f'O financiamento é da Caixa. Vocês atendem casos assim em {c["nome"]}?',
        'Sim. A Caixa é a instituição que mais leiloa imóveis financiados. Quando é preciso ir à Justiça contra ela, a ação corre na Justiça Federal, com processo eletrônico.'),
@@ -510,13 +510,13 @@ body=f'''  <article class="art">
       <p class="crumb"><a href="/">Início</a> › Atendimento por cidade</p>
       <p class="eyebrow">Leilão de imóveis</p>
       <h1>Advogado para leilão de imóveis: atendimento por cidade</h1>
-      <p class="lead">O escritório fica em Novo Hamburgo/RS e atende presencialmente na Região Metropolitana de Porto Alegre e por videochamada em todo o Brasil, com páginas para capitais e cidades do Rio Grande do Sul, de Santa Catarina, do Paraná, de São Paulo, de Mato Grosso e de Mato Grosso do Sul. Escolha a sua cidade para ver como funciona o caminho do leilão aí.</p>
+      <p class="lead">O escritório fica em Novo Hamburgo/RS e atende por videochamada em todo o Brasil e presencialmente na Região Metropolitana de Porto Alegre; nas demais cidades, o atendimento presencial pode ser combinado com o cliente, com páginas para capitais e cidades do Rio Grande do Sul, de Santa Catarina, do Paraná, de São Paulo, de Mato Grosso e de Mato Grosso do Sul. Escolha a sua cidade para ver como funciona o caminho do leilão aí.</p>
       <div class="cards">{cards}</div>
-      <p style="margin-top:1.5rem">Não encontrou a sua cidade? O atendimento online funciona do mesmo jeito: a conversa começa pelo WhatsApp, a consulta é por vídeo e os processos são eletrônicos.</p>
+      <p style="margin-top:1.5rem">Não encontrou a sua cidade? O atendimento online funciona do mesmo jeito: a conversa começa pelo WhatsApp, a consulta é por vídeo e os processos são eletrônicos. Quando combinado com o cliente, o atendimento também pode ser presencial.</p>
     </div>
   </article>'''
 ldc={"@context":"https://schema.org","@type":"CollectionPage","name":"Advogado para leilão de imóveis: atendimento por cidade","url":"https://fceadvogados.com.br/leilao-de-imoveis/","publisher":ORG}
-page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade | FCE Advogados','Atendimento em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, São Paulo, Florianópolis, Curitiba, Cuiabá e Campo Grande. Presencial na Região Metropolitana de Porto Alegre e online em todo o Brasil.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
+page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade | FCE Advogados','Atendimento em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, São Paulo, Florianópolis, Curitiba, Cuiabá e Campo Grande. Online em todo o Brasil e presencial quando combinado com o cliente.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
 # paginas feitas a mao (calculadoras): mesmo rodape e menu do resto do site
 _FCSS=IDX[IDX.index('footer .flinks{'):IDX.index('footer .aviso{')]
 for _p,_hd,_tg in (('/calculadora/index.html',header,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
