@@ -66,7 +66,7 @@ p{margin:0}
 .top nav{display:flex;gap:1.5rem;align-items:center}
 .top nav a{color:var(--ink);text-decoration:none;font-weight:500;font-size:.95rem}
 .top nav a.btn{color:var(--accent-ink);padding:.65rem 1rem;font-size:.9rem}
-@media (max-width:760px){.top nav a:not(.btn){display:none}}
+@media (max-width:1399px){.top nav a:not(.btn){display:none}}
 
 /* Abertura */
 .hero{padding-block:clamp(2.5rem,7vw,5rem)}
@@ -177,8 +177,10 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 .menu-panel ul{list-style:none;margin:0;padding-block:.5rem;display:grid}
 .menu-panel a{display:block;padding:.8rem 0;color:var(--ink);text-decoration:none;font-weight:500;border-bottom:1px solid var(--line)}
 .menu-panel li:last-child a{border-bottom:0}
-@media (max-width:760px){.menu-btn{display:inline-flex}}
-@media (min-width:761px){.menu-panel{display:none!important}}
+@media (max-width:1399px){.menu-btn{display:inline-flex}}
+@media (min-width:1400px){.menu-panel{display:none!important}}
+@media (max-width:1599px){.brand-tag{display:none}}
+@media (min-width:1400px){.top .wrap{max-width:none}.top nav{gap:1rem}.top nav a:not(.btn){font-size:.93rem}}
 .brand-row{display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--ink)}
 .brand-row .logo-svg{height:1.9rem;width:auto;display:block;color:var(--ink);flex:none}
 .brand-tag{font:500 .7rem/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--line);padding-left:.75rem}
@@ -334,10 +336,12 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
       <span class="brand-tag">Dívidas, garantias<br>e leilões de imóveis</span>
     </a>
     <nav aria-label="Seções">
-      <a href="/leilao/">Imóvel em risco</a>
-      <a href="/imovel-em-garantia/">Garantias</a>
-      <a href="/guia/">Guias</a>
-      <a href="/sobre/">O escritório</a>
+      <a href="/#triagem">Minha situação</a>
+      <a href="/leilao/">Imóvel em leilão</a>
+      <a href="/penhora-de-imovel/">Dívidas e penhora</a>
+      <a href="/imovel-em-garantia/">Garantias e fiança</a>
+      <a href="/calculadora/">Calculadora</a>
+      <a href="/sobre/">Sobre o Dr. Fábio</a>
       <a href="/contato/">Contato</a>
       <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
       <button class="tema-btn" type="button" data-tema aria-label="Alternar tema claro ou escuro" title="Tema claro/escuro"><svg class="sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="lua" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
@@ -346,37 +350,28 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
   </div>
   <div class="menu-panel" id="menu-panel" hidden>
     <ul class="wrap">
-      <li><a href="/">Início</a></li>
-      <li class="mp-k">Imóvel em risco por dívida</li>
+      <li><a href="/#triagem">Minha situação: encontre o caminho do seu caso</a></li>
+      <li class="mp-k">Imóvel em leilão</li>
       <li><a href="/leilao/">Financiamento atrasado e leilão extrajudicial</a></li>
-      <li><a href="/#fases">As fases até o leilão</a></li>
       <li><a href="/suspensao-de-leilao/">Leilão marcado: quando cabe a suspensão</a></li>
-      <li><a href="/guia/como-saber-se-meu-imovel-vai-a-leilao/">Como saber se o imóvel foi ou vai a leilão</a></li>
-      <li><a href="/calculadora/">Simule quanto do seu imóvel está em jogo</a></li>
-      <li class="mp-k">Garantias e dívidas da empresa</li>
-      <li><a href="/imovel-em-garantia/">Imóvel dado em garantia de dívida</a></li>
-      <li><a href="/imovel-em-garantia/divida-da-empresa/">Casa em garantia de dívida da empresa</a></li>
-      <li><a href="/imovel-em-garantia/fiador/">Fiador de contrato de locação</a></li>
-      <li><a href="/imovel-em-garantia/bem-de-familia/">Bem de família</a></li>
-      <li class="mp-k">Penhora e execução</li>
+      <li><a href="/parcelas-em-dia/">Parcelas em dia, mas sem conseguir pagar as próximas</a></li>
+      <li><a href="/calculadora/">Calculadora: quanto do seu imóvel está em jogo</a></li>
+      <li class="mp-k">Dívidas e penhora</li>
       <li><a href="/penhora-de-imovel/">Imóvel penhorado</a></li>
-      <li><a href="/imovel-em-garantia/execucao-contra-garantidor/">Execução contra fiador ou avalista</a></li>
+      <li><a href="/divida-bancaria/">Dívida bancária e nome negativado</a></li>
+      <li><a href="/divida-bancaria/execucao/">Execução de dívida bancária</a></li>
       <li><a href="/penhora-de-imovel/divida-de-condominio/">Dívida de condomínio</a></li>
       <li><a href="/penhora-de-imovel/iptu/" aria-current="page">Dívida de IPTU</a></li>
       <li><a href="/penhora-de-imovel/itr/">Dívida de ITR (imóvel rural)</a></li>
-      <li class="mp-k">Conteúdo</li>
-      <li><a href="/guia/">Guias por situação</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/ebook/">Guia gratuito: parcelas atrasadas</a></li>
+      <li><a href="/veiculo/">Busca e apreensão de veículo ou máquina</a></li>
+      <li class="mp-k">Garantias e fiança</li>
+      <li><a href="/imovel-em-garantia/">Imóvel dado em garantia de dívida</a></li>
+      <li><a href="/imovel-em-garantia/divida-da-empresa/">Casa em garantia de dívida da empresa</a></li>
+      <li><a href="/imovel-em-garantia/fiador/">Fiança e aval</a></li>
+      <li><a href="/imovel-em-garantia/bem-de-familia/">Bem de família</a></li>
       <li class="mp-k">O escritório</li>
-      <li><a href="/sobre/">Sobre o advogado</a></li>
-      <li><a href="/#atendimento">Como funciona o atendimento</a></li>
-      <li><a href="/#localizacao">Localização</a></li>
-      <li><a href="/#avaliacoes">Avaliações no Google</a></li>
-      <li><a href="/#perguntas">Perguntas frequentes</a></li>
+      <li><a href="/sobre/">Sobre o Dr. Fábio</a></li>
       <li><a href="/contato/">Contato</a></li>
-      <li class="mp-k">Outras áreas</li>
-      <li><a href="/veiculo/">Veículo financiado: busca e apreensão</a></li>
     </ul>
   </div>
 </header>
@@ -467,7 +462,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     <div><strong>Contato</strong><br>WhatsApp (51) 99206-8037<br>atendimento@fceadvogados.com.br<br><span class="muted-foot">WhatsApp de segunda a sexta, das 8h às 20h. Consultas mediante agendamento.</span></div>
     <nav class="flinks" aria-label="Mapa do site">
       <div><strong>Imóvel em risco</strong><ul><li><a href="/leilao/">Financiamento atrasado e leilão</a></li><li><a href="/suspensao-de-leilao/">Suspensão de leilão</a></li><li><a href="/guia/alienacao-fiduciaria-fase-a-fase/">Alienação fiduciária fase a fase</a></li><li><a href="/guia/intimacao-do-cartorio-parcelas-atrasadas/">Intimação do cartório</a></li><li><a href="/guia/propriedade-consolidada-no-nome-do-banco/">Propriedade consolidada</a></li><li><a href="/guia/saldo-do-leilao-como-receber/">Saldo do leilão</a></li><li><a href="/calculadora/">Simulador: quanto está em jogo</a></li><li><a href="/ebook/">Guia gratuito: parcelas atrasadas</a></li></ul></div>
-      <div><strong>Garantias e dívidas</strong><ul><li><a href="/imovel-em-garantia/">Imóvel dado em garantia</a></li><li><a href="/imovel-em-garantia/divida-da-empresa/">Garantia de dívida da empresa</a></li><li><a href="/imovel-em-garantia/fiador/">Fiador de locação</a></li><li><a href="/imovel-em-garantia/bem-de-familia/">Bem de família</a></li><li><a href="/penhora-de-imovel/">Imóvel penhorado</a></li><li><a href="/penhora-de-imovel/divida-de-condominio/">Dívida de condomínio</a></li><li><a href="/penhora-de-imovel/iptu/">Dívida de IPTU</a></li><li><a href="/penhora-de-imovel/itr/">Dívida de ITR</a></li><li><a href="/empresario/">Guia para empresários (PDF)</a></li></ul></div>
+      <div><strong>Garantias e dívidas</strong><ul><li><a href="/imovel-em-garantia/">Imóvel dado em garantia</a></li><li><a href="/imovel-em-garantia/divida-da-empresa/">Garantia de dívida da empresa</a></li><li><a href="/imovel-em-garantia/fiador/">Fiador de locação</a></li><li><a href="/imovel-em-garantia/bem-de-familia/">Bem de família</a></li><li><a href="/penhora-de-imovel/">Imóvel penhorado</a></li><li><a href="/penhora-de-imovel/divida-de-condominio/">Dívida de condomínio</a></li><li><a href="/penhora-de-imovel/iptu/">Dívida de IPTU</a></li><li><a href="/penhora-de-imovel/itr/">Dívida de ITR</a></li><li><a href="/divida-bancaria/">Dívida bancária</a></li><li><a href="/divida-bancaria/execucao/">Execução bancária</a></li><li><a href="/parcelas-em-dia/">Parcelas em dia, sem conseguir pagar</a></li><li><a href="/empresario/">Guia para empresários (PDF)</a></li></ul></div>
       <div><strong>Atendimento por cidade</strong><ul><li><a href="/leilao-de-imoveis/porto-alegre/">Porto Alegre</a></li><li><a href="/leilao-de-imoveis/novo-hamburgo/">Novo Hamburgo</a></li><li><a href="/leilao-de-imoveis/sao-paulo/">São Paulo</a></li><li><a href="/leilao-de-imoveis/florianopolis/">Florianópolis</a></li><li><a href="/leilao-de-imoveis/curitiba/">Curitiba</a></li><li><a href="/leilao-de-imoveis/cuiaba/">Cuiabá</a></li><li><a href="/leilao-de-imoveis/campo-grande/">Campo Grande</a></li><li><a href="/guia/alienacao-fiduciaria-no-rio-grande-do-sul/">Regras no RS</a></li><li><a href="/guia/leilao-extrajudicial-em-sao-paulo/">Como decide o TJSP</a></li><li><a href="/leilao-de-imoveis/">Outras cidades</a></li></ul></div>
       <div><strong>Outras áreas</strong><ul><li><a href="/veiculo/">Veículo: busca e apreensão</a></li><li><a href="/investidor/">Para arrematantes: comprar em leilão</a></li><li><a href="/investidor/calculadora/">Calculadora do lance máximo</a></li><li><a href="/investidor/guia/">Guia: 20 pontos antes do lance</a></li></ul></div>
       <div><strong>Escritório</strong><ul><li><a href="/sobre/">Sobre o advogado</a></li><li><a href="/contato/">Contato</a></li><li><a href="/guia/">Guias</a></li><li><a href="/blog/">Blog</a></li><li><a href="/privacidade/">Privacidade</a></li></ul></div>
