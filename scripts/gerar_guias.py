@@ -179,8 +179,32 @@ def _final(tag):
     </div>
   </section>'''
 TEMA_JS='''<script>(function(){try{var t=localStorage.getItem("tema");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>'''
+_BC_NOMES={'/guia/':'Guias','/blog/':'Blog','/leilao-de-imoveis/':'Atendimento por cidade','/imovel-em-garantia/':'Imóvel em garantia','/penhora-de-imovel/':'Penhora de imóvel','/divida-bancaria/':'Dívida bancária','/veiculo/':'Veículo','/investidor/':'Investidor','/ferramentas/':'Ferramentas'}
+def _addbc(ld, path, title):
+    # SEO: toda página indexável recebe BreadcrumbList (se ainda não tiver).
+    if 'BreadcrumbList' in json.dumps(ld): return ld
+    u=path[:-len('index.html')] if path.endswith('index.html') else path
+    parts=[x for x in u.strip('/').split('/') if x]
+    if not parts: return ld
+    itens=[]; acc=''
+    for i,x in enumerate(parts):
+        acc+='/'+x
+        if i==len(parts)-1: nm=re.sub(r'\s*[|·]\s*FCE Advogados$','',title)
+        else: nm=_BC_NOMES.get(acc+'/', x.replace('-',' ').capitalize())
+        itens.append((nm,'https://fceadvogados.com.br'+acc+'/'))
+    bc={"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":uu} for i,(n,uu) in enumerate([("Início","https://fceadvogados.com.br/")]+itens)]}
+    if isinstance(ld,dict) and '@graph' in ld:
+        return {**ld,"@graph":list(ld["@graph"])+[bc]}
+    if isinstance(ld,dict):
+        base={k:v for k,v in ld.items() if k!='@context'}
+        return {"@context":"https://schema.org","@graph":[base,bc]}
+    return ld
 def page(path, title, desc, canon, body, ld, tag, robots=''):
     body=body.replace('{{ATUALIZADO}}', MES_ATUAL)
+    # SEO: títulos acima de ~62 caracteres são cortados pelo Google; nesses casos a marca sai do <title> (o Google já mostra o nome do site).
+    for _suf in (' | FCE Advogados',' · FCE Advogados'):
+        if len(title)>62 and title.endswith(_suf): title=title[:-len(_suf)]
+    if 'noindex' not in robots and path not in ('/index.html','/404.html'): ld=_addbc(ld, path, title)
     h=f'''<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -333,7 +357,7 @@ ld={"@context":"https://schema.org","@type":"CollectionPage","name":"Guias sobre
 page('/guia/index.html','Guias sobre dívidas, garantias e leilões de imóveis | FCE Advogados','Guias por situação: financiamento atrasado, alienação fiduciária, consolidação, leilão, penhora, garantias empresariais, fiança e bem de família.','https://fceadvogados.com.br/guia/',body,ld,'guia')
 SOBRE=open(SITE+'/content/sobre.html',encoding='utf-8').read()
 ldp={"@context":"https://schema.org","@graph":[{"@type":"ProfilePage","url":"https://fceadvogados.com.br/sobre/","mainEntity":{"@id":"https://fceadvogados.com.br/sobre/#fabio"}},
- {"@type":"Person","@id":"https://fceadvogados.com.br/sobre/#fabio","name":"Fábio de Castro Emerim","jobTitle":"Advogado","identifier":"OAB/RS 88.912","image":"https://fceadvogados.com.br/img/fabio.jpg","worksFor":ORG,"url":"https://fceadvogados.com.br/sobre/","sameAs":["https://www.linkedin.com/in/fabioemerimadv"],"knowsAbout":["Dívidas e garantias imobiliárias","Alienação fiduciária","Leilão de imóveis","Fiança","Bem de família","Penhora de imóvel","Execução civil"],"hasCredential":{"@type":"EducationalOccupationalCredential","credentialCategory":"Inscrição profissional","name":"OAB/RS 88.912","recognizedBy":{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}},"memberOf":[{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}],"hasOccupation":[{"@type":"Occupation","name":"Advogado"}],"address":{"@type":"PostalAddress","addressLocality":"Novo Hamburgo","addressRegion":"RS","addressCountry":"BR"}}]}
+ {"@type":"Person","@id":"https://fceadvogados.com.br/sobre/#fabio","name":"Fábio de Castro Emerim","jobTitle":"Advogado","identifier":"OAB/RS 88.912","image":"https://fceadvogados.com.br/img/fabio.jpg","worksFor":ORG,"url":"https://fceadvogados.com.br/sobre/","sameAs":["https://www.linkedin.com/in/fabioemerimadv","https://www.instagram.com/adv.fabioemerim/"],"knowsAbout":["Dívidas e garantias imobiliárias","Alienação fiduciária","Leilão de imóveis","Fiança","Bem de família","Penhora de imóvel","Execução civil"],"hasCredential":{"@type":"EducationalOccupationalCredential","credentialCategory":"Inscrição profissional","name":"OAB/RS 88.912","recognizedBy":{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}},"memberOf":[{"@type":"Organization","name":"Ordem dos Advogados do Brasil, Seccional do Rio Grande do Sul"}],"hasOccupation":[{"@type":"Occupation","name":"Advogado"}],"address":{"@type":"PostalAddress","addressLocality":"Novo Hamburgo","addressRegion":"RS","addressCountry":"BR"}}]}
 page('/sobre/index.html','Fábio Emerim: dívidas, garantias e leilões de imóveis | FCE Advogados','Fábio de Castro Emerim (OAB/RS 88.912), sócio da FCE Advogados: dívidas, garantias e leilões de imóveis. Execução civil desde 2013 e fiscal desde 2017.','https://fceadvogados.com.br/sobre/',SOBRE,ldp,'sobre')
 # blog
 import datetime
@@ -411,7 +435,7 @@ page('/investidor/guia/index.html','Guia: 20 pontos antes do lance em leilão (P
 OBI=OB.replace('/ebook/fce-guia-parcelas-atrasadas.pdf','/investidor/guia/fce-guia-investidor-20-pontos.pdf').replace('Se preferir, comece pelo capítulo 2, “A linha do tempo”, e pelo quadro “Onde você está agora?”, na última parte.','O checklist dos 20 pontos está numa página só, no final: salve e use em cada imóvel. Para analisar um imóvel específico, veja a <a href="/investidor/">análise pré-lance</a>.')
 page('/investidor/guia/obrigado/index.html','Seu guia gratuito | FCE Advogados','Download do guia gratuito para investidores em leilão de imóveis.','https://fceadvogados.com.br/investidor/guia/obrigado/',OBI,{"@context":"https://schema.org","@type":"WebPage","name":"Download do guia"},'investidor-obrigado','<meta name="robots" content="noindex">')
 PR=open(SITE+'/content/privacidade.html',encoding='utf-8').read()
-page('/privacidade/index.html','Política de privacidade | FCE Advogados','Como a FCE Advogados trata dados pessoais de visitantes, contatos e clientes, nos termos da LGPD.','https://fceadvogados.com.br/privacidade/',PR,{"@context":"https://schema.org","@type":"WebPage","name":"Política de privacidade","url":"https://fceadvogados.com.br/privacidade/","publisher":ORG},'privacidade')
+page('/privacidade/index.html','Política de privacidade e LGPD do site | FCE Advogados','Como a FCE Advogados trata os dados pessoais de visitantes do site, contatos e clientes, com base na LGPD: finalidades, prazos de guarda e direitos do titular.','https://fceadvogados.com.br/privacidade/',PR,{"@context":"https://schema.org","@type":"WebPage","name":"Política de privacidade","url":"https://fceadvogados.com.br/privacidade/","publisher":ORG},'privacidade')
 # veiculo
 V=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/content/veiculo/*.json')],key=lambda g:(g.get('ordem',999),g['slug']))
 for g in V:
@@ -516,7 +540,7 @@ body=f'''  <article class="art">
     </div>
   </article>'''
 ldc={"@context":"https://schema.org","@type":"CollectionPage","name":"Advogado para leilão de imóveis: atendimento por cidade","url":"https://fceadvogados.com.br/leilao-de-imoveis/","publisher":ORG}
-page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade | FCE Advogados','Atendimento em leilão de imóveis por cidade: Porto Alegre, Novo Hamburgo, São Paulo, Florianópolis, Curitiba, Cuiabá e Campo Grande. Online em todo o Brasil e presencial quando combinado com o cliente.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
+page('/leilao-de-imoveis/index.html','Advogado para leilão de imóveis por cidade | FCE Advogados','Advogado para leilão de imóveis em Porto Alegre, Novo Hamburgo, São Paulo, Florianópolis, Curitiba, Cuiabá e Campo Grande. Online e, se combinado, presencial.','https://fceadvogados.com.br/leilao-de-imoveis/',body,ldc,'cidades')
 # paginas feitas a mao (calculadoras): mesmo rodape e menu do resto do site
 _FCSS=IDX[IDX.index('footer .flinks{'):IDX.index('footer .aviso{')]
 for _p,_hd,_tg in (('/calculadora/index.html',header,'calculadora'),('/investidor/calculadora/index.html',header_inv,'calc-investidor')):
