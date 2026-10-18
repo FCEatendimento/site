@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /app/
+Disallow: /content/
+Disallow: /minha-analise/
 Disallow: /materiais/*/corpo.html
 
 Sitemap: https://fceadvogados.com.br/sitemap.xml
