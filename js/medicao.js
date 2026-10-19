@@ -51,9 +51,34 @@
     if (tipo === 'whatsapp') meta('Contact');
     else meta('Lead', { content_name: tipo });
   }
+  // Origem do anúncio (gclid/utm): guarda na sessão ao chegar e leva para TODOS os botões de WhatsApp,
+  // mesmo que a pessoa navegue por outras páginas antes de clicar. Assim o clique fica ligado ao anúncio.
+  var ORIG = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid'];
+  function origem() {
+    var m = {};
+    try { m = JSON.parse(sessionStorage.getItem('fce_utm') || '{}') || {}; } catch (e) { m = {}; }
+    try {
+      var q = new URLSearchParams(location.search), novo = {};
+      ORIG.forEach(function (k) { var v = q.get(k); if (v) novo[k] = v.slice(0, 150); });
+      if (Object.keys(novo).length) { m = novo; try { sessionStorage.setItem('fce_utm', JSON.stringify(m)); } catch (e) {} }
+    } catch (e) {}
+    return m;
+  }
+  var ORIGEM = origem();
+  function marcarLink(a) {
+    try {
+      var u = new URL(a.href), src = String(ORIGEM.utm_source || '').toLowerCase();
+      ORIG.forEach(function (k) { if (ORIGEM[k] && !u.searchParams.get(k)) u.searchParams.set(k, ORIGEM[k]); });
+      if (!u.searchParams.get('c') || u.searchParams.get('c') === 'site') {
+        if (ORIGEM.gclid || ORIGEM.gbraid || ORIGEM.wbraid || src === 'google') u.searchParams.set('c', 'google-ads');
+        else if (ORIGEM.fbclid || /^(facebook|instagram|meta|fb|ig)$/.test(src)) u.searchParams.set('c', 'meta-ads');
+      }
+      a.href = u.toString();
+    } catch (e) {}
+  }
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href*="/webhook/fce-wa"]');
-    if (a) conversao('whatsapp');
+    if (a) { marcarLink(a); conversao('whatsapp'); }
   }, true);
   window.addEventListener('fce:lead', function (e) { conversao(String(e.detail || '')); });
   if (/\/obrigado\/$/.test(location.pathname)) {
