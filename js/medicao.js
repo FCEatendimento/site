@@ -65,9 +65,15 @@
     return m;
   }
   var ORIGEM = origem();
+  // Página de entrada na visita (primeira página vista nesta sessão), para o app mostrar onde o lead chegou ao site.
+  var ENTRADA = '';
+  try { ENTRADA = sessionStorage.getItem('fce_lp') || ''; if (!ENTRADA) { ENTRADA = location.pathname; sessionStorage.setItem('fce_lp', ENTRADA); } } catch (e) { ENTRADA = location.pathname; }
   function marcarLink(a) {
     try {
       var u = new URL(a.href), src = String(ORIGEM.utm_source || '').toLowerCase();
+      // Página exata em que a pessoa clicou no WhatsApp (só o caminho, sem parâmetros) e página de entrada.
+      u.searchParams.set('url', location.pathname.slice(0, 250));
+      if (ENTRADA) u.searchParams.set('lp', String(ENTRADA).slice(0, 250));
       ORIG.forEach(function (k) { if (ORIGEM[k] && !u.searchParams.get(k)) u.searchParams.set(k, ORIGEM[k]); });
       if (!u.searchParams.get('c') || u.searchParams.get('c') === 'site') {
         if (ORIGEM.gclid || ORIGEM.gbraid || ORIGEM.wbraid || src === 'google') u.searchParams.set('c', 'google-ads');

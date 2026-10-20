@@ -318,6 +318,11 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 
 .bolha.out.eu{background:color-mix(in srgb,var(--info) 14%,var(--surface))}
 .bolha .quem{display:block;font-size:11.5px;font-weight:700;color:var(--gold);margin-bottom:2px}
+.bolha.nota{align-self:center;max-width:88%;background:var(--warn-soft);border:1px dashed color-mix(in srgb,var(--warn) 45%,transparent);box-shadow:none;font-size:13.5px}
+.bolha.nota .quem{color:var(--warn)}
+.bolha.nota .res{display:block;margin-top:4px;font-size:12px;color:var(--mut)}
+.bolha.nota .off{opacity:.55}
+.orient-op{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0;font-size:14px;line-height:1.4;cursor:pointer}.orient-op input{margin-top:3px;width:17px;height:17px;flex:none}
 .resp-box{margin-top:12px;padding:12px}
 .resp-st{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;margin-bottom:10px}
 .resp-st span{flex:1;min-width:200px}
@@ -946,6 +951,49 @@ VIEWS.caso = async (id, forcar) => {
     delete S.cache['caso:' + id]; S.cache = {}; VIEWS.caso(id, true);
   };
 };
+// Como o lead chegou: canal, campanha/grupo/palavra-chave do Google Ads (pelo clique), anúncio da Meta e a página do site em que clicou no WhatsApp.
+function lnkExt(u) { u = String(u || ''); if (!/^https?:\/\//i.test(u)) return esc(u); return '<a href="' + esc(u) + '" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600;overflow-wrap:anywhere">' + esc(u.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '')) + '</a>'; }
+function cardOrigem(c) {
+  const o = c.origem_detalhe || {}, g = o.google || {}, mr = o.meta_referral || {};
+  if (!c.origem_canal && !Object.keys(o).length) return '';
+  const L = []; const add = (t, v) => { if (v) L.push('<dt>' + t + '</dt><dd>' + v + '</dd>'); };
+  add('Canal', esc(CANAL[c.origem_canal] || c.origem_canal || 'não identificado'));
+  add('Campanha', esc(g.campanha || o.utm_campaign || ''));
+  add('Grupo de anúncios', esc(g.grupo || ''));
+  add('Palavra-chave', g.palavra_chave ? esc(g.palavra_chave) + (g.correspondencia ? ' <span class="mut pp">(' + esc(g.correspondencia) + ')</span>' : '') : esc(o.utm_term || ''));
+  add('Anúncio', g.anuncio ? 'nº ' + esc(g.anuncio) : esc(o.utm_content || ''));
+  if (mr.headline || mr.body || mr.source_url || mr.source_id) {
+    add('Anúncio (Meta)', esc([mr.headline, mr.body].filter(Boolean).join(' · ').slice(0, 260)) || (mr.source_id ? 'nº ' + esc(mr.source_id) : ''));
+    if (mr.source_url) add('Link do anúncio', lnkExt(mr.source_url));
+  }
+  const pu = o.pagina_url || '';
+  add('Página onde clicou no WhatsApp', pu ? lnkExt(pu) : (o.pagina ? esc(String(o.pagina).replace(/-/g, ' ')) : ''));
+  if (o.landing_url && o.landing_url !== pu) add('Entrou no site pela página', lnkExt(o.landing_url));
+  add('Data do clique', g.data_clique ? esc(String(g.data_clique).split('-').reverse().join('/')) : (o.created_at ? esc(quando(o.created_at, true)) : ''));
+  if (o.declarado && !String(c.origem_canal || '').startsWith(o.declarado)) add('A pessoa disse que veio por', esc(CANAL[o.declarado] || o.declarado));
+  let aviso = '';
+  if (c.origem_canal === 'GOOGLE_ADS' && o.tem_gclid && !g.campanha) aviso = 'A campanha e a palavra-chave aparecem aqui em até 1 hora: o Google libera os dados do clique com um pequeno atraso.';
+  else if (c.origem_canal === 'GOOGLE_ADS' && !o.tem_gclid && !o.pagina) aviso = 'Veio direto do anúncio para o WhatsApp, sem passar pelo site; nesse caso o Google não informa a campanha.';
+  return '<div class="card"><div class="cab"><h2>' + ic('link', 's') + ' Como o lead chegou</h2></div><div class="corpo"><dl class="def">' + L.join('') + '</dl>' + (aviso ? '<p class="pp mut" style="margin:10px 0 0">' + esc(aviso) + '</p>' : '') + '</div></div>';
+}
+// Orientação privada do Dr. Fábio à Helena, mostrada no meio da conversa (o cliente não vê).
+function notaHtml(o) {
+  const r = o.resultado || {};
+  return '<div class="bolha nota' + (o.ativa === false ? ' off' : '') + '"><span class="quem">' + ic('estrela', 's') + ' Você → Helena · o cliente não vê' + (o.licao ? ' · vale para todos os atendimentos' : '') + (o.ativa === false ? ' · desativada' : '') + '</span>' + esc(o.texto || '') +
+    (o.licao && o.regra ? '<span class="res">Lição: ' + esc(o.regra) + '</span>' : '') +
+    (r.enviado ? '<span class="res">A Helena respondeu ao cliente seguindo a orientação.</span>' : (r.motivo ? '<span class="res">Helena: ' + esc(r.motivo) + '</span>' : '')) +
+    '<span class="h">' + esc(hora(o.t)) + (o.ativa !== false ? ' · <a href="#" data-od="' + esc(o.id) + '" style="color:inherit">desativar</a>' : '') + '</span></div>';
+}
+async function abrirLicoes() {
+  let d; try { d = await api('orientacoes', {}); } catch (e) { return toast(e.message || 'Não deu certo.', true); }
+  const L = (d && d.licoes) || [];
+  const corpo = '<p class="mut pq" style="margin:0 0 10px">Regras que você ensinou à Helena e que ela segue em todos os atendimentos. Para criar uma, marque "vale também para os próximos atendimentos" ao orientar a Helena numa conversa.</p>' +
+    (L.length ? '<div class="lista">' + L.map((x) => '<div class="item"><div class="mid"><div class="t" style="font-weight:550">' + esc(x.regra || x.texto) + '</div><div class="d">' + (x.regra && x.regra !== x.texto ? 'Você escreveu: “' + esc(x.texto) + '” · ' : '') + esc(x.cliente || '') + ' · ' + esc(quando(x.t, true)) + '</div></div><button class="btn sm fant" data-rl="' + esc(x.id) + '">Remover</button></div>').join('') + '</div>'
+      : '<div class="vazio">Nenhuma lição ainda.</div>');
+  const pm = modal({ titulo: 'Lições da Helena', corpo });
+  $$('[data-rl]').forEach((b) => b.onclick = async () => { try { await agir(b, () => api('licao', { id: b.dataset.rl, op: 'remover_licao' }), 'Lição removida. A orientação continua valendo só no atendimento em que foi dada.'); } catch (e) { return; } const it = b.closest('.item'); if (it) it.remove(); });
+  await pm;
+}
 const ABAS = {
   resumo(c) {
     const a = c.analise, f = c.fatos || {};
@@ -953,6 +1001,7 @@ const ABAS = {
     h += '<div class="card"><div class="cab"><h2>Resumo do caso</h2></div><div class="corpo">' + (c.titulo ? '<div style="font-weight:650;margin-bottom:6px">' + esc(c.titulo) + '</div>' : '') + '<div class="texto">' + esc(c.resumo || 'A Helena ainda não montou o resumo.') + '</div>' +
       (f.objetivo_cliente || f.parte_contraria || f.numero_processo ? '<dl class="def" style="margin-top:14px">' + (f.objetivo_cliente ? '<dt>Objetivo do cliente</dt><dd>' + esc(f.objetivo_cliente) + '</dd>' : '') + (f.parte_contraria ? '<dt>Parte contrária</dt><dd>' + esc(f.parte_contraria) + '</dd>' : '') +
         (f.numero_processo ? '<dt>Processo</dt><dd>' + esc(f.numero_processo) + (f.comarca ? ' · ' + esc(f.comarca) : '') + '</dd>' : '') + '</dl>' : '') + '</div></div>';
+    h += cardOrigem(c);
     if (a) {
       const v = Number(a.nota_viabilidade || 0);
       h += '<div class="card"><div class="cab"><h2>Análise jurídica</h2><div class="dir"><span class="pp mut">v' + a.versao + ' · ' + esc(quando(a.created_at, true)) + '</span></div></div><div class="corpo">' +
@@ -983,9 +1032,10 @@ const ABAS = {
     if (!m.length) h += '<div class="card"><div class="vazio">' + ic('chat') + '<div>Sem mensagens registradas.</div></div></div>';
     else {
       h += '<div class="chat" id="chat">'; let ult = '';
-      m.forEach((x) => {
+      m.map((x) => ({ x })).concat((c.orientacoes || []).map((o) => ({ x: { t: o.t }, o }))).sort((p, q) => new Date(p.x.t) - new Date(q.x.t)).forEach(({ x, o }) => {
         const k = diaChave(x.t);
         if (k !== ult) { ult = k; h += '<div class="dia-sep">' + esc(fmtD(x.t, { weekday: 'short', day: '2-digit', month: 'short' })) + '</div>'; }
+        if (o) { h += notaHtml(o); return; }
         const out = String(x.dir).toUpperCase() === 'OUTBOUND', eu = out && x.autor === 'fabio';
         const TIPO = { audio: 'Áudio', image: 'Imagem', document: 'Documento', video: 'Vídeo', sticker: 'Figurinha', template: 'Modelo' };
         const txt = x.tipo === 'audio' ? String(x.texto || '').replace(/^\(mensagem de voz\)\s*/i, '').replace(/^\[ÁUDIO\]$/i, '') : x.texto;
@@ -996,8 +1046,8 @@ const ABAS = {
     }
     if (!c.conversa_id) return h;
     h += '<div class="card resp-box"><div class="resp-st ' + (humano ? 'warn' : 'ok') + '">' + ic(humano ? 'pessoa' : 'chat', 's') + '<span>' +
-      (humano ? '<b>Você está atendendo.</b> A Helena está pausada nesta conversa.' : '<b>A Helena está atendendo.</b> Se você enviar uma mensagem, ela pausa e você assume a conversa.') + '</span>' +
-      (humano ? '<button class="btn sm pri" id="bDevolver">' + ic('voltar', 's') + ' Devolver para a Helena</button>' : '') + '</div>' +
+      (humano ? '<b>Você está atendendo.</b> A Helena está pausada nesta conversa.' : '<b>A Helena está atendendo.</b> Para conduzir sem aparecer, use <b>Orientar a Helena</b>: o cliente não vê. Se você escrever no campo abaixo, a mensagem vai para o cliente e você assume a conversa.') + '</span>' +
+      '<span style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">' + (humano ? '<button class="btn sm pri" id="bDevolver">' + ic('voltar', 's') + ' Devolver para a Helena</button>' : '<button class="btn sm pri" id="bOrientar">' + ic('estrela', 's') + ' Orientar a Helena</button>') + '<button class="btn sm fant" id="bLicoes">Lições</button></span></div>' +
       (janela ? '<textarea class="inp" id="msgTxt" rows="3" placeholder="Escreva para o cliente. A mensagem sai pelo WhatsApp do escritório."></textarea>' +
         '<div class="resp-rod"><span class="pp mut">Janela do WhatsApp aberta até ' + esc(fmtD(new Date(ultIn + 24 * 3600e3), { weekday: 'short', hour: '2-digit', minute: '2-digit' })) + '</span><button class="btn pri" id="bEnviarMsg">' + ic('zap', 's') + ' Enviar</button></div>'
         : '<p class="pq mut" style="margin:10px 2px 2px">' + ic('alerta', 's') + ' O WhatsApp só permite mensagem livre até 24 horas depois da última mensagem do cliente, e essa janela está fechada. Quando o cliente escrever de novo, o campo para responder aparece aqui' + (humano ? '; ou devolva a conversa para a Helena.' : '.') + '</p>') +
@@ -1088,6 +1138,26 @@ function ligarAba(k, c) {
       await agir(be, () => api('responder', { id: c.id, texto: t }), 'Mensagem enviada ao cliente');
       S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
     };
+    const bo = $('#bOrientar');
+    if (bo) bo.onclick = async () => {
+      const r = await modal({ titulo: 'Orientar a Helena', corpo: '<p class="mut pq" style="margin:0 0 10px">Só a Helena lê. O cliente não vê esta mensagem e a conversa continua com ela.</p>' +
+        '<textarea class="inp" id="otx" rows="4" placeholder="Ex.: ela está insegura com o valor; reforce que os R$ 200 da consulta são abatidos se ela fechar o contrato."></textarea>' +
+        '<label class="orient-op"><input type="checkbox" id="oag" checked><span>A Helena já responde o cliente agora seguindo isso (se fizer sentido)</span></label>' +
+        '<label class="orient-op"><input type="checkbox" id="oap"><span>Vale também para os próximos atendimentos (a Helena aprende como regra)</span></label>',
+        botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Enviar à Helena', c: 'pri', v: (m) => { const x = $('#otx', m).value.trim(); if (x.length < 3) { $('#otx', m).focus(); return false; } return { texto: x, agir: $('#oag', m).checked, aprender: $('#oap', m).checked }; } }] });
+      if (!r) return;
+      bo.dataset.lento = '1';
+      let d; try { d = await agir(bo, () => api('orientar', { id: c.id, texto: r.texto, agir: r.agir, aprender: r.aprender })); } catch (e) { return; }
+      toast((d && d.mensagem) || 'Orientação enviada à Helena');
+      S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
+    };
+    const bl = $('#bLicoes'); if (bl) bl.onclick = () => abrirLicoes();
+    $$('[data-od]').forEach((a) => a.onclick = async (e) => {
+      e.preventDefault();
+      if (!(await confirmar('Desativar orientação', 'A Helena deixa de seguir esta orientação neste atendimento (e, se era uma lição, nos próximos).', 'Desativar'))) return;
+      try { await api('licao', { id: a.dataset.od, op: 'desativar' }); toast('Orientação desativada'); } catch (er) { return toast(er.message || 'Não deu certo.', true); }
+      S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
+    });
     const bd = $('#bDevolver');
     if (bd) bd.onclick = async () => {
       const inst = await pedirTexto('Devolver para a Helena', 'A Helena volta a atender este cliente já sabendo tudo o que foi conversado. Ela lê a sua orientação e, se for o caso, já manda uma mensagem ao cliente seguindo o que você pediu (por exemplo, oferecer os horários ou pedir documentos). Sem orientação, ela só responde se houver mensagem do cliente sem resposta.', 'Ex.: já expliquei o prazo do leilão; ofereça os horários da consulta.', false);
