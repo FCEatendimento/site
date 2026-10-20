@@ -917,6 +917,35 @@ VIEWS.casos = async (_, forcar) => {
   carregar(forcar);
 };
 
+// Encaixar horário: o Dr. Fábio escolhe dia e hora (mesmo fora da agenda automática); o sistema cria a reserva ou a consulta
+// na agenda e avisa o cliente (com o link de pagamento, se a consulta ainda não foi paga; ou com a confirmação e o Meet).
+async function encaixarHorario(c, btn) {
+  const z = (n) => String(n).padStart(2, '0');
+  const agoraSP = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+  const sug = new Date(agoraSP.getTime() + 60 * 60e3); sug.setMinutes(sug.getMinutes() < 30 ? 30 : 60, 0, 0);
+  const hoje = agoraSP.getFullYear() + '-' + z(agoraSP.getMonth() + 1) + '-' + z(agoraSP.getDate());
+  const dia = sug.getFullYear() + '-' + z(sug.getMonth() + 1) + '-' + z(sug.getDate());
+  const r = await modal({ titulo: 'Encaixar horário', corpo: '<p class="mut pq" style="margin:0 0 12px">Escolha o dia e a hora da consulta de ' + esc(c.nome) + ', mesmo fora dos horários da agenda automática. O sistema coloca na sua agenda e avisa o cliente pelo WhatsApp: se a consulta ainda não foi paga, ele recebe a reserva com o link de pagamento; se já foi paga, a confirmação' + ' com o link do Meet (ou o endereço, se for presencial).</p>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="pq mut">Dia<input class="inp" type="date" id="eDia" min="' + hoje + '" value="' + dia + '" style="margin-top:6px"></label><label class="pq mut">Hora<input class="inp" type="time" id="eHora" step="300" value="' + z(sug.getHours()) + ':' + z(sug.getMinutes()) + '" style="margin-top:6px"></label></div>' +
+    '<label class="pq mut" style="display:block;margin-top:10px">Modalidade<select class="sel" id="eMod" style="margin-top:6px"><option value="ONLINE">Por vídeo (Google Meet)</option><option value="PRESENCIAL">Presencial, no escritório</option></select></label>',
+    botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Encaixar', c: 'pri', v: (m) => { const d = $('#eDia', m).value, h = $('#eHora', m).value; if (!d || !h) { (d ? $('#eHora', m) : $('#eDia', m)).focus(); return false; } return { data: d, hora: h, modalidade: $('#eMod', m).value }; } }] });
+  if (!r) return;
+  const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = ic('att', 's gira') + ' Aguarde';
+  try {
+    let d;
+    try { d = await api('encaixar', Object.assign({ id: c.id }, r)); }
+    catch (e) {
+      if (!/CONFLITO/.test(e.message || '')) throw e;
+      btn.innerHTML = orig; btn.disabled = false;
+      if (!(await confirmar('Horário ocupado', String(e.message).replace(/^CONFLITO:\s*/, 'Esse horário ') .replace(/^Esse horário esse horário/i, 'Esse horário') + ' Quer encaixar mesmo assim?', 'Encaixar mesmo assim'))) return;
+      btn.disabled = true; btn.innerHTML = ic('att', 's gira') + ' Aguarde';
+      d = await api('encaixar', Object.assign({ id: c.id, forcar: true }, r));
+    }
+    toast((d && d.mensagem) || 'Horário encaixado');
+    S.cache = {}; VIEWS.caso(c.id, true);
+  } catch (e) { toast(e.message || 'Não deu certo.', true); }
+  finally { if (document.body.contains(btn)) { btn.disabled = false; btn.innerHTML = orig; } }
+}
 // ---------- CASO ----------
 VIEWS.caso = async (id, forcar) => {
   if (/[?&]aba=conversa/.test(location.hash)) S.abaCaso = 'conversa';
@@ -932,7 +961,7 @@ VIEWS.caso = async (id, forcar) => {
     '<div class="chips">' + chipEtapa(c.etapa) + (c.perfil ? '<span class="chip nav">' + esc(PERFIL[c.perfil] || c.perfil) + '</span>' : '') + (u && c.urgencia !== 'NORMAL' ? '<span class="chip ' + u[1] + '">Urgência ' + u[0].toLowerCase() + '</span>' : '') +
     (c.origem_canal ? '<span class="chip">' + ic('link', 's') + esc(CANAL[c.origem_canal] || c.origem_canal) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">' + ic('pessoa', 's') + 'com você (Helena pausada)</span>' : '') + '</div></div>' +
     '<div class="acoes">' + (tel ? '<a class="btn" href="https://wa.me/' + tel + '" target="_blank" rel="noopener">' + ic('zap', 's') + ' WhatsApp</a>' : '') +
-    '<button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
+    (c.conversa_id ? '<button class="btn" id="bEncaixe">' + ic('cal', 's') + ' Encaixar horário</button>' : '') + '<button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
   const abas = [['resumo', 'Resumo', 'doc'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['processos', 'Processos e assinaturas', 'martelo'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
   const cont = { conversa: (c.mensagens || []).length, docs: (c.documentos || []).length, prazos: (c.prazos || []).filter((p) => p.status === 'ABERTO').length, notas: (c.notas || []).length };
   S.abaCaso = S.abaCaso || 'resumo';
@@ -941,6 +970,8 @@ VIEWS.caso = async (id, forcar) => {
   const mostrar = (k) => { S.abaCaso = k; $$('#abas button').forEach((b) => b.classList.toggle('on', b.dataset.a === k)); $('#aba').innerHTML = ABAS[k](c); ligarAba(k, c); };
   $$('#abas button').forEach((b) => b.onclick = () => mostrar(b.dataset.a));
   mostrar(S.abaCaso);
+  const be = $('#bEncaixe');
+  if (be) be.onclick = () => encaixarHorario(c, be);
   $('#bEtapa').onclick = async () => {
     const r = await modal({ titulo: 'Mudar etapa do caso', corpo: '<label class="pq mut">Nova etapa</label><select class="sel" id="me" style="margin:6px 0 12px">' + ETAPAS.map((e) => '<option value="' + e + '"' + (e === c.etapa ? ' selected' : '') + '>' + ETAPA[e] + '</option>').join('') + '</select><label class="pq mut">Motivo (opcional)</label><input class="inp" id="mm" style="margin-top:6px" placeholder="Ex.: consulta realizada, cliente decidiu não seguir">' +
       '<p class="pp mut" style="margin:10px 0 0">A mudança fica registrada no histórico e aciona o agente responsável pela nova etapa (por exemplo, a análise jurídica em "Em análise").</p>',
