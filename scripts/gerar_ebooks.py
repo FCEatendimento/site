@@ -41,7 +41,7 @@ def montar(g, MES):
     TITULO, SUB, TAG = g['titulo'], g['sub'], g['tag']
     capa = f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts}{BASE}
     @page{{size:A5;margin:0}}
-    .capa{{width:148mm;height:210mm;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(0,0,0,.14)),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 .25mm,rgba(0,0,0,.045) .25mm .5mm,transparent .5mm 1mm),#3A4048;color:#EEF0F2;padding:16mm 14mm 14mm;display:flex;flex-direction:column;position:relative;overflow:hidden}}
+    .capa{{width:148mm;height:210mm;background:linear-gradient(112deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.12) 24%,rgba(255,255,255,.02) 40%,rgba(0,0,0,.18) 64%,rgba(255,255,255,.06) 86%,rgba(0,0,0,.10) 100%),linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.30)),url('file://{SITE}/img/aco-escovado.jpg') 0 0/148mm 74mm repeat,#4A5056;color:#EEF0F2;padding:16mm 14mm 14mm;display:flex;flex-direction:column;position:relative;overflow:hidden}}
     .capa .logo{{font:800 26pt/1 LOGO,sans-serif;letter-spacing:-.02em;color:#FFFFFF;display:flex;align-items:baseline}}.capa .logo i{{font-style:normal;color:#AEB4BB;margin-left:.5mm}}.capa .logo i.o{{color:#D1AE6C;margin-left:0}}.capa .logo span{{font:600 7.5pt/1 RHT,sans-serif;letter-spacing:.28em;color:#C9CED4;margin-left:4mm}}
     .capa .tag{{margin-top:34mm;font:500 8.5pt RHM,monospace;letter-spacing:.14em;text-transform:uppercase;color:#E6CF9C}}
     .capa h1{{font-size:30pt;font-weight:800;margin:4mm 0 6mm;color:#fff;letter-spacing:-.01em}}
