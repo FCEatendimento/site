@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Calculadora de juros do financiamento de veículo · FCE Advogados</title>
 <script>(function(){try{var t=localStorage.getItem("tema");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
-<meta name="description" content="Compare os juros do seu financiamento de carro com a taxa média do Banco Central no mês do contrato e veja tarifas e seguros que a Justiça costuma analisar. Simulação gratuita e informativa.">
+<meta name="description" content="Compare os juros do seu financiamento de carro com a taxa média do Banco Central no mês do contrato e veja tarifas e seguros que a Justiça costuma analisar. Simulação informativa.">
 <link rel="icon" href="/img/logo.svg">
 <link rel="canonical" href="https://fceadvogados.com.br/veiculo/calculadora-de-juros/">
 <meta property="og:title" content="Os juros do seu carro financiado estão acima da média?">
@@ -407,7 +407,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
   <section class="calc-hero">
     <div class="wrap">
       <p class="crumb-calc"><a href="/">Início</a> › <a href="/veiculo/">Veículo</a> › Calculadora de juros</p>
-      <p class="eyebrow">Simulação gratuita · financiamento de veículo</p>
+      <p class="eyebrow">Simulação informativa · financiamento de veículo</p>
       <h1>Os juros do seu carro financiado estão acima da média do mercado?</h1>
       <p class="lead">Compare a taxa do seu contrato com a taxa média que o Banco Central divulga para o financiamento de veículos no mês em que você assinou, e veja quais cobranças do contrato a Justiça costuma analisar. É informativo e leva cerca de 3 minutos.</p>
     </div>
@@ -525,8 +525,8 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
           </div>
           <div class="fin-grid">
             <div class="jur"><span>Diferença em cada parcela</span><b id="r-dif">–</b></div>
-            <div class="jur"><span>Já pago a mais, até agora</span><b id="r-pago">–</b></div>
-            <div><span>A mais no contrato inteiro</span><b id="r-total">–</b></div>
+            <div class="jur"><span>Diferença estimada nas parcelas já pagas</span><b id="r-pago">–</b></div>
+            <div><span>Diferença estimada no contrato todo</span><b id="r-total">–</b></div>
           </div>
           <p class="fin-futuro" id="r-saldo"></p>
         </div>
@@ -546,11 +546,11 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
         <details class="metodo">
           <summary>Como a conta é feita e quais critérios usamos</summary>
           <div>
-            <p><b>Taxa média.</b> Usamos a taxa média mensal de juros das operações de crédito com recursos livres para pessoas físicas, modalidade aquisição de veículos, divulgada pelo Banco Central (séries 25471, ao mês, e 20749, ao ano, do Sistema Gerenciador de Séries Temporais), no mês da assinatura do contrato. Dados disponíveis de março de 2011 até <span id="m-ult">agosto de 2026</span>.</p>
-            <p><b>Taxa do contrato.</b> Quando você informa a taxa mensal, usamos a do contrato. Sem ela, calculamos a taxa que faz a sua parcela pagar o valor financiado no prazo informado (Tabela Price). Sem o valor total financiado e sem o IOF, essa taxa calculada pode ficar um pouco acima da real.</p>
-            <p><b>Recalculo.</b> A parcela recalculada usa o mesmo valor financiado e o mesmo prazo, sem as cobranças marcadas como “a conferir”. Os juros só são limitados à média do Banco Central quando a sua taxa chega a 1,5 vez a média; abaixo disso, mantemos a taxa do contrato. Não incluímos correção monetária, juros sobre valores a devolver, encargos de atraso nem eventual devolução em dobro.</p>
-            <p><b>Critérios do STJ.</b> Juros acima de 12% ao ano não são abusivos por si só (Súmula 382). A revisão é admitida quando a abusividade fica demonstrada no caso concreto, e a taxa média do mercado é o principal parâmetro de comparação (REsp 1.061.530/RS, recursos repetitivos). Nesse julgamento, o STJ citou precedentes que consideraram abusivas taxas acima de uma vez e meia, do dobro ou do triplo da média; muitos tribunais usam 1,5 vez como referência, mas esse número não é um limite fixado em lei. O tema está sendo revisto pelo STJ no Tema 1.378 (afetado em setembro de 2025, sem julgamento até outubro de 2026).</p>
-            <p><b>Outras regras.</b> Capitalização mensal dos juros: Súmulas 539 e 541 do STJ. Tarifas TAC e TEC, tarifa de cadastro e IOF financiado: Temas 618 a 621 e Súmula 566 do STJ. Serviços de terceiros, comissão do correspondente, avaliação do bem e registro do contrato: Tema 958. Seguro e registro do pré-gravame: Tema 972. Encargos de atraso: Código de Defesa do Consumidor, art. 52, § 1º, e Súmulas 379 e 472 do STJ. Abuso nos juros e na capitalização e efeito sobre a mora: Tema 28 do STJ.</p>
+            <p><b>Taxa média.</b> Usamos a taxa média mensal de juros das operações de crédito com recursos livres para pessoas físicas, modalidade aquisição de veículos, divulgada pelo Banco Central (série 25471 do Sistema Gerenciador de Séries Temporais), no mês da assinatura do contrato. A taxa anual mostrada é a equivalente à mensal. Usamos os dados de janeiro de 2008 até <span id="m-ult">agosto de 2026</span>.</p>
+            <p><b>Taxa do contrato.</b> Quando você informa a taxa mensal, usamos a do contrato; se informar só a anual, usamos a mensal equivalente. Sem ela, calculamos a taxa que faz a sua parcela pagar o valor financiado no prazo informado (Tabela Price). Sem o valor total financiado e sem o IOF, essa taxa calculada pode ficar um pouco acima da real.</p>
+            <p><b>Recálculo.</b> A parcela recalculada usa o mesmo valor financiado e o mesmo prazo, sem as cobranças marcadas como “a conferir”. Os juros só são limitados à média do Banco Central quando a sua taxa chega a 1,5 vez a média; abaixo disso, mantemos a taxa do contrato. Não incluímos correção monetária, juros sobre valores a devolver, encargos de atraso nem eventual devolução em dobro.</p>
+            <p><b>Critérios do STJ.</b> Juros acima de 12% ao ano não são abusivos por si só (Súmula 382). A revisão é admitida quando a abusividade fica demonstrada no caso concreto, e a taxa média do mercado é usada como referencial de comparação, não como teto (REsp 1.061.530/RS, recursos repetitivos). Nesse julgamento, o STJ citou precedentes que consideraram abusivas taxas acima de uma vez e meia, do dobro ou do triplo da média; muitos tribunais usam 1,5 vez como referência, mas esse número não é um limite fixado em lei. O tema está sendo revisto pelo STJ no Tema 1.378 (afetado em setembro de 2025, sem julgamento até outubro de 2026).</p>
+            <p><b>Outras regras.</b> Capitalização mensal dos juros: Súmulas 539 e 541 do STJ. Tarifas TAC e TEC, tarifa de cadastro e IOF financiado: Temas 618 a 621 e Súmulas 565 e 566 do STJ. Serviços de terceiros, comissão do correspondente, avaliação do bem e registro do contrato: Tema 958. Seguro e registro do pré-gravame: Tema 972. Encargos de atraso: Código de Defesa do Consumidor, art. 52, § 1º, e Súmulas 379 e 472 do STJ. Abuso nos juros e na capitalização e efeito sobre a mora: Tema 28 do STJ; abuso em encargos acessórios, como tarifas e seguro, não afasta a mora (Tema 972).</p>
             <p>Simulação informativa, com base apenas nos valores informados. O resultado real depende do contrato, dos documentos e do andamento de cada caso, e não representa promessa de resultado.</p>
           </div>
         </details>
@@ -595,13 +595,13 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
   var leadId=null; try{leadId=sessionStorage.getItem("fce_calc_veic_id");}catch(e){}
   var MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   // Taxa média mensal de juros, recursos livres, pessoas físicas, aquisição de veículos (Banco Central, SGS 25471, % a.m.)
-  var MEDIA={2011:[null,null,2.08,2.11,2.10,2.08,2.08,2.04,1.96,1.96,1.94,1.89],2012:[1.91,1.92,1.90,1.86,1.71,1.55,1.58,1.55,1.61,1.57,1.56,1.51],2013:[1.57,1.58,1.51,1.53,1.51,1.49,1.55,1.62,1.64,1.59,1.62,1.62],2014:[1.72,1.80,1.78,1.71,1.74,1.74,1.75,1.76,1.72,1.74,1.72,1.69],2015:[1.80,1.86,1.85,1.85,1.86,1.86,1.84,1.86,1.92,1.94,1.96,1.95],2016:[2.04,2.05,2.01,2.00,1.97,1.94,1.94,1.96,1.95,1.93,1.93,1.92],2017:[1.96,1.93,1.86,1.84,1.83,1.81,1.79,1.76,1.74,1.71,1.68,1.69],2018:[1.72,1.70,1.65,1.64,1.64,1.67,1.69,1.68,1.68,1.70,1.65,1.65],2019:[1.70,1.67,1.63,1.62,1.61,1.59,1.55,1.54,1.52,1.51,1.48,1.47],2020:[1.51,1.49,1.51,1.56,1.49,1.46,1.45,1.45,1.43,1.45,1.46,1.47],2021:[1.55,1.53,1.58,1.62,1.62,1.64,1.67,1.72,1.80,1.86,2.04,2.00],2022:[2.00,1.98,2.02,2.03,2.02,2.04,2.05,2.04,2.02,2.03,2.06,2.12],2023:[2.15,2.14,2.12,2.11,2.08,2.00,1.95,1.96,1.94,1.96,1.94,1.91],2024:[1.95,1.93,1.91,1.91,1.91,1.91,1.91,1.93,1.91,1.94,1.97,2.05],2025:[2.18,2.15,2.12,2.08,2.05,2.05,2.03,2.03,2.03,2.04,2.01,1.97],2026:[2.06,2.03,1.98,1.99,1.97,1.97,1.98,1.97,null,null,null,null]};
+  var MEDIA={2008:[2.29,2.29,2.22,2.20,2.25,2.28,2.43,2.43,2.41,2.48,2.70,2.63],2009:[2.51,2.32,2.19,2.20,2.15,2.00,2.01,1.96,1.87,1.91,1.90,1.90],2010:[1.89,1.82,1.78,1.78,1.86,1.78,1.81,1.77,1.76,1.78,1.72,1.89],2011:[2.02,2.03,2.08,2.11,2.10,2.08,2.08,2.04,1.96,1.96,1.94,1.89],2012:[1.91,1.92,1.90,1.86,1.71,1.55,1.58,1.55,1.61,1.57,1.56,1.51],2013:[1.57,1.58,1.51,1.53,1.51,1.49,1.55,1.62,1.64,1.59,1.62,1.62],2014:[1.72,1.80,1.78,1.71,1.74,1.74,1.75,1.76,1.72,1.74,1.72,1.69],2015:[1.80,1.86,1.85,1.85,1.86,1.86,1.84,1.86,1.92,1.94,1.96,1.95],2016:[2.04,2.05,2.01,2.00,1.97,1.94,1.94,1.96,1.95,1.93,1.93,1.92],2017:[1.96,1.93,1.86,1.84,1.83,1.81,1.79,1.76,1.74,1.71,1.68,1.69],2018:[1.72,1.70,1.65,1.64,1.64,1.67,1.69,1.68,1.68,1.70,1.65,1.65],2019:[1.70,1.67,1.63,1.62,1.61,1.59,1.55,1.54,1.52,1.51,1.48,1.47],2020:[1.51,1.49,1.51,1.56,1.49,1.46,1.45,1.45,1.43,1.45,1.46,1.47],2021:[1.55,1.53,1.58,1.62,1.62,1.64,1.67,1.72,1.80,1.86,2.04,2.00],2022:[2.00,1.98,2.02,2.03,2.02,2.04,2.05,2.04,2.02,2.03,2.06,2.12],2023:[2.15,2.14,2.12,2.11,2.08,2.00,1.95,1.96,1.94,1.96,1.94,1.91],2024:[1.95,1.93,1.91,1.91,1.91,1.91,1.91,1.93,1.91,1.94,1.97,2.05],2025:[2.18,2.15,2.12,2.08,2.05,2.05,2.03,2.03,2.03,2.04,2.01,1.97],2026:[2.06,2.03,1.98,1.99,1.97,1.97,1.98,1.97,null,null,null,null]};
   var ULT=(function(){var a=Object.keys(MEDIA).map(Number).sort(), y=a[a.length-1], l=MEDIA[y], m=l.length; while(m>0&&l[m-1]==null)m--; return {y:y,m:m}})();
   function media(y,m){var l=MEDIA[y]; if(l&&l[m-1]!=null) return {v:l[m-1],y:y,m:m,exato:true}; return {v:MEDIA[ULT.y][ULT.m-1],y:ULT.y,m:ULT.m,exato:false}}
   function brl(n){return "R$ "+Math.round(n||0).toLocaleString("pt-BR")}
   function pc(x,d){return (x*100).toLocaleString("pt-BR",{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d})+"%"}
   function vezes(r){return r.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"×"}
-  function val(id){var s=String($(id).value||"").replace(/\D/g,""); return s?Number(s):0}
+  function val(id){var s=String($(id).value||"").replace(/\./g,"").replace(",","."), n=Number(s); return isFinite(n)&&n>0?n:0}
   function num(id){var s=String($(id).value||"").trim().replace(/\s|%/g,""); if(!s) return 0; if(s.indexOf(",")>=0) s=s.replace(/\./g,"").replace(",","."); var n=Number(s); return isFinite(n)&&n>0?n:0}
   function int(id){var s=String($(id).value||"").replace(/\D/g,""); return s?Number(s):0}
   function pmt(i,n,v){return i>1e-9? v*i/(1-Math.pow(1+i,-n)) : v/n}
@@ -611,11 +611,11 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 
   // Ano do contrato: de 2011 até o ano atual
   var hoje=new Date(), anoSel=$("ano");
-  for(var y=hoje.getFullYear(); y>=2011; y--){var o=document.createElement("option"); o.value=y; o.textContent=y; anoSel.appendChild(o);}
+  for(var y=hoje.getFullYear(); y>=2008; y--){var o=document.createElement("option"); o.value=y; o.textContent=y; anoSel.appendChild(o);}
   anoSel.value=String(hoje.getFullYear()-2);
   if($("m-ult")) $("m-ult").textContent=MES[ULT.m-1]+" de "+ULT.y;
 
-  document.querySelectorAll("[data-moeda]").forEach(function(i){i.addEventListener("input",function(){var d=i.value.replace(/\D/g,"").slice(0,9); i.value=d?Number(d).toLocaleString("pt-BR"):""});});
+  document.querySelectorAll("[data-moeda]").forEach(function(i){i.addEventListener("input",function(){var v=i.value.replace(/[^\d,]/g,""), p=v.indexOf(","), int=(p>=0?v.slice(0,p):v).replace(/\D/g,"").slice(0,9), dec=p>=0?v.slice(p+1).replace(/\D/g,"").slice(0,2):null; i.value=(int?Number(int).toLocaleString("pt-BR"):(dec!=null?"0":""))+(dec!=null?","+dec:"");});});
   document.querySelectorAll("[data-pct]").forEach(function(i){i.addEventListener("input",function(){i.value=i.value.replace(/[^\d,\.]/g,"").slice(0,7)});});
   var tel=$("telefone"); tel.addEventListener("input",function(){var d=tel.value.replace(/\D/g,"").slice(0,11); var f=d; if(d.length>2) f="("+d.slice(0,2)+") "+d.slice(2); if(d.length>7) f="("+d.slice(0,2)+") "+d.slice(2,d.length-4)+"-"+d.slice(-4); tel.value=f;});
   function enviar(dados){var b=new URLSearchParams(); Object.keys(dados).forEach(function(k){b.append(k,dados[k])}); return fetch(API,{method:"POST",body:b}).then(function(r){return r.json().catch(function(){return {ok:false}})})}
@@ -651,12 +651,12 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     e.preventDefault(); var err=$("e-sim"); err.textContent="";
     var sit=$("situacao").value, y=Number($("ano").value), m=Number($("mes").value);
     var preco=val("preco"), ent=val("entrada"), n=int("n"), P=val("parcela"), pagas=int("pagas"), atr=int("atraso");
-    var txm=num("tx_m")/100, txa=num("tx_a")/100, cet=num("cet")/100, tfInf=val("tf");
+    var txm=num("tx_m")/100, txa=num("tx_a")/100, cet=num("cet")/100, tfInf=val("tf"), txmDaAnual=false;
+    if(!txm&&txa&&txa<=5){txm=Math.pow(1+txa,1/12)-1; txmDaAnual=true;}
     var t={cad:val("t_cad"),aval:val("t_aval"),reg:val("t_reg"),seg:val("t_seg"),ter:val("t_ter"),tac:val("t_tac"),out:val("t_out"),iof:val("t_iof")};
     var segEsc=$("seg_esc").value, cliente=$("cliente").value, zero=$("zero").value==="novo";
     if(!sit){err.textContent="Escolha como está o financiamento.";$("situacao").focus();return}
     if(y*12+m>hoje.getFullYear()*12+hoje.getMonth()+1){err.textContent="Confira a data do contrato.";return}
-    if(y===2011&&m<3){err.textContent="Para contratos anteriores a março de 2011, fale conosco: a série do Banco Central usada aqui começa nesse mês.";return}
     if(!preco){err.textContent="Informe o preço do veículo.";$("preco").focus();return}
     if(ent>=preco){err.textContent="A entrada precisa ser menor que o preço.";$("entrada").focus();return}
     if(n<6||n>99){err.textContent="Informe o número de parcelas (entre 6 e 99).";$("n").focus();return}
@@ -664,6 +664,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     if(txm&&(txm>0.2)){err.textContent="Confira a taxa mensal: use o número do contrato, por exemplo 2,49.";$("tx_m").focus();return}
     if(txa&&txa>5){err.textContent="Confira a taxa anual.";$("tx_a").focus();return}
     if(pagas>n){err.textContent="As parcelas pagas não podem passar do total.";$("pagas").focus();return}
+    if(sit!=="quitado"&&atr>n-pagas){err.textContent="As parcelas em atraso não podem passar das que faltam pagar.";$("atraso").focus();return}
     if(sit==="quitado") pagas=n;
 
     var L=preco-ent, tarifas=t.cad+t.aval+t.reg+t.seg+t.ter+t.tac+t.out+t.iof;
@@ -674,8 +675,11 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     else if(txm){TF=pv(txm,n,P); origemTF="pela taxa";}
     else {TF=L+tarifas; origemTF="somado";}
     if(TF<L*0.5||P*n<TF){err.textContent="Os valores não fecham: confira o preço, a entrada, as parcelas e o valor financiado.";return}
+    if(P>TF){err.textContent="A parcela não pode ser maior que o valor financiado: confira os valores (use vírgula para os centavos).";$("parcela").focus();return}
     var iP=taxa(n,TF,P);                 // taxa que a parcela efetivamente cobra sobre o valor financiado
-    var iRef=txm||iP, origemTx=txm?"contrato":"calculada";
+    if(iP>0.15){err.textContent="Os valores não fecham: a parcela daria juros acima de 15% ao mês. Confira a parcela, o prazo e o valor financiado (use vírgula para os centavos).";$("parcela").focus();return}
+    if(iP<=0.0001&&!txm){err.textContent="Pelos valores informados, a parcela não tem juros. Confira a parcela e o prazo.";$("parcela").focus();return}
+    var iRef=txm||iP, origemTx=txm?(txmDaAnual?"anual":"contrato"):"calculada";
     var R=iRef/M;
 
     // Cobranças a conferir (entram no recálculo)
@@ -684,7 +688,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     var dataTxt=MES[m-1]+" de "+y;
 
     // 1. Juros remuneratórios
-    if(R>=2) ponto("al","Juros "+vezes(R)+" a média do mercado","A taxa passa do dobro da média do Banco Central para financiamento de veículos em "+dataTxt+". O STJ admite a revisão quando a abusividade fica demonstrada no caso concreto, e taxas nesse patamar costumam ser tratadas como forte indício (REsp 1.061.530/RS).");
+    if(R>=2) ponto("al","Juros "+vezes(R)+" a média do mercado","A taxa passa do dobro da média do Banco Central para financiamento de veículos em "+dataTxt+". O STJ admite a revisão quando a abusividade fica demonstrada no caso concreto, e tribunais costumam considerar taxas nesse patamar indício de abusividade, usando a média como referencial (REsp 1.061.530/RS).");
     else if(R>=1.5) ponto("al","Juros "+vezes(R)+" a média do mercado","A taxa está pelo menos uma vez e meia acima da média do Banco Central em "+dataTxt+". Muitos tribunais usam esse patamar como indício de abusividade, a ser confirmado com o contrato e o perfil da operação (REsp 1.061.530/RS).");
     else if(R>=1.3) ponto("at","Juros "+vezes(R)+" a média do mercado","A taxa está bem acima da média, mas abaixo de 1,5 vez. Sozinha, costuma não bastar para a revisão; somada a outras cobranças, merece análise.");
     else if(R>1) ponto("in","Juros perto da média ("+vezes(R)+")","A taxa está um pouco acima da média do Banco Central em "+dataTxt+". Juros acima de 12% ao ano não são abusivos por si só (Súmula 382 do STJ). Nesse caso, o ponto de atenção costuma estar nas tarifas e no seguro.");
@@ -693,7 +697,8 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     // 2. Parcela x taxa informada
     if(txm&&tfInf){
       var dif=iP-txm;
-      if(dif>0.0005) ponto("al","A parcela é maior do que a taxa do contrato explica","Com o valor financiado e a taxa de "+pc(txm)+" ao mês, a parcela deveria ser de cerca de "+brl(pmt(txm,n,TF))+", e não "+brl(P)+". Pela sua parcela, a taxa efetivamente cobrada é de "+pc(iP)+" ao mês. Pode haver cobrança não informada ou dado divergente.");
+      if(dif<-0.0005) ponto("at","A parcela é menor do que a taxa do contrato indicaria","Com o valor financiado e a taxa de "+pc(txm)+" ao mês, a parcela seria de cerca de "+brl(pmt(txm,n,TF))+". Pela sua parcela, a taxa efetiva fica em "+pc(iP)+" ao mês. Pode haver carência, valor financiado diferente ou dado divergente; vale conferir no contrato.");
+      else if(dif>0.0005) ponto("al","A parcela é maior do que a taxa do contrato explica","Com o valor financiado e a taxa de "+pc(txm)+" ao mês, a parcela deveria ser de cerca de "+brl(pmt(txm,n,TF))+", e não "+brl(P)+". Pela sua parcela, a taxa efetivamente cobrada é de "+pc(iP)+" ao mês. Pode haver cobrança não informada ou dado divergente.");
       else ponto("ok","Parcela coerente com a taxa do contrato","Com o valor financiado e a taxa informada, a parcela confere (Tabela Price).");
     } else if(txm&&!tfInf){
       var gap=TF-(L+tarifas);
@@ -702,26 +707,27 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
 
     // 3. Capitalização
     if(txm&&txa){
-      if(txa>12*txm+0.001) ponto("ok","Capitalização mensal prevista","A taxa anual ("+pc(txa)+") é maior que 12 vezes a mensal ("+pc(12*txm)+"). Pelo STJ, isso basta para considerar a capitalização mensal expressamente pactuada (Súmula 541), e ela é permitida nos contratos posteriores a 31/3/2000 (Súmula 539).");
+      if(txa>12*txm+0.001) ponto("ok","Capitalização mensal prevista","A taxa anual ("+pc(txa)+") é maior que 12 vezes a mensal ("+pc(12*txm)+"). Pelo STJ, isso basta para considerar a capitalização mensal expressamente pactuada (Súmula 541), e ela é permitida nos contratos celebrados a partir de 31/3/2000, desde que expressamente pactuada (Súmula 539).");
       else if(Math.abs(txa-12*txm)<=0.001) ponto("at","Taxa anual igual a 12 vezes a mensal","O contrato indica juros simples ("+pc(txa)+" ao ano). Se as parcelas foram calculadas com juros compostos, como na Tabela Price, há um ponto a analisar: a capitalização mensal precisa estar pactuada de forma expressa e clara (Súmulas 539 e 541 do STJ).");
       else ponto("in","Confira as taxas","A taxa anual informada é menor que 12 vezes a mensal, o que não é usual. Confira os números no quadro-resumo.");
     } else ponto("in","Capitalização dos juros","Informe a taxa mensal e a anual para conferir. Pelo STJ, a capitalização mensal é permitida quando expressa no contrato, e uma taxa anual maior que 12 vezes a mensal basta para isso (Súmulas 539 e 541).");
 
     // 4. Tarifas e seguros
-    if(t.tac){Q+=t.tac; ponto("al","Tarifa de abertura de crédito ou de carnê (TAC/TEC)","Desde 30/4/2008, essas tarifas não têm respaldo nas normas do Banco Central para pessoas físicas (Temas 618 e 619 do STJ; Súmula 565).",brl(t.tac));}
-    if(t.ter){Q+=t.ter; ponto("al","Serviços de terceiros ou comissão do correspondente","É abusiva a cobrança de serviços de terceiros sem especificar o serviço, e a da comissão do correspondente bancário nos contratos assinados a partir de 25/2/2011 (Tema 958 do STJ).",brl(t.ter));}
+    var ym=y*12+m;
+    if(t.tac){ if(ym>=2008*12+5){Q+=t.tac; ponto("al","Tarifa de abertura de crédito ou de carnê (TAC/TEC)","Desde 30/4/2008, essas tarifas não têm respaldo nas normas do Banco Central para pessoas físicas (Temas 618 e 619 do STJ; Súmula 565).",brl(t.tac));} else ponto("at","Tarifa de abertura de crédito ou de carnê (TAC/TEC)","Nos contratos assinados até 30/4/2008, essas tarifas eram válidas, ressalvado o abuso no valor (Tema 618 do STJ). Não abatemos esse valor no recálculo.",brl(t.tac)); }
+    if(t.ter){ if(ym>=2011*12+3){Q+=t.ter; ponto("al","Serviços de terceiros ou comissão do correspondente","É abusiva a cobrança de serviços de terceiros sem especificar o serviço, e a da comissão do correspondente bancário nos contratos assinados a partir de 25/2/2011 (Tema 958 do STJ).",brl(t.ter));} else ponto("at","Serviços de terceiros ou comissão do correspondente","É abusiva a cobrança de serviços de terceiros sem especificar o serviço (Tema 958 do STJ). A comissão do correspondente só passou a ser abusiva nos contratos a partir de 25/2/2011. Não abatemos esse valor no recálculo.",brl(t.ter)); }
     if(t.seg){
       if(segEsc==="nao"){Q+=t.seg; ponto("al","Seguro sem opção de escolha","O consumidor não pode ser obrigado a contratar seguro com o banco ou com seguradora indicada por ele: é venda casada (Tema 972 do STJ).",brl(t.seg));}
       else if(segEsc==="sim") ponto("ok","Seguro contratado com escolha","Se você pôde escolher a seguradora ou recusar o seguro, a cobrança tende a ser válida.",brl(t.seg));
       else ponto("at","Seguro: confira se houve escolha","Se o seguro veio junto, sem opção de recusar ou de escolher a seguradora, a cobrança pode ser questionada como venda casada (Tema 972 do STJ).",brl(t.seg));
     }
-    if(t.out){Q+=t.out; ponto("al","Produto vendido junto com o financiamento","Título de capitalização, assistência ou garantia estendida embutidos no contrato podem configurar venda casada quando foram condição para o crédito (CDC, art. 39, I).",brl(t.out));}
+    if(t.out) ponto("at","Produto vendido junto com o financiamento","Título de capitalização, assistência ou garantia estendida embutidos no contrato podem configurar venda casada quando foram condição para o crédito (CDC, art. 39, I). Não abatemos esse valor no recálculo: depende de como foi a contratação.",brl(t.out));
     if(t.cad){
       if(cliente==="sim"){Q+=t.cad; ponto("al","Tarifa de cadastro para quem já era cliente","A tarifa de cadastro só pode ser cobrada no início do relacionamento com o banco (Tema 620 do STJ; Súmula 566).",brl(t.cad));}
       else ponto(cliente==="nsei"?"at":"ok","Tarifa de cadastro","É válida quando cobrada no início do relacionamento com o banco (Tema 620 do STJ; Súmula 566). Valores muito altos podem ser revistos.",brl(t.cad));
     }
     if(t.aval){
-      if(zero){Q+=t.aval; ponto("al","Avaliação de veículo 0 km","A tarifa de avaliação só vale quando o serviço é efetivamente prestado (Tema 958 do STJ). Em veículo novo, muitos tribunais entendem que não houve avaliação real; confira se existe laudo.",brl(t.aval));}
+      if(zero) ponto("at","Avaliação de veículo 0 km","A tarifa de avaliação só vale quando o serviço é efetivamente prestado (Tema 958 do STJ). Em veículo novo, vale conferir se houve laudo de avaliação. Não abatemos esse valor no recálculo."+"",brl(t.aval));
       else ponto("at","Avaliação do veículo","É válida se a vistoria foi realmente feita e o valor não é excessivo (Tema 958 do STJ). Vale pedir o laudo ao banco.",brl(t.aval));
     }
     if(t.reg) ponto("at","Registro do contrato","É válido se o registro no Detran foi feito e o valor corresponde à despesa real (Tema 958 do STJ). Cobrança de “pré-gravame” em contratos a partir de 25/2/2011 é abusiva (Tema 972).",brl(t.reg));
@@ -743,20 +749,20 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     // Mostrar
     $("r-razao").textContent=vezes(R);
     var selo=$("r-selo"); selo.className="selo "+(R>=1.5?"al":R>=1.3?"at":"ok"); selo.textContent=R>=2?"Mais que o dobro da média":R>=1.5?"Acima de 1,5 vez a média":R>=1.3?"Bem acima da média":R>1?"Perto da média":"Na média ou abaixo";
-    $("r-razao-txt").textContent="A taxa "+(origemTx==="contrato"?"do seu contrato":"calculada pela sua parcela")+" é "+vezes(R)+" a taxa média do Banco Central para financiamento de veículos em "+MES[md.m-1]+" de "+md.y+(md.exato?".":" (último mês divulgado; o mês do seu contrato ainda não foi publicado).");
+    $("r-razao-txt").textContent="A taxa "+(origemTx==="calculada"?"calculada pela sua parcela":"do seu contrato")+" é "+vezes(R)+" a taxa média do Banco Central para financiamento de veículos em "+MES[md.m-1]+" de "+md.y+(md.exato?".":" (último mês divulgado; o mês do seu contrato ainda não foi publicado).");
     $("r-marca").style.left=Math.min(100,Math.max(0,R/3*100))+"%";
     $("r-tx").textContent=pc(iRef)+" ao mês"; $("r-tx-a").textContent=pc(anual(iRef),1)+" ao ano";
     $("r-md").textContent=pc(M)+" ao mês"; $("r-md-a").textContent=pc(anual(M),1)+" ao ano"; $("r-md-l").textContent="Média do Banco Central ("+String(md.m).padStart(2,"0")+"/"+md.y+")";
     $("r-lim").textContent=pc(1.5*M)+" ao mês"; $("r-lim-a").textContent=pc(anual(1.5*M),1)+" ao ano";
-    $("r-tx-orig").textContent=origemTx==="contrato"?(Math.abs(iP-txm)>0.0005&&tfInf?"Pela parcela e pelo valor financiado, a taxa efetivamente cobrada é de "+pc(iP)+" ao mês.":"Taxa informada por você, do quadro-resumo do contrato."):"Taxa calculada pela parcela, pelo prazo e pelo valor financiado ("+brl(TF)+"). Com a taxa do contrato, o resultado fica mais preciso.";
+    $("r-tx-orig").textContent=origemTx==="anual"?"Taxa mensal equivalente à taxa anual que você informou ("+pc(txa)+" ao ano).":origemTx==="contrato"?(Math.abs(iP-txm)>0.0005&&tfInf?"Pela parcela e pelo valor financiado, a taxa efetivamente cobrada é de "+pc(iP)+" ao mês.":"Taxa informada por você, do quadro-resumo do contrato."):"Taxa calculada pela parcela, pelo prazo e pelo valor financiado ("+brl(TF)+"). Com a taxa do contrato, o resultado fica mais preciso.";
     $("r-cen-txt").textContent=cenTxt;
     $("r-p-sua").textContent=brl(P); $("r-p-alt").textContent=brl(Pn); $("r-p-alt-l").textContent="Recalculada";
     $("b-sua").style.width="100%"; $("b-alt").style.width=(P>0?Pn/P*100:0)+"%";
     $("r-dif").textContent=brl(d); $("r-pago").textContent=brl(d*pagas); $("r-total").textContent=brl(d*n);
     if(sit!=="quitado"&&restam>0){
       var saldo=pv(iP,restam,P), saldoN=pv(iNova,restam,Pn);
-      $("r-saldo").innerHTML="Faltam <b>"+restam+" parcelas</b>"+(atr?", "+atr+" delas em atraso":"")+". O saldo devedor estimado hoje, pelo contrato, é de cerca de <b>"+brl(saldo)+"</b>"+(d>0?"; pelo recálculo, ficaria em cerca de <b>"+brl(saldoN)+"</b>, sem contar o que já foi pago a mais.":".")+" Sem encargos de atraso.";
-    } else $("r-saldo").textContent=sit==="quitado"?"Contrato quitado: a diferença das parcelas pagas é o que pode ser discutido.":"";
+      $("r-saldo").innerHTML="Faltam <b>"+restam+" parcelas</b>"+(atr?", "+atr+" delas em atraso":"")+". O saldo devedor estimado hoje, pelo contrato, é de cerca de <b>"+brl(saldo)+"</b>"+(d>0?"; pelo recálculo, ficaria em cerca de <b>"+brl(saldoN)+"</b>, sem contar a diferença das parcelas já pagas.":".")+" Sem encargos de atraso.";
+    } else $("r-saldo").textContent=sit==="quitado"?(d>0?"Contrato quitado: a diferença estimada das parcelas pagas é o ponto a analisar.":"Contrato quitado."):"";
     var ul=$("r-pontos"); ul.innerHTML="";
     var ROT={al:"A conferir",at:"Atenção",ok:"Em regra válido",in:"Informação"};
     var ordem={al:0,at:1,in:2,ok:3};
@@ -764,7 +770,7 @@ footer .aviso{grid-column:1/-1;border-top:1px solid var(--line);padding-top:1.25
     $("r-sit").textContent=SIT[sit]||"";
 
     var sitTxt=$("situacao").options[$("situacao").selectedIndex].text;
-    var msg="Olá! Fiz a simulação da calculadora de juros do financiamento de veículo no site da FCE. Contrato de "+String(m).padStart(2,"0")+"/"+y+", "+n+" parcelas de "+brl(P)+", juros de "+pc(iRef)+" ao mês ("+(origemTx==="contrato"?"do contrato":"calculado")+"), "+vezes(R)+" a média do Banco Central. Situação: "+sitTxt+(atr?", "+atr+" parcela(s) em atraso":"")+". Gostaria de uma análise do contrato.";
+    var msg="Olá! Fiz a simulação da calculadora de juros do financiamento de veículo no site da FCE. Contrato de "+String(m).padStart(2,"0")+"/"+y+", "+n+" parcelas de "+brl(P)+", juros de "+pc(iRef)+" ao mês ("+(origemTx==="calculada"?"calculado":"do contrato")+"), "+vezes(R)+" a média do Banco Central. Situação: "+sitTxt+(atr?", "+atr+" parcela(s) em atraso":"")+". Gostaria de uma análise do contrato.";
     $("b-wa").href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
     mostrar("resultado");
     var ult={acao:"simulacao",pagina:"veiculo",id:leadId||"",situacao:sit,data_contrato:y+"-"+String(m).padStart(2,"0"),veiculo_novo:zero?"sim":"nao",preco:preco,entrada:ent,valor_financiado:Math.round(TF),parcelas:n,valor_parcela:P,parcelas_pagas:pagas,parcelas_atraso:atr,
