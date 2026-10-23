@@ -94,16 +94,16 @@ ART_CSS='''<style>
 .frase-fabio p{font:600 1.15rem/1.45 var(--display);margin:0 0 .5rem!important;color:var(--ink)}
 .frase-fabio footer{font-size:.9rem;color:var(--muted);border:0;padding:0;margin:0;background:none;display:block}
 .caso{padding-block:clamp(2rem,5vw,3rem)}
-.caso-box{max-width:calc(var(--read) + 4rem);margin-inline:auto;padding:clamp(1.4rem,4vw,2.2rem);border-radius:10px;background:#0E1A2B;color:#fff;border-top:4px solid #F2C200}
+.caso-box{max-width:calc(var(--read) + 4rem);margin-inline:auto;padding:clamp(1.4rem,4vw,2.2rem);border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.10)),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,rgba(0,0,0,.04) 1px 2px,transparent 2px 4px),#5A626B;color:#fff;border-top:4px solid #D1AE6C}
 .caso-box h2{margin:0 0 .9rem;font-size:clamp(1.35rem,3vw,1.75rem);color:#fff;text-transform:none}
 .caso-box p,.caso-box li{color:#E6E9EE;line-height:1.6}
 .caso-box p{margin:0 0 .9rem}
-.caso-box .caso-dest{font-family:var(--display);font-weight:700;color:#F2C200;font-size:1.08rem}
+.caso-box .caso-dest{font-family:var(--display);font-weight:700;color:#E6CF9C;font-size:1.08rem}
 .caso-box ul{margin:.2rem 0 1rem;padding-left:1.2rem;display:grid;gap:.35rem}
 .caso-box .caso-acoes{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.2rem;margin:1.2rem 0 0}
-.caso-box .btn-primary{background:#F2C200;color:#0E1A2B;border-color:#F2C200}
+.caso-box .btn-primary{background:#D1AE6C;color:#1C2025;border-color:#D1AE6C}
 .caso-box .caso-sec{color:#E6E9EE;font-size:.95rem;text-decoration:underline;text-underline-offset:3px}
-.caso-box a:focus-visible{outline:3px solid #F2C200;outline-offset:3px}
+.caso-box a:focus-visible{outline:3px solid #D1AE6C;outline-offset:3px}
 </style>'''
 def fix(s, tag):
     s=s.replace('href="#inicio"','href="/"')
@@ -225,7 +225,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
 <script type="application/ld+json">{json.dumps(ld,ensure_ascii=False)}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700&family=Red+Hat+Text:wght@400;500;600&family=Red+Hat+Mono:wght@500&display=swap"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700&family=Red+Hat+Text:wght@400;500;600&family=Red+Hat+Mono:wght@500&display=swap"></noscript>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=Archivo:wght@800&display=swap"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=Archivo:wght@800&display=swap"></noscript>
 {style}
 {ART_CSS}
 <script src="/js/medicao.js" defer></script>

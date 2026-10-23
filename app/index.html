@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>FCE · Gestão</title>
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#0E1A2B">
+<meta name="theme-color" content="#25292E">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,23 +14,23 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
 <style>:root{
-  --navy:#0E1A2B;--navy-2:#16263d;--gold:#C9901C;--gold-2:#e0a93a;--gold-soft:rgba(201,144,28,.12);
-  --bg:#F4F2ED;--surface:#FFFFFF;--surface-2:#F9F8F5;--line:rgba(14,26,43,.09);--line-2:rgba(14,26,43,.16);
-  --txt:#142033;--mut:#667085;--mut-2:#98A2B3;
+  --navy:#25292E;--navy-2:#30353B;--gold:#9C7A3C;--gold-2:#D1AE6C;--gold-soft:rgba(184,150,90,.14);
+  --bg:#F3F4F6;--surface:#FFFFFF;--surface-2:#F8F9FA;--line:rgba(20,24,28,.09);--line-2:rgba(20,24,28,.16);
+  --txt:#1C2025;--mut:#667085;--mut-2:#98A2B3;
   --ok:#12805c;--ok-soft:rgba(18,128,92,.12);--warn:#b54708;--warn-soft:rgba(181,71,8,.12);--bad:#c0261a;--bad-soft:rgba(192,38,26,.11);--info:#2e6ad1;--info-soft:rgba(46,106,209,.11);
   --r:14px;--r-sm:10px;--sh:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);--sh-lg:0 12px 32px rgba(16,24,40,.14);
   --side:248px;--top:60px;--tab:68px;
-  --serif:"Playfair Display",Georgia,serif;--sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:"Source Serif 4",Georgia,serif;--sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){
-  --bg:#0A111D;--surface:#111B2B;--surface-2:#0E1726;--line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.13);
-  --txt:#E8EBF0;--mut:#98A2B3;--mut-2:#6b7688;--gold-soft:rgba(224,169,58,.14);
+  --bg:#16191D;--surface:#1D2126;--surface-2:#1A1E22;--line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.13);
+  --txt:#E8EBF0;--mut:#98A2B3;--mut-2:#6b7688;--gold-soft:rgba(209,174,108,.16);
   --ok-soft:rgba(18,160,112,.16);--warn-soft:rgba(230,120,40,.16);--bad-soft:rgba(230,70,60,.16);--info-soft:rgba(80,140,240,.16);
   --sh:0 1px 2px rgba(0,0,0,.4);--sh-lg:0 12px 32px rgba(0,0,0,.5)}}
-:root[data-tema="escuro"]{--bg:#0A111D;--surface:#111B2B;--surface-2:#0E1726;--line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.13);
-  --txt:#E8EBF0;--mut:#98A2B3;--mut-2:#6b7688;--gold-soft:rgba(224,169,58,.14);--ok-soft:rgba(18,160,112,.16);--warn-soft:rgba(230,120,40,.16);--bad-soft:rgba(230,70,60,.16);--info-soft:rgba(80,140,240,.16);--sh:0 1px 2px rgba(0,0,0,.4);--sh-lg:0 12px 32px rgba(0,0,0,.5)}
+:root[data-tema="escuro"]{--bg:#16191D;--surface:#1D2126;--surface-2:#1A1E22;--line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.13);
+  --txt:#E8EBF0;--mut:#98A2B3;--mut-2:#6b7688;--gold-soft:rgba(209,174,108,.16);--ok-soft:rgba(18,160,112,.16);--warn-soft:rgba(230,120,40,.16);--bad-soft:rgba(230,70,60,.16);--info-soft:rgba(80,140,240,.16);--sh:0 1px 2px rgba(0,0,0,.4);--sh-lg:0 12px 32px rgba(0,0,0,.5)}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--txt);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
@@ -42,13 +42,13 @@ svg.i.s{width:16px;height:16px}
 .app{min-height:100%}
 .side{position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--navy);color:#DDE3EC;display:flex;flex-direction:column;padding:18px 14px;z-index:30}
 .marca{display:flex;align-items:center;gap:12px;padding:6px 8px 22px}
-.marca .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1c2e49,#0b1524);border:1px solid rgba(201,144,28,.45);display:grid;place-items:center;font:700 22px var(--serif);color:var(--gold)}
+.marca .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1c2e49,#0b1524);border:1px solid rgba(184,150,90,.45);display:grid;place-items:center;font:700 22px var(--serif);color:var(--gold)}
 .marca b{display:block;font:700 17px/1.1 var(--serif);color:#fff;letter-spacing:.2px}
 .marca span{font-size:12px;color:#8C98AB;letter-spacing:.4px}
 .nav{display:flex;flex-direction:column;gap:2px}
 .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#B7C1D0;font-weight:500;position:relative}
 .nav a:hover{background:rgba(255,255,255,.05);color:#fff}
-.nav a.on{background:rgba(201,144,28,.14);color:#fff}
+.nav a.on{background:rgba(184,150,90,.14);color:#fff}
 .nav a.on::before{content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--gold)}
 .nav .bdg{margin-left:auto}
 .side .rodape{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 8px 4px;border-top:1px solid rgba(255,255,255,.08)}
@@ -177,7 +177,7 @@ ul.lim{margin:6px 0 0;padding-left:18px}ul.lim li{margin:3px 0}
 .bolha .doc{display:flex;gap:6px;align-items:center;font-weight:600}
 .dia-sep{align-self:center;font-size:11.5px;font-weight:600;color:var(--mut);background:var(--surface);border:1px solid var(--line);padding:2px 10px;border-radius:99px;margin:8px 0}
 /* aprovações */
-.prev{border-radius:12px;overflow:hidden;background:#0E1A2B;position:relative}
+.prev{border-radius:12px;overflow:hidden;background:#25292E;position:relative}
 .prev iframe{border:0;transform-origin:0 0;display:block;pointer-events:none;position:absolute;top:0;left:0}
 .ad-post{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:16px;padding:16px}
 @media (max-width:760px){.ad-post{grid-template-columns:1fr}}
@@ -244,9 +244,9 @@ table.tb tfoot td{font-weight:700;border-top:1px solid var(--line-2)}
 @keyframes brilho{to{background-position:-200% 0}}
 .gira{animation:gira .8s linear infinite}@keyframes gira{to{transform:rotate(360deg)}}
 /* login */
-.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(1200px 600px at 20% -10%,rgba(201,144,28,.22),transparent 60%),radial-gradient(900px 500px at 110% 110%,rgba(46,72,110,.55),transparent 60%),var(--navy)}
+.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(1200px 600px at 20% -10%,rgba(184,150,90,.22),transparent 60%),radial-gradient(900px 500px at 110% 110%,rgba(46,72,110,.55),transparent 60%),var(--navy)}
 .login .caixa{width:100%;max-width:400px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:34px 28px;text-align:center;color:#DDE3EC;backdrop-filter:blur(8px);box-shadow:0 30px 80px rgba(0,0,0,.35)}
-.login .logo{width:64px;height:64px;border-radius:18px;margin:0 auto 18px;background:linear-gradient(135deg,#1c2e49,#0b1524);border:1px solid rgba(201,144,28,.5);display:grid;place-items:center;font:700 34px var(--serif);color:var(--gold)}
+.login .logo{width:64px;height:64px;border-radius:18px;margin:0 auto 18px;background:linear-gradient(135deg,#1c2e49,#0b1524);border:1px solid rgba(184,150,90,.5);display:grid;place-items:center;font:700 34px var(--serif);color:var(--gold)}
 .login h1{font:700 28px var(--serif);color:#fff;margin:0}
 .login p{color:#9AA6B8;margin:6px 0 26px;font-size:14px}
 .login .gbtn{display:flex;justify-content:center;min-height:44px}
@@ -463,7 +463,7 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 .cc-canal{display:grid;gap:6px;padding:14px;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);min-width:0}
 .cc-canal.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)}
 .cc-canal-t{display:flex;align-items:center;gap:8px;font-size:15px}.cc-num{display:flex;align-items:baseline;gap:6px}.cc-num b{font-size:22px}.cc-num span{font-size:12.5px;color:var(--mut)}
-.cc-terc{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#3B4A63;color:#fff;flex:none}.cc-terc .i{width:12px;height:12px}.cc-terc.g{width:22px;height:22px}
+.cc-terc{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#3A4048;color:#fff;flex:none}.cc-terc .i{width:12px;height:12px}.cc-terc.g{width:22px;height:22px}
 .rede.g{width:22px;height:22px}
 .cc-filtro{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:16px 2px 4px}
 .cc-leg{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
@@ -667,8 +667,8 @@ async function agir(btn, fn, okMsg) {
 
 // ---------- logotipo FCE (svg) ----------
 const LOGO_P = ["M8.28 100.0V0.0H87.71V21.28H32.85V40.0H69.42V60.57H32.85V100.0ZM145.14 101.42Q133.71 101.42 123.92 97.5Q114.14 93.57 106.85 86.57Q99.57 79.57 95.5 70.21Q91.42 60.85 91.42 50.0Q91.42 39.0 95.5 29.64Q99.57 20.28 106.92 13.28Q114.28 6.28 124.07 2.35Q133.85 -1.57 145.14 -1.57Q153.42 -1.57 161.42 0.85Q169.42 3.28 176.21 7.64Q183.0 12.0 187.57 18.0L171.0 34.28Q160.57 21.0 145.14 21.0Q137.14 21.0 130.64 24.78Q124.14 28.57 120.42 35.14Q116.71 41.71 116.71 50.0Q116.71 58.14 120.57 64.64Q124.42 71.14 131.07 74.92Q137.71 78.71 146.0 78.71Q160.71 78.71 170.71 66.28L186.85 82.14Q182.28 88.0 175.57 92.35Q168.85 96.71 161.0 99.07Q153.14 101.42 145.14 101.42ZM190.85 100.0V0.0H269.71V21.28H215.42V39.28H251.28V59.85H215.42V78.71H270.28V100.0Z", "M288.4,100 L309.4,100 L349.4,0 L328.4,0 Z", "M319.4,100 L340.4,100 L380.4,0 L359.4,0 Z", "M410.47 65.0 422.85 35.0H428.12L440.42 65.0H435.54L432.07 56.21H418.65L415.14 65.0ZM420.11 52.48H430.61L425.38 39.28ZM453.8 65.0V35.0H464.38Q467.77 35.0 470.66 36.11Q473.55 37.22 475.67 39.26Q477.8 41.3 479.0 44.04Q480.2 46.78 480.2 50.04Q480.2 53.25 479.02 55.97Q477.84 58.7 475.70 60.73Q473.55 62.77 470.66 63.88Q467.77 65.0 464.38 65.0ZM458.3 60.97H464.47Q467.6 60.97 470.12 59.51Q472.65 58.05 474.11 55.59Q475.57 53.12 475.57 50.04Q475.57 46.91 474.11 44.42Q472.65 41.94 470.12 40.48Q467.6 39.02 464.47 39.02H458.3ZM504.50 65.0 492.24 35.0H497.08L507.24 60.58L517.57 35.0H522.2L509.77 65.0ZM549.92 65.47Q546.62 65.47 543.77 64.29Q540.92 63.11 538.80 60.99Q536.68 58.87 535.48 56.06Q534.28 53.25 534.28 50.0Q534.28 46.74 535.48 43.93Q536.68 41.12 538.80 39.00Q540.92 36.88 543.77 35.70Q546.62 34.52 549.92 34.52Q553.18 34.52 556.01 35.70Q558.84 36.88 560.98 39.00Q563.12 41.12 564.32 43.93Q565.52 46.74 565.52 50.0Q565.52 53.25 564.32 56.06Q563.12 58.87 560.98 60.99Q558.84 63.11 556.01 64.29Q553.18 65.47 549.92 65.47ZM549.92 61.31Q553.01 61.31 555.52 59.81Q558.02 58.31 559.48 55.76Q560.94 53.21 560.94 50.0Q560.94 46.78 559.48 44.21Q558.02 41.64 555.52 40.16Q553.01 38.68 549.92 38.68Q546.80 38.68 544.29 40.16Q541.78 41.64 540.32 44.21Q538.87 46.78 538.87 50.0Q538.87 53.21 540.32 55.76Q541.78 58.31 544.29 59.81Q546.80 61.31 549.92 61.31ZM594.97 65.47Q591.67 65.47 588.82 64.27Q585.97 63.07 583.82 60.97Q581.68 58.87 580.48 56.06Q579.28 53.25 579.28 50.0Q579.28 46.74 580.48 43.93Q581.68 41.12 583.80 39.02Q585.92 36.92 588.75 35.72Q591.58 34.52 594.88 34.52Q598.44 34.52 601.61 35.89Q604.78 37.27 606.97 39.71L603.88 42.71Q602.21 40.78 599.85 39.73Q597.5 38.68 594.88 38.68Q591.75 38.68 589.27 40.16Q586.78 41.64 585.32 44.21Q583.87 46.78 583.87 50.0Q583.87 53.21 585.32 55.78Q586.78 58.35 589.29 59.85Q591.80 61.35 594.97 61.35Q597.62 61.35 599.79 60.24Q601.95 59.12 603.32 57.2Q604.7 55.27 605.0 52.78H595.01V48.84H609.71V50.38Q609.71 53.59 608.60 56.34Q607.48 59.08 605.47 61.14Q603.45 63.2 600.77 64.33Q598.1 65.47 594.97 65.47ZM621.71 65.0 634.1 35.0H639.37L651.67 65.0H646.78L643.31 56.21H629.9L626.38 65.0ZM631.35 52.48H641.85L636.62 39.28ZM665.04 65.0V35.0H675.62Q679.01 35.0 681.90 36.11Q684.8 37.22 686.92 39.26Q689.04 41.3 690.24 44.04Q691.44 46.78 691.44 50.04Q691.44 53.25 690.26 55.97Q689.08 58.7 686.94 60.73Q684.8 62.77 681.90 63.88Q679.01 65.0 675.62 65.0ZM669.54 60.97H675.71Q678.84 60.97 681.37 59.51Q683.9 58.05 685.35 55.59Q686.81 53.12 686.81 50.04Q686.81 46.91 685.35 44.42Q683.9 41.94 681.37 40.48Q678.84 39.02 675.71 39.02H669.54ZM720.84 65.47Q717.54 65.47 714.69 64.29Q711.84 63.11 709.72 60.99Q707.6 58.87 706.40 56.06Q705.2 53.25 705.2 50.0Q705.2 46.74 706.40 43.93Q707.6 41.12 709.72 39.00Q711.84 36.88 714.69 35.70Q717.54 34.52 720.84 34.52Q724.1 34.52 726.92 35.70Q729.75 36.88 731.90 39.00Q734.04 41.12 735.24 43.93Q736.44 46.74 736.44 50.0Q736.44 53.25 735.24 56.06Q734.04 58.87 731.90 60.99Q729.75 63.11 726.92 64.29Q724.1 65.47 720.84 65.47ZM720.84 61.31Q723.92 61.31 726.43 59.81Q728.94 58.31 730.40 55.76Q731.85 53.21 731.85 50.0Q731.85 46.78 730.40 44.21Q728.94 41.64 726.43 40.16Q723.92 38.68 720.84 38.68Q717.71 38.68 715.20 40.16Q712.7 41.64 711.24 44.21Q709.78 46.78 709.78 50.0Q709.78 53.21 711.24 55.76Q712.7 58.31 715.20 59.81Q717.71 61.31 720.84 61.31ZM761.64 65.42Q758.04 65.42 754.7 64.03Q751.35 62.64 748.78 60.02L751.52 56.85Q756.32 61.57 761.85 61.57Q765.11 61.57 767.12 60.17Q769.14 58.78 769.14 56.55Q769.14 54.54 767.72 53.47Q766.31 52.4 763.05 51.84L758.04 51.02Q749.85 49.65 749.85 43.22Q749.85 40.65 751.22 38.70Q752.6 36.75 755.08 35.68Q757.57 34.61 760.91 34.61Q764.12 34.61 767.30 35.66Q770.47 36.71 773.0 38.68L770.51 42.07Q765.67 38.42 760.7 38.42Q757.74 38.42 755.96 39.64Q754.18 40.87 754.18 42.88Q754.18 44.72 755.42 45.69Q756.67 46.65 759.54 47.08L764.38 47.9Q769.14 48.67 771.37 50.68Q773.6 52.69 773.6 56.21Q773.6 58.95 772.1 61.03Q770.6 63.11 767.90 64.27Q765.2 65.42 761.64 65.42Z"];
-const logo = (cls, txt) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 781 104" role="img" aria-label="FCE Advogados" class="' + (cls || '') + '"><path fill="' + (txt || 'currentColor') + '" d="' + LOGO_P[0] + '"/><path fill="#8C8C8C" d="' + LOGO_P[1] + '"/><path fill="#F2C200" d="' + LOGO_P[2] + '"/><path fill="' + (txt || 'currentColor') + '" d="' + LOGO_P[3] + '"/></svg>';
-const logoMarca = (cls) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 -4 386 108" role="img" aria-label="FCE" class="' + (cls || '') + '"><path fill="currentColor" d="' + LOGO_P[0] + '"/><path fill="#8C8C8C" d="' + LOGO_P[1] + '"/><path fill="#F2C200" d="' + LOGO_P[2] + '"/></svg>';
+const logo = (cls, txt) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 781 104" role="img" aria-label="FCE Advogados" class="' + (cls || '') + '"><path fill="' + (txt || 'currentColor') + '" d="' + LOGO_P[0] + '"/><path fill="#8C8C8C" d="' + LOGO_P[1] + '"/><path fill="#D1AE6C" d="' + LOGO_P[2] + '"/><path fill="' + (txt || 'currentColor') + '" d="' + LOGO_P[3] + '"/></svg>';
+const logoMarca = (cls) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 -4 386 108" role="img" aria-label="FCE" class="' + (cls || '') + '"><path fill="currentColor" d="' + LOGO_P[0] + '"/><path fill="#8C8C8C" d="' + LOGO_P[1] + '"/><path fill="#D1AE6C" d="' + LOGO_P[2] + '"/></svg>';
 // ---------- rodapé institucional ----------
 const FCE = { nome: 'FCE Advogados', razao: 'Fabio de Castro Emerim Sociedade Individual de Advocacia', oab: 'OAB/RS 15.656', cnpj: '57.727.037/0001-33', end1: 'Rua Araguaia, 509, Jardim Mauá', end2: 'Novo Hamburgo/RS · CEP 93548-350', wa: '(51) 99206-8037', waLink: 'https://wa.me/5551992068037', email: 'atendimento@fceadvogados.com.br' };
 const blocosFCE = () => '<div class="rb"><b>' + FCE.nome + '</b><span>' + FCE.razao + '</span><span>' + FCE.oab + ' · CNPJ ' + FCE.cnpj + '</span></div>' +
