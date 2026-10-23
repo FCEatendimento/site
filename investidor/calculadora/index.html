@@ -376,6 +376,11 @@ footer p,footer a,footer span,footer strong,footer li,footer h2,footer h3,footer
 /* Tema B: ícones das ferramentas em inox escovado */
 a.fi .fi-ic{background:var(--inox);color:#E6CF9C;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 3px rgba(0,0,0,.3)}
 a.fi:hover .fi-ic{background:#D1AE6C;color:#1C2025}
+/* Tema B: fotos do prédio no topo (saguão e recepção, alternando) */
+.hero2::before{background:var(--veu),url(/img/saguao-fundo.jpg) center 45%/cover no-repeat}
+.hero2::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--veu),url(/img/recepcao-fundo.jpg) center 50%/cover no-repeat;opacity:0;animation:hero-foto 18s ease-in-out infinite;pointer-events:none}
+@keyframes hero-foto{0%,42%{opacity:0}50%,92%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.hero2::after{animation:none}}
 </style>
 <script src="/js/medicao.js" defer></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Calculadora do lance máximo em leilão de imóveis", "url": "https://fceadvogados.com.br/investidor/calculadora/", "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "inLanguage": "pt-BR", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "BRL"}, "publisher": {"@id": "https://fceadvogados.com.br/#escritorio"}, "author": {"@type": "Person", "@id": "https://fceadvogados.com.br/sobre/#fabio", "name": "Fábio de Castro Emerim", "jobTitle": "Advogado", "identifier": "OAB/RS 88.912", "url": "https://fceadvogados.com.br/sobre/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://fceadvogados.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Investidores", "item": "https://fceadvogados.com.br/investidor/"}, {"@type": "ListItem", "position": 3, "name": "Calculadora do lance máximo em leilão de imóveis", "item": "https://fceadvogados.com.br/investidor/calculadora/"}]}]}</script>
