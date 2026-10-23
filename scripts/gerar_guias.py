@@ -220,7 +220,7 @@ def page(path, title, desc, canon, body, ld, tag, robots=''):
 <meta property="og:title" content="{html.escape(title)}">
 <meta property="og:description" content="{html.escape(desc)}">
 <meta property="og:url" content="{canon}">
-<meta property="og:image" content="https://fceadvogados.com.br/img/og-fce.jpg">
+<meta property="og:image" content="https://fceadvogados.com.br/img/og-fce.jpg?v=20261023">
 <meta property="og:locale" content="pt_BR">
 <script type="application/ld+json">{json.dumps(ld,ensure_ascii=False)}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -317,7 +317,7 @@ for g in G:
   </article>'''
     bc=[("Início","https://fceadvogados.com.br/"),("Investidores","https://fceadvogados.com.br/investidor/")] if inv else [("Início","https://fceadvogados.com.br/"),("Guias","https://fceadvogados.com.br/guia/")]
     ld={"@context":"https://schema.org","@graph":[
-      {"@type":"Article","headline":g["titulo"],"description":g["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":g.get("data","2026-10-03"),"dateModified":g.get("atualizado",g.get("data","2026-10-03")),"image":"https://fceadvogados.com.br/img/og-fce.jpg"},
+      {"@type":"Article","headline":g["titulo"],"description":g["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":g.get("data","2026-10-03"),"dateModified":g.get("atualizado",g.get("data","2026-10-03")),"image":"https://fceadvogados.com.br/img/og-fce.jpg?v=20261023"},
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":u} for i,(n,u) in enumerate(bc+[(g["titulo"],url)])]}]}
     _fq=[{"@type":"Question","name":html.unescape(re.sub('<[^>]+>','',m.group(1))),"acceptedAnswer":{"@type":"Answer","text":html.unescape(re.sub('<[^>]+>','',m.group(2)))}} for m in re.finditer(r'<details><summary>(.*?)</summary><p>(.*?)</p></details>',g["corpo"],re.S)]
     if _fq: ld["@graph"].append({"@type":"FAQPage","mainEntity":_fq})
@@ -384,7 +384,7 @@ for b in B:
     </div>
   </article>'''
     ld={"@context":"https://schema.org","@graph":[
-      {"@type":"BlogPosting","headline":b["titulo"],"description":b["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":b["data"],"dateModified":b.get("atualizado",b["data"]),"image":"https://fceadvogados.com.br/img/og-fce.jpg"},
+      {"@type":"BlogPosting","headline":b["titulo"],"description":b["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":b["data"],"dateModified":b.get("atualizado",b["data"]),"image":"https://fceadvogados.com.br/img/og-fce.jpg?v=20261023"},
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fceadvogados.com.br/blog/"},{"@type":"ListItem","position":3,"name":b["titulo"],"item":url}]}]}
     page(f'/blog/{b["slug"]}/index.html', b["seo"] if 'FCE' in b["seo"] else b["seo"]+' | FCE Advogados', b["desc"], url, body, ld, 'blog')
 cards=''.join(f'<a href="/blog/{b["slug"]}/"><time datetime="{b["data"]}">{dbr(b["data"])}</time><strong>{html.escape(b["titulo"])}</strong><span>{html.escape(b["desc"])}</span></a>' for b in B) or '<p>Em breve, os primeiros artigos.</p>'
@@ -453,7 +453,7 @@ for g in V:
     </div>
   </article>'''
     ld={"@context":"https://schema.org","@graph":[
-      {"@type":"Article","headline":g["titulo"],"description":g["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":g.get("data","2026-10-03"),"dateModified":g.get("data","2026-10-03"),"image":"https://fceadvogados.com.br/img/og-fce.jpg"},
+      {"@type":"Article","headline":g["titulo"],"description":g["desc"],"inLanguage":"pt-BR","mainEntityOfPage":url,"author":AUT,"publisher":ORG,"datePublished":g.get("data","2026-10-03"),"dateModified":g.get("data","2026-10-03"),"image":"https://fceadvogados.com.br/img/og-fce.jpg?v=20261023"},
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://fceadvogados.com.br/"},{"@type":"ListItem","position":2,"name":"Veículo","item":"https://fceadvogados.com.br/veiculo/"},{"@type":"ListItem","position":3,"name":g["titulo"],"item":url}]}]}
     page(f'/veiculo/{g["slug"]}/index.html', g["seo"] if 'FCE' in g["seo"] else g["seo"]+' | FCE Advogados', g["desc"], url, body, ld, 'veiculo')
 VH=open(SITE+'/content/veiculo.html',encoding='utf-8').read().replace('{{GUIAS}}',''.join(f'<a href="/veiculo/{g["slug"]}/"><strong>{html.escape(g["titulo"])}</strong><span>{html.escape(g["desc"])}</span></a>' for g in V))
