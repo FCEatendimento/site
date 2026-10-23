@@ -335,6 +335,11 @@ a.fi:hover .fi-ic{background:#D1AE6C;color:#1C2025}
 .hero2::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--veu),url(/img/recepcao-fundo.jpg) center 50%/cover no-repeat;opacity:0;animation:hero-foto 18s ease-in-out infinite;pointer-events:none}
 @keyframes hero-foto{0%,42%{opacity:0}50%,92%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.hero2::after{animation:none}}
+/* Tema B: foto da biblioteca atrás da palavra do advogado */
+:root{--veu2:linear-gradient(180deg,rgba(255,255,255,.80),rgba(255,255,255,.86))}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--veu2:linear-gradient(180deg,rgba(22,25,29,.80),rgba(22,25,29,.88))}}
+:root[data-theme="dark"]{--veu2:linear-gradient(180deg,rgba(22,25,29,.80),rgba(22,25,29,.88))}
+section.fala{background:var(--veu2),url(/img/biblioteca-fundo.jpg) center 45%/cover no-repeat}
 </style>
 <style id="triagem-css">
 /* Guia de triagem da home */
