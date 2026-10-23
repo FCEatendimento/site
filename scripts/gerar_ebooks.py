@@ -26,11 +26,12 @@ GUIAS = [
 
 def ff(fam, pkg, w):
     return f"@font-face{{font-family:'{fam}';font-weight:{w};src:url('file://{M}/fontes/{pkg}-latin-{w}-normal.woff2') format('woff2')}}"
-fonts = '\n'.join([ff('RHD', 'red-hat-display', w) for w in (500, 700, 800)] + [ff('RHT', 'red-hat-text', w) for w in (400, 500, 600, 700)] + [ff('RHM', 'red-hat-mono', 500)])
-logo_claro = open(SITE + '/img/logo-escuro.svg').read()
+# Visual novo (out/2026): títulos em Source Serif 4, texto e rótulos em Inter, logotipo em Archivo
+fonts = '\n'.join([ff('RHD', 'source-serif-4', w) for w in (600, 700)] + ["@font-face{font-family:'RHD';font-weight:800;src:url('file://" + M + "/fontes/source-serif-4-latin-700-normal.woff2') format('woff2')}"] + [ff('RHT', 'inter', w) for w in (400, 500, 600, 700)] + [ff('RHM', 'inter', 500), ff('LOGO', 'archivo', 800)])
+logo_claro = ('<div class="logo">FCE<i>/</i><i class="o">/</i><span>ADVOGADOS</span></div>')
 foto = 'data:image/jpeg;base64,' + base64.b64encode(open(SITE + '/img/fabio.jpg', 'rb').read()).decode()
 BASE = '''
-:root{--ink:#0E1A2B;--muted:#5A5A56;--line:#DCDCD7;--bg:#F6F6F4;--acc:#F2C200;--acc-soft:#FBF4D9;--acc-text:#7A5E00;--red:#A3372A;--red-soft:#F7E4E0}
+:root{--ink:#1C2025;--muted:#5C636B;--line:#E2E4E7;--bg:#F5F6F7;--acc:#B8965A;--acc-soft:#F1F2F4;--acc-text:#8A6A2E;--red:#A3372A;--red-soft:#F7E4E0}
 *{box-sizing:border-box}html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{margin:0;font-family:RHT,sans-serif;color:var(--ink);font-size:9.8pt;line-height:1.5}
 h1,h2{font-family:RHD,sans-serif;line-height:1.15;margin:0}
@@ -40,17 +41,17 @@ def montar(g, MES):
     TITULO, SUB, TAG = g['titulo'], g['sub'], g['tag']
     capa = f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts}{BASE}
     @page{{size:A5;margin:0}}
-    .capa{{width:148mm;height:210mm;background:#0E1A2B;color:#ECECE8;padding:16mm 14mm 14mm;display:flex;flex-direction:column;position:relative;overflow:hidden}}
-    .capa svg{{width:62mm;height:auto}}
-    .capa .tag{{margin-top:34mm;font:500 8.5pt RHM,monospace;letter-spacing:.14em;text-transform:uppercase;color:#F2C200}}
+    .capa{{width:148mm;height:210mm;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(0,0,0,.14)),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 .25mm,rgba(0,0,0,.045) .25mm .5mm,transparent .5mm 1mm),#3A4048;color:#EEF0F2;padding:16mm 14mm 14mm;display:flex;flex-direction:column;position:relative;overflow:hidden}}
+    .capa .logo{{font:800 26pt/1 LOGO,sans-serif;letter-spacing:-.02em;color:#FFFFFF;display:flex;align-items:baseline}}.capa .logo i{{font-style:normal;color:#AEB4BB;margin-left:.5mm}}.capa .logo i.o{{color:#D1AE6C;margin-left:0}}.capa .logo span{{font:600 7.5pt/1 RHT,sans-serif;letter-spacing:.28em;color:#C9CED4;margin-left:4mm}}
+    .capa .tag{{margin-top:34mm;font:500 8.5pt RHM,monospace;letter-spacing:.14em;text-transform:uppercase;color:#E6CF9C}}
     .capa h1{{font-size:30pt;font-weight:800;margin:4mm 0 6mm;color:#fff;letter-spacing:-.01em}}
-    .capa p.sub{{font-size:12.5pt;line-height:1.45;color:#C9CDD3;max-width:112mm;margin:0}}
+    .capa p.sub{{font-size:12.5pt;line-height:1.45;color:#E4E7EB;max-width:112mm;margin:0}}
     .capa .faixa{{position:absolute;right:-14mm;bottom:52mm;display:flex;gap:4mm}}
     .capa .faixa i{{display:block;width:9mm;height:58mm;transform:skewX(-22deg)}}
-    .capa .faixa i:first-child{{background:#8C8C8C}}.capa .faixa i:last-child{{background:#F2C200}}
-    .capa .pe{{margin-top:auto;border-top:1px solid #22304A;padding-top:5mm;font-size:9pt;color:#A6A6A0;line-height:1.5}}
+    .capa .faixa i:first-child{{background:#8C8C8C}}.capa .faixa i:last-child{{background:#D1AE6C}}
+    .capa .pe{{margin-top:auto;border-top:1px solid rgba(255,255,255,.2);padding-top:5mm;font-size:9pt;color:#C9CED4;line-height:1.5}}
     .capa .pe strong{{color:#fff;font-family:RHD;font-size:11pt}}
-    .capa .atual{{display:inline-block;margin-top:2.5mm;font:500 7.8pt RHM,monospace;letter-spacing:.12em;text-transform:uppercase;color:#F2C200}}
+    .capa .atual{{display:inline-block;margin-top:2.5mm;font:500 7.8pt RHM,monospace;letter-spacing:.12em;text-transform:uppercase;color:#E6CF9C}}
     </style></head><body><div class="capa">{logo_claro}
     <p class="tag">{TAG}</p>
     <h1>{TITULO}</h1><p class="sub">{SUB}</p>
