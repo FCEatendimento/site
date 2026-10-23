@@ -324,6 +324,9 @@ footer p,footer a,footer span,footer strong,footer li,footer h2,footer h3,footer
 /* Tema B: botões da barra superior escura */
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .top button{background:rgba(13,14,16,.6)}}
 :root[data-theme="dark"] .top button{background:rgba(13,14,16,.6)}
+/* Tema B: barra superior escura em inox escovado */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .top{background:linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.30)),var(--inox)}}
+:root[data-theme="dark"] .top{background:linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.30)),var(--inox)}
 </style>
 <style>
 .art{padding-block:clamp(2rem,5vw,3.5rem)}
