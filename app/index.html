@@ -454,6 +454,42 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 :root[data-tema="escuro"] .prz-c b{background:#3a4c6b}
 @media (max-width:760px){.cal-d.prz{min-height:64px}.prz-c{gap:2px}.prz-c .tlogo.xs{width:16px;height:12px;padding:0 1px}.prz-c b{min-width:15px;height:15px;font-size:10px}.prz-tag{padding-right:6px}.prz-c em{font-size:9px}.prz-c:not(.trf) em{display:none}.prz-c.trf .tlogo{display:none}}
 .prz-c em{font-style:normal;font-weight:700;font-size:11px;color:var(--mut)}
+
+/* Conteúdo: calendário por canal */
+.cc-meta{margin-top:12px}.cc-meta .corpo{display:grid;gap:8px}.cc-meta-l{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;align-items:baseline}.cc-meta-l b{font-size:15px}
+.cc-barra{height:8px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden;position:relative}
+.cc-barra i{position:absolute;left:0;top:0;bottom:0;background:var(--ok);border-radius:99px}.cc-barra i.def{background:var(--gold-soft);border-right:2px solid var(--gold)}
+.cc-canais{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}
+.cc-canal{display:grid;gap:6px;padding:14px;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);min-width:0}
+.cc-canal.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)}
+.cc-canal-t{display:flex;align-items:center;gap:8px;font-size:15px}.cc-num{display:flex;align-items:baseline;gap:6px}.cc-num b{font-size:22px}.cc-num span{font-size:12.5px;color:var(--mut)}
+.cc-terc{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#3B4A63;color:#fff;flex:none}.cc-terc .i{width:12px;height:12px}.cc-terc.g{width:22px;height:22px}
+.rede.g{width:22px;height:22px}
+.cc-filtro{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:16px 2px 4px}
+.cc-leg{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.cc-pt{display:inline-block;width:9px;height:9px;border-radius:50%;flex:none;background:var(--mut-2)}
+.cc-pt.IDEIA{background:var(--mut-2)}.cc-pt.EM_PRODUCAO{background:var(--warn)}.cc-pt.PRONTO{background:var(--info)}.cc-pt.APROVADO{background:var(--gold)}.cc-pt.PUBLICADO{background:var(--ok)}
+.cc-grade{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start;margin-top:8px}
+.cc-lado{position:sticky;top:calc(var(--top) + 12px)}
+.cc-nts{display:grid;gap:14px;max-height:calc(100vh - var(--top) - 120px);overflow:auto}
+.cc-nt{display:grid;gap:5px;padding-bottom:12px;border-bottom:1px solid var(--line)}.cc-nt:last-child{border-bottom:0;padding-bottom:0}
+.cc-nt-t{font-weight:650;font-size:14px;line-height:1.35;color:var(--txt);text-decoration:none}.cc-nt-t:hover{text-decoration:underline}
+.cc-nt-r{margin:0;color:var(--mut);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cc-sg{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.4;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px}
+.cc-sg>div{flex:1;min-width:0}.cc-sg .rede,.cc-sg .cc-terc{width:16px;height:16px;margin-top:1px;flex:none}.cc-sg .btn{flex:none}
+.cc-sem{margin-top:12px}.cc-sem .cab h2{font-size:15px}
+.cc-dia{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;padding:10px 16px;border-top:1px solid var(--line)}
+.cc-dia .dn{font-weight:700;font-size:13px;line-height:1.25}.cc-dia .dn small{display:block;font-weight:500;color:var(--mut)}.cc-dia.hoje .dn{color:var(--gold)}
+.cc-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.cc-slot{border:1px solid var(--line);border-radius:10px;padding:7px 9px;min-height:52px;display:flex;flex-direction:column;gap:3px;background:var(--surface);text-align:left;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.cc-slot:hover{border-color:var(--gold)}.cc-slot.vazio{border-style:dashed;background:transparent;color:var(--mut)}
+.cc-slot.c-TERCEIROS,.cc-slot.c-LINKEDIN{border-left:3px solid var(--navy)}.cc-slot.c-LINKEDIN{border-left-color:#0A66C2}
+.cc-sl-top{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut)}.cc-sl-top .rede,.cc-sl-top .cc-terc{width:14px;height:14px}.cc-sl-top .cc-pt{margin-left:auto}
+.cc-sl-t{font-size:12.5px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cc-slot.vazio .cc-sl-t{font-weight:500}
+@media (max-width:1100px){.cc-grade{grid-template-columns:minmax(0,1fr)}.cc-lado{position:static}.cc-nts{max-height:none}}
+.cc-ir{display:none}@media (max-width:1100px){.cc-ir{display:inline-flex}}
+@media (max-width:760px){.cc-canais{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cc-canal{padding:10px;gap:4px}.cc-canal>.pp{display:none}.cc-canal-t{font-size:12.5px;flex-direction:column;align-items:flex-start;gap:4px}.cc-num b{font-size:18px}.cc-num span{font-size:11px}.cc-meta-l b{font-size:14px}.cc-dia{grid-template-columns:44px minmax(0,1fr);padding-left:10px;padding-right:10px;gap:8px}.cc-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}}
 </style>
 </head>
 <body>
@@ -1555,7 +1591,7 @@ VIEWS.mais = async () => {
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="#/conteudo"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário do LinkedIn e do Instagram, aprovações e pautas</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/conteudo"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário de 30 dias por canal (terceiros, Instagram, LinkedIn) e sugestões das notícias</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a>' +
     '<a class="item" href="https://fceadvogados.com.br/calculadora/" target="_blank" rel="noopener"><div class="ic-circ info">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Simulador da calculadora</div><div class="d">Abre o simulador do site (quanto do imóvel está em jogo)</div></div>' + ic('link', 's') + '</a></div>' +
@@ -1565,71 +1601,168 @@ VIEWS.mais = async () => {
   $('#mTema').onclick = () => $('#btnTema').click();
   $('#mSair').onclick = () => $('[data-sair]').click();
 };
-// ---------- CONTEÚDO (calendário) ----------
+// ---------- CONTEÚDO (calendário por canal) ----------
 const STATUS_POST = { AGUARDANDO: 'para aprovar', APROVADO: 'aprovado', PUBLICANDO: 'publicando', PUBLICADO: 'publicado', FALHOU: 'falhou', RASCUNHO: 'rascunho' };
-const PUB_POST = { DEVEDOR: 'devedor', ARREMATANTE: 'arrematante', GERAL: 'geral' };
+const PUB_POST = { DEVEDOR: 'devedor', ARREMATANTE: 'arrematante', GERAL: 'geral', GARANTIA: 'garantia', VEICULO: 'veículo' };
 function itemPauta(n) {
   const us = (n.usada_por || []).map((x) => x === 'MARINA' ? 'Instagram' : x === 'BEATRIZ' ? 'LinkedIn' : x);
   return '<a class="item" href="' + esc(n.url) + '" target="_blank" rel="noopener"><div class="ic-circ info">' + ic('jornal', 's') + '</div><div class="mid"><div class="t">' + esc(n.titulo) + '</div><div class="d">' + esc(String(n.fonte || '').replace(/^www\./, '')) + (n.publicada_em ? ' · ' + esc(dataCurta(n.publicada_em)) : '') + ' · ' + esc(PUB_POST[n.publico] || 'geral') + (us.length ? ' · usada no ' + esc(us.join(' e ')) : '') + '</div>' + (n.resumo ? '<div class="d" style="white-space:normal;margin-top:2px">' + esc(n.resumo) + '</div>' : '') + '</div>' + ic('link', 's') + '</a>';
 }
+// Cotas: sites de terceiros 1 artigo a cada 2 semanas (quinta, a partir de 29/10/2026);
+// Instagram 2 carrosséis, 1 reels e 3 stories por dia; LinkedIn 1 post por semana (terça).
+const CONT = {
+  dias: 30, linkedinDia: 2, terceirosBase: '2026-10-29',
+  canais: {
+    TERCEIROS: { nome: 'Sites de terceiros', curto: 'Terceiros', cota: '1 artigo a cada 2 semanas', sub: 'JusBrasil, Conjur e Migalhas' },
+    INSTAGRAM: { nome: 'Instagram', curto: 'Instagram', cota: '2 carrosséis, 1 reels e 3 stories por dia', sub: '' },
+    LINKEDIN: { nome: 'LinkedIn', curto: 'LinkedIn', cota: '1 post por semana (terça)', sub: '' }
+  },
+  formatos: { ARTIGO: 'Artigo', CARROSSEL: 'Carrossel', REELS: 'Reels', STORY: 'Story', POST: 'Post' },
+  status: { IDEIA: 'ideia', EM_PRODUCAO: 'em produção', PRONTO: 'pronto', APROVADO: 'aprovado', PUBLICADO: 'publicado', CANCELADO: 'cancelado' },
+  veiculos: { JUSBRASIL: 'JusBrasil', CONJUR: 'Conjur', MIGALHAS: 'Migalhas' }
+};
+const contDt = (k) => new Date(k + 'T12:00:00Z');
+const contK = (d) => d.toISOString().slice(0, 10);
+const contSoma = (k, n) => { const d = contDt(k); d.setUTCDate(d.getUTCDate() + n); return contK(d); };
+function contVagas(k) {
+  const d = contDt(k), v = [];
+  if (Math.round((d - contDt(CONT.terceirosBase)) / 864e5) % 14 === 0) v.push({ canal: 'TERCEIROS', formato: 'ARTIGO', posicao: 1 });
+  if (d.getUTCDay() === CONT.linkedinDia) v.push({ canal: 'LINKEDIN', formato: 'POST', posicao: 1 });
+  [['CARROSSEL', 1], ['CARROSSEL', 2], ['REELS', 1], ['STORY', 1], ['STORY', 2], ['STORY', 3]].forEach(([f, p]) => v.push({ canal: 'INSTAGRAM', formato: f, posicao: p }));
+  return v;
+}
+const contIcone = (c, cls) => c === 'INSTAGRAM' ? rede('insta', cls) : c === 'LINKEDIN' ? rede('linkedin', cls) : '<span class="cc-terc' + (cls ? ' ' + cls : '') + '">' + ic('jornal', 's') + '</span>';
+const contRot = (x) => (CONT.formatos[x.formato] || x.formato) + (x.canal === 'INSTAGRAM' && x.formato !== 'REELS' ? ' ' + x.posicao : '');
+const contPronto = (it) => it && ['PRONTO', 'APROVADO', 'PUBLICADO'].includes(it.status);
 VIEWS.conteudo = async (_, forcar) => {
   titulo('Conteúdo');
   if (!S.cache.conteudo) carregando(4);
   const d = await dados('conteudo', 'conteudo', null, forcar);
-  const li = d.linkedin || [], ig = d.insta || [], nt = d.noticias || [];
+  const itens = d.itens || [], nt = d.noticias || [];
   const hoje = d.hoje || hojeChave();
-  const porData = (arr) => { const m = {}; arr.forEach((p) => { m[String(p.data_publicacao).slice(0, 10)] = p; }); return m; };
-  const mL = porData(li), mI = porData(ig);
-  const todos = li.map((p) => Object.assign({ canal: 'linkedin' }, p)).concat(ig.map((p) => Object.assign({ canal: 'insta' }, p)));
-  const cont = (st) => todos.filter((p) => p.status === st && String(p.data_publicacao) >= hoje).length;
-  const kpi = (rot, val, sub, i) => '<div class="card kpi"><div class="ico">' + ic(i, 's') + '</div><div class="rot">' + rot + '</div><div class="val">' + val + '</div><div class="sub">' + sub + '</div></div>';
-  let h = '<div class="kpis kpis3" style="margin-top:12px">' + kpi('Para aprovar', cont('AGUARDANDO'), 'posts esperando você', 'checks') + kpi('Aprovados', cont('APROVADO'), 'publicam no dia marcado', 'cal') +
-    kpi('Publicados', todos.filter((p) => p.status === 'PUBLICADO').length, 'nos últimos 7 dias', 'check') + '</div>';
-  h += '<p class="pp mut" style="margin:10px 2px 0">LinkedIn (Beatriz): segunda, quarta e sexta às 8h · Instagram e Facebook (Marina): segunda a sexta às 12h. Cada post é preparado na véspera e só é publicado depois da sua aprovação.</p>';
-  const dt = (k) => new Date(k + 'T12:00:00Z');
-  const k0 = (() => { const x = dt(hoje); x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7)); return x; })();
-  const slot = (p, canal, k, dia) => {
-    const prev = canal === 'linkedin' ? [1, 3, 5].includes(dia) : dia <= 5;
-    if (!p) return '<div class="slot vazio"><div class="sl-top">' + rede(canal) + (prev ? (k <= hoje ? 'sem post' : 'preparado na véspera') : 'sem post neste dia') + '</div></div>';
-    return '<button class="slot" data-post="' + canal + '|' + p.token + '"><div class="sl-top">' + rede(canal) + '<span class="fmt">' + (canal === 'insta' ? (p.formato === 'IMAGEM' ? 'imagem' : 'carrossel') : 'carrossel') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div><div class="sl-t">' + esc(p.tema || 'Post') + '</div></button>';
-  };
-  for (let w = 0; w < 4; w++) {
-    const ini = new Date(k0.getTime() + w * 7 * 864e5);
-    const fim = new Date(ini.getTime() + 4 * 864e5);
-    h += '<div class="card cal-sem"><div class="cab"><h2 style="flex:1">' + (w === 0 ? 'Esta semana' : w === 1 ? 'Próxima semana' : 'Semana de ' + esc(ini.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', timeZone: 'UTC' }))) + '</h2><span class="pp mut">' + esc(ini.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + ' a ' + esc(fim.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + '</span></div>' +
-      '<div class="cal-cols"><span></span><span>' + rede('linkedin') + ' LinkedIn</span><span>' + rede('insta') + rede('facebook') + ' Instagram e Facebook</span></div>';
-    for (let i = 0; i < 5; i++) {
-      const x = new Date(ini.getTime() + i * 864e5), k = x.toISOString().slice(0, 10);
-      h += '<div class="cal-dia' + (k === hoje ? ' hoje' : '') + '" style="' + (k < hoje ? 'opacity:.62' : '') + '"><div class="dn">' + esc(x.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' }).replace('.', '')) + '<small>' + esc(x.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + '</small></div>' +
-        slot(mL[k], 'linkedin', k, i + 1) + slot(mI[k], 'insta', k, i + 1) + '</div>';
+  const filtro = S.contFiltro || 'TODOS';
+  const chave = (x) => x.data + '|' + x.canal + '|' + x.formato + '|' + x.posicao;
+  const mapa = {}; itens.forEach((x) => { mapa[chave(x)] = x; });
+  const dias = []; for (let i = 0; i < CONT.dias; i++) dias.push(contSoma(hoje, i));
+  // cobertura por canal nos próximos 30 dias
+  const cob = {};
+  Object.keys(CONT.canais).forEach((c) => {
+    let tot = 0, def = 0, pr = 0, ate = null, seq = true;
+    dias.forEach((k) => {
+      const vs = contVagas(k).filter((v) => v.canal === c);
+      let diaOk = true;
+      vs.forEach((v) => { tot++; const it = mapa[chave(Object.assign({ data: k }, v))]; if (it) def++; if (contPronto(it)) pr++; else diaOk = false; });
+      if (seq && vs.length) { if (diaOk) ate = k; else seq = false; }
+    });
+    cob[c] = { tot, def, pr, ate };
+  });
+  // dias à frente com tudo pronto (todos os canais)
+  let frente = 0;
+  for (const k of dias) { if (contVagas(k).every((v) => contPronto(mapa[chave(Object.assign({ data: k }, v))]))) frente++; else break; }
+  const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+  let h = '<div class="cc-meta card"><div class="corpo"><div class="cc-meta-l"><span class="pq mut">Meta: 30 dias de conteúdo programado com antecedência</span><b>' + frente + ' de 30 dias prontos</b></div><div class="cc-barra"><i style="width:' + pct(frente, 30) + '%"></i></div></div></div>';
+  h += '<div class="cc-canais">' + Object.entries(CONT.canais).map(([c, m]) => {
+    const x = cob[c];
+    return '<button class="card cc-canal' + (filtro === c ? ' on' : '') + '" data-filtro="' + c + '"><div class="cc-canal-t">' + contIcone(c, 'g') + '<b>' + esc(m.nome) + '</b></div><div class="pp mut">' + esc(m.cota) + (m.sub ? ' · ' + esc(m.sub) : '') + '</div>' +
+      '<div class="cc-num"><b>' + x.def + '</b><span>de ' + x.tot + ' vagas preenchidas</span></div><div class="cc-barra"><i class="def" style="width:' + pct(x.def, x.tot) + '%"></i><i style="width:' + pct(x.pr, x.tot) + '%"></i></div>' +
+      '<div class="pp mut">' + x.pr + ' prontas' + (x.ate ? ' · programado até ' + esc(dataCurta(x.ate + 'T12:00:00')) : '') + '</div></button>';
+  }).join('') + '</div>';
+  h += '<div class="cc-filtro"><div class="seg" id="ccSeg">' + [['TODOS', 'Todos']].concat(Object.entries(CONT.canais).map(([c, m]) => [c, m.curto])).map(([c, t]) => '<button data-filtro="' + c + '" class="' + (filtro === c ? 'on' : '') + '">' + t + '</button>').join('') + '</div>' +
+    '<button class="btn sm fant cc-ir" id="ccIr">' + ic('jornal', 's') + ' Sugestões (' + nt.length + ')</button><span class="pp mut cc-leg"><i class="cc-pt IDEIA"></i>ideia <i class="cc-pt EM_PRODUCAO"></i>em produção <i class="cc-pt PRONTO"></i>pronto <i class="cc-pt APROVADO"></i>aprovado <i class="cc-pt PUBLICADO"></i>publicado</span></div>';
+  // calendário
+  let cal = '';
+  dias.forEach((k, i) => {
+    const x = contDt(k), dow = x.getUTCDay();
+    if (i === 0 || dow === 1) {
+      if (i) cal += '</div>';
+      const fim = contSoma(k, Math.min(6 - ((dow + 6) % 7), CONT.dias - 1 - i));
+      cal += '<div class="card cc-sem"><div class="cab"><h2 style="flex:1">' + (i === 0 ? 'Esta semana' : 'Semana de ' + esc(x.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', timeZone: 'UTC' }))) + '</h2><span class="pp mut">' + esc(dataCurta(k + 'T12:00:00')) + ' a ' + esc(dataCurta(fim + 'T12:00:00')) + '</span></div>';
     }
-    h += '</div>';
-  }
-  h += '<div class="sec-tit">Pautas da semana <span class="pp mut" style="font-weight:500;margin-left:6px">notícias que a Beatriz e a Marina podem usar como gancho</span></div><div class="card lista">' + (nt.length ? nt.map(itemPauta).join('') : '<div class="vazio">As notícias do tema aparecem aqui todo dia às 6h.</div>') + '</div>';
+    const vs = contVagas(k).filter((v) => filtro === 'TODOS' || v.canal === filtro);
+    const extras = itens.filter((it) => it.data === k && (filtro === 'TODOS' || it.canal === filtro) && !vs.some((v) => v.canal === it.canal && v.formato === it.formato && v.posicao === it.posicao));
+    const slots = vs.map((v) => Object.assign({ data: k }, v)).concat(extras).map((v) => {
+      const it = mapa[chave(v)];
+      const lab = '<span class="cc-sl-top">' + contIcone(v.canal) + '<span>' + esc(contRot(v)) + (v.canal === 'TERCEIROS' && it && it.veiculo ? ' · ' + esc(CONT.veiculos[it.veiculo]) : '') + '</span>' + (it ? '<i class="cc-pt ' + esc(it.status) + '" title="' + esc(CONT.status[it.status] || it.status) + '"></i>' : '') + '</span>';
+      return '<button class="cc-slot' + (it ? ' ' + esc(it.status) : ' vazio') + ' c-' + v.canal + '" data-vaga="' + esc(chave(v)) + '">' + lab + '<span class="cc-sl-t">' + (it ? esc(it.tema || '') : '+ definir') + '</span></button>';
+    }).join('');
+    cal += '<div class="cc-dia' + (k === hoje ? ' hoje' : '') + '"><div class="dn">' + esc(x.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' }).replace('.', '')) + '<small>' + esc(x.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })) + '</small></div><div class="cc-slots">' + slots + '</div></div>';
+  });
+  cal += '</div>';
+  // sugestões das notícias
+  const sug = nt.length ? nt.map((n, i) => {
+    const sg = Array.isArray(n.sugestoes) ? n.sugestoes : [];
+    return '<div class="cc-nt"><a class="cc-nt-t" href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.titulo) + '</a><div class="pp mut">' + esc(String(n.fonte || '').replace(/^www\./, '')) + ' · ' + esc(dataCurta(n.publicada_em || n.created_at)) + ' · ' + esc(PUB_POST[n.publico] || 'geral') + (n.no_calendario ? ' · <span class="chip ok" style="height:20px">no calendário</span>' : '') + '</div>' +
+      (n.resumo ? '<p class="pq cc-nt-r">' + esc(n.resumo) + '</p>' : '') +
+      (sg.length ? sg.map((g, j) => '<div class="cc-sg">' + contIcone(g.canal) + '<div><b>' + esc(CONT.formatos[g.formato] || g.formato) + '</b> · ' + esc(g.ideia) + '</div><button class="btn sm fant" data-usar="' + i + '|' + j + '" title="Pôr no calendário">' + ic('mais2', 's') + '</button></div>').join('')
+        : '<div class="cc-sg"><span class="pp mut" style="flex:1">Sem sugestão pronta.</span><button class="btn sm fant" data-usar="' + i + '|-1">' + ic('mais2', 's') + ' Usar</button></div>') + '</div>';
+  }).join('') : '<div class="vazio">As notícias do tema chegam todo dia às 6h10, com sugestões para cada canal.</div>';
+  h += '<div class="cc-grade"><div class="cc-cal">' + cal + '</div><aside class="cc-lado"><div class="sec-tit" style="margin-top:0">' + ic('jornal', 's') + 'Sugestões a partir de notícias</div><div class="card"><div class="corpo cc-nts">' + sug + '</div></div>' +
+    '<p class="pp mut" style="margin:10px 2px 0">As sugestões são só ponto de partida: o conteúdo é definido com o senhor antes de entrar no calendário. Nada é publicado automaticamente.</p></aside></div>';
   $('#cont').innerHTML = h;
-  const recarregar = () => { S.cache = {}; VIEWS.conteudo(null, true); };
-  $$('[data-post]').forEach((b) => b.onclick = async () => {
-    const [canal, tk] = b.dataset.post.split('|');
-    const p = (canal === 'insta' ? ig : li).find((x) => x.token === tk); if (!p) return;
-    const pend = ['AGUARDANDO', 'FALHOU'].includes(p.status);
-    const corpo = '<div class="post-modal">' + (p.html ? prevHtml(p.html, 'm0') : '') + '<div class="chips" style="margin:12px 0 6px"><span class="chip">' + rede(canal) + (canal === 'insta' ? rede('facebook') + 'Marina' : 'Beatriz') + '</span><span class="chip">' + esc(dataCurta(p.data_publicacao + 'T12:00:00')) + (canal === 'insta' ? ' às 12h' : ' às 8h') + '</span><span class="st ' + esc(p.status) + '">' + esc(STATUS_POST[p.status] || p.status) + '</span></div>' +
-      '<div style="font-weight:700">' + esc(p.tema || '') + '</div>' + (p.erro ? '<p class="pp" style="color:var(--bad)">' + esc(p.erro) + '</p>' : '') +
-      '<div class="texto pq" style="margin-top:8px;padding:12px;border-radius:10px;background:var(--surface-2);max-height:220px;overflow:auto;white-space:pre-wrap">' + esc(p.texto || '') + '</div>' +
-      (p.link ? '<p class="pq" style="margin-top:10px"><a href="' + esc(p.link) + '" target="_blank" rel="noopener">' + ic('link', 's') + ' Ver publicação</a></p>' : '') + '</div>';
-    const botoes = pend ? [{ t: 'Descartar', c: 'fant', v: 'descartar' }, { t: 'Pedir ajuste', c: 'fant', v: 'ajustar' }, { t: 'Editar texto', c: '', v: 'editar' }, { t: 'Aprovar', c: 'pri', v: 'aprovar' }] : [{ t: 'Fechar', c: 'pri', v: null }];
-    const pr = modal({ titulo: canal === 'insta' ? 'Post do Instagram' : 'Post do LinkedIn', corpo, botoes });
-    setTimeout(ajustarPrevs, 50);
-    let a = await pr; if (!a) return;
-    let obs = '', texto = '';
-    if (a === 'editar') { texto = await pedirTexto(canal === 'insta' ? 'Editar legenda' : 'Editar texto do post', 'O post é aprovado com o texto que você deixar aqui.', '', true, p.texto); if (!texto) return; a = 'aprovar'; }
-    if (a === 'ajustar') { obs = await pedirTexto('Pedir ajuste', 'O que mudar no post?', '', true); if (!obs) return; }
-    if (a === 'descartar' && !(await confirmar('Descartar post?', 'Este post não será publicado.', 'Descartar', true))) return;
-    try {
-      await agir(null, () => api('decidir', { tipo: canal === 'insta' ? 'insta' : 'post', token: tk, decisao: a, obs, texto }), a === 'aprovar' ? 'Post aprovado' : a === 'descartar' ? 'Post descartado' : 'Pedido enviado. A nova versão chega em alguns minutos.');
-    } catch (e) { return; }
-    recarregar();
+  const recarregar = () => { delete S.cache.conteudo; VIEWS.conteudo(null, true); };
+  if ($('#ccIr')) $('#ccIr').onclick = () => $('.cc-lado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $$('[data-filtro]').forEach((b) => b.onclick = () => { S.contFiltro = (S.contFiltro === b.dataset.filtro && b.classList.contains('cc-canal')) ? 'TODOS' : b.dataset.filtro; VIEWS.conteudo(); });
+  $$('[data-vaga]').forEach((b) => b.onclick = async () => {
+    const [data, canal, formato, posicao] = b.dataset.vaga.split('|');
+    const it = mapa[b.dataset.vaga];
+    if (await editarConteudo(it || { data, canal, formato, posicao: Number(posicao) }, mapa)) recarregar();
+  });
+  $$('[data-usar]').forEach((b) => b.onclick = async () => {
+    const [i, j] = b.dataset.usar.split('|').map(Number), n = nt[i], g = j >= 0 ? (n.sugestoes || [])[j] : null;
+    const canal = g ? g.canal : (filtro !== 'TODOS' ? filtro : 'INSTAGRAM');
+    const formato = g ? g.formato : (canal === 'TERCEIROS' ? 'ARTIGO' : canal === 'LINKEDIN' ? 'POST' : 'CARROSSEL');
+    const vaga = contProximaVaga(canal, formato, hoje, mapa);
+    if (await editarConteudo({ data: vaga.data, canal, formato, posicao: vaga.posicao, tema: g ? g.ideia : n.titulo, noticia_url: n.url, descricao: n.resumo ? 'Notícia: ' + n.titulo + '\n' + n.resumo : '' }, mapa)) recarregar();
   });
 };
+// primeira vaga livre do canal/formato a partir de hoje (dentro da cota); se não houver, o dia seguinte ao último
+function contProximaVaga(canal, formato, hoje, mapa) {
+  for (let i = 0; i < 90; i++) {
+    const k = contSoma(hoje, i);
+    const v = contVagas(k).find((x) => x.canal === canal && x.formato === formato && !mapa[k + '|' + canal + '|' + formato + '|' + x.posicao]);
+    if (v) return { data: k, posicao: v.posicao };
+  }
+  return { data: contSoma(hoje, 1), posicao: 1 };
+}
+async function editarConteudo(x, mapa) {
+  const novo = !x.id;
+  const fmts = { TERCEIROS: ['ARTIGO'], INSTAGRAM: ['CARROSSEL', 'REELS', 'STORY', 'POST'], LINKEDIN: ['POST', 'CARROSSEL', 'ARTIGO'] }[x.canal] || ['POST'];
+  const opt = (lista, sel, rot) => lista.map((k) => '<option value="' + k + '"' + (k === sel ? ' selected' : '') + '>' + esc(rot[k] || k) + '</option>').join('');
+  const lin = (rot, campo) => '<label class="pq mut" style="display:block;margin-top:12px">' + rot + '</label>' + campo;
+  const corpo = '<div class="chips" style="margin:0 0 4px">' + '<span class="chip">' + contIcone(x.canal) + esc(CONT.canais[x.canal].nome) + '</span>' + (x.status ? '<span class="chip">' + esc(CONT.status[x.status]) + '</span>' : '') + '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+      '<div>' + lin('Data', '<input class="inp" type="date" id="cData" style="margin-top:6px" value="' + esc(x.data) + '">') + '</div>' +
+      '<div>' + lin('Formato', '<select class="sel" id="cFmt" style="margin-top:6px">' + opt(fmts, x.formato, CONT.formatos) + '</select>') + '</div></div>' +
+    (x.canal === 'TERCEIROS' ? lin('Site', '<select class="sel" id="cVei" style="margin-top:6px"><option value="">a definir</option>' + opt(Object.keys(CONT.veiculos), x.veiculo, CONT.veiculos) + '</select>') : '') +
+    lin('Tema', '<input class="inp" id="cTema" style="margin-top:6px" maxlength="300" value="' + esc(x.tema || '') + '" placeholder="Ex.: Juros do carro: quando a taxa passa do limite">') +
+    lin('Roteiro, texto ou observações do conteúdo', '<textarea class="inp" id="cDesc" style="margin-top:6px;min-height:120px">' + esc(x.descricao || '') + '</textarea>') +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+      '<div>' + lin('Situação', '<select class="sel" id="cSt" style="margin-top:6px">' + opt(['IDEIA', 'EM_PRODUCAO', 'PRONTO', 'APROVADO', 'PUBLICADO'], x.status || 'IDEIA', CONT.status) + '</select>') + '</div>' +
+      '<div>' + lin('Link do material', '<input class="inp" id="cMat" style="margin-top:6px" value="' + esc(x.material_url || '') + '" placeholder="https://">') + '</div></div>' +
+    lin('Notícia de origem', '<input class="inp" id="cNot" style="margin-top:6px" value="' + esc(x.noticia_url || '') + '" placeholder="https://">') +
+    lin('Link da publicação', '<input class="inp" id="cPub" style="margin-top:6px" value="' + esc(x.publicado_url || '') + '" placeholder="preencha quando publicar">');
+  const ler = (m) => {
+    const tema = $('#cTema', m).value.trim(); if (tema.length < 2) { $('#cTema', m).focus(); return false; }
+    const data = $('#cData', m).value || x.data, formato = $('#cFmt', m).value;
+    let posicao = Number(x.posicao) || 1;
+    if (data !== x.data || formato !== x.formato) {
+      const livre = contVagas(data).find((v) => v.canal === x.canal && v.formato === formato && !mapa[data + '|' + x.canal + '|' + formato + '|' + v.posicao]);
+      if (livre) posicao = livre.posicao; else { posicao = 1; while (posicao < 9 && mapa[data + '|' + x.canal + '|' + formato + '|' + posicao]) posicao++; }
+    }
+    return { id: x.id || '', data, canal: x.canal, formato, posicao, veiculo: $('#cVei', m) ? $('#cVei', m).value : '', tema, descricao: $('#cDesc', m).value.trim(),
+      status: $('#cSt', m).value, material_url: $('#cMat', m).value.trim(), noticia_url: $('#cNot', m).value.trim(), publicado_url: $('#cPub', m).value.trim(), obs: x.obs || '' };
+  };
+  const r = await modal({ titulo: novo ? 'Definir conteúdo' : 'Conteúdo do calendário', corpo,
+    botoes: (novo ? [] : [{ t: 'Tirar do calendário', c: 'fant', v: 'cancelar' }]).concat([{ t: 'Fechar', c: 'fant', v: null }, { t: 'Salvar', c: 'pri', v: ler }]) });
+  if (!r) return false;
+  try {
+    if (r === 'cancelar') {
+      if (!(await confirmar('Tirar do calendário?', 'A vaga fica livre de novo. O registro continua guardado.', 'Tirar', true))) return false;
+      await api('conteudo_salvar', Object.assign({}, x, { status: 'CANCELADO' })); toast('Vaga liberada');
+    } else { await api('conteudo_salvar', r); toast('Conteúdo salvo'); }
+  } catch (e) { toast(e.message, true); return false; }
+  return true;
+}
 // ---------- mensagens de clientes para você (conversas que estão com o Dr. Fábio) ----------
 const MSGV = 'fce_msg_vistas';
 function vistas() { try { return JSON.parse(localStorage.getItem(MSGV) || '{}'); } catch (e) { return {}; } }
