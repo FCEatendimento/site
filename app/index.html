@@ -1862,7 +1862,28 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 window.addEventListener('hashchange', () => { if (/#\/caso\/[0-9a-f-]{36}/.test(location.hash)) agendarChecagem(4000); });
 agendarChecagem(2500);
 // ---------- início ----------
-if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
+if ('serviceWorker' in navigator) {
+  try {
+    // Atualização automática: confere versão nova ao abrir, ao voltar para a janela e a cada 30 min;
+    // quando a versão nova assume, recarrega a tela (sem atrapalhar janela aberta ou texto sendo digitado).
+    const tinhaControle = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      const conferir = () => { try { reg.update(); } catch (e) {} };
+      setInterval(conferir, 30 * 60 * 1000);
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') conferir(); });
+    }).catch(() => {});
+    let recarregou = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!tinhaControle || recarregou) return;
+      const tentar = () => {
+        const ocupado = $('.veu') || (document.activeElement && /TEXTAREA|INPUT|SELECT/.test(document.activeElement.tagName));
+        if (ocupado) return setTimeout(tentar, 15000);
+        recarregou = true; location.reload();
+      };
+      tentar();
+    });
+  } catch (e) {}
+}
 (function boot() {
   try { const t = localStorage.getItem('fce_tema'); if (t) document.documentElement.dataset.tema = t; } catch (e) {}
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;
