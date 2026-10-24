@@ -516,6 +516,7 @@ async function carregarLinks() {
 }
 // ---------- ícones (traços no estilo Lucide) ----------
 const IC = {
+  balanca: '<path d="M12 3v18"/><path d="M7 21h10"/><path d="M4 7h16"/><path d="M4 7l-3 7a3 3 0 0 0 6 0z"/><path d="M20 7l-3 7a3 3 0 0 0 6 0z"/>',
   olho: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   baixar: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
   lista: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
@@ -715,7 +716,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['processos', 'Processos', 'martelo'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['conteudo', 'Conteúdo', 'insta'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Marketing', 'mega']
+  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['diagnostico', 'Diagnóstico', 'balanca'], ['processos', 'Processos', 'martelo'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['conteudo', 'Conteúdo', 'insta'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Marketing', 'mega']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -744,7 +745,7 @@ async function rota(forcar) {
   const h = location.hash.replace(/^#\/?/, '') || 'inicio';
   const [nome, arg] = h.split('?')[0].split('/');
   const k = VIEWS[nome] ? nome : 'inicio';
-  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || (k === 'caso' && a.dataset.k === 'casos') || (k === 'processo' && a.dataset.k === 'processos') || (a.dataset.k === 'mais' && ['financeiro', 'marketing', 'despesas', 'processos', 'processo'].includes(k))));
+  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || (k === 'caso' && a.dataset.k === 'casos') || (k === 'processo' && a.dataset.k === 'processos') || (a.dataset.k === 'mais' && ['financeiro', 'marketing', 'despesas', 'processos', 'processo', 'diagnostico'].includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
   rotaAtual = h;
   try { await VIEWS[k](arg, forcar); } catch (e) { erroTela(e, () => rota(true)); }
@@ -999,7 +1000,7 @@ VIEWS.caso = async (id, forcar) => {
     '<div class="chips">' + chipEtapa(c.etapa) + (c.perfil ? '<span class="chip nav">' + esc(PERFIL[c.perfil] || c.perfil) + '</span>' : '') + (u && c.urgencia !== 'NORMAL' ? '<span class="chip ' + u[1] + '">Urgência ' + u[0].toLowerCase() + '</span>' : '') +
     (c.origem_canal ? '<span class="chip">' + ic('link', 's') + esc(CANAL[c.origem_canal] || c.origem_canal) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">' + ic('pessoa', 's') + 'com você (Helena pausada)</span>' : '') + '</div></div>' +
     '<div class="acoes">' + (tel ? '<a class="btn" href="https://wa.me/' + tel + '" target="_blank" rel="noopener">' + ic('zap', 's') + ' WhatsApp</a>' : '') +
-    (c.conversa_id ? '<button class="btn" id="bEncaixe">' + ic('cal', 's') + ' Encaixar horário</button>' : '') + '<button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
+    (c.conversa_id ? '<button class="btn" id="bEncaixe">' + ic('cal', 's') + ' Encaixar horário</button>' : '') + '<a class="btn" href="#/diagnostico/c-' + c.id + '">' + ic('balanca', 's') + ' Diagnóstico</a><button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
   const abas = [['resumo', 'Resumo', 'doc'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['processos', 'Processos e assinaturas', 'martelo'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
   const cont = { conversa: (c.mensagens || []).length, docs: (c.documentos || []).length, prazos: (c.prazos || []).filter((p) => p.status === 'ABERTO').length, notas: (c.notas || []).length };
   S.abaCaso = S.abaCaso || 'resumo';
@@ -1591,6 +1592,7 @@ VIEWS.mais = async () => {
   const eu = S.eu || {};
   $('#cont').innerHTML = '<div class="card cab-caso" style="margin-top:12px"><div class="av">' + '<img src="fabio.jpg" alt="Dr. Fábio">' + '</div><div><h2>' + esc(eu.nome || 'Fábio') + '</h2><div class="mut pq">' + esc(eu.email || '') + '</div></div></div>' +
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/diagnostico"><div class="ic-circ ouro">' + ic('balanca', 's') + '</div><div class="mid"><div class="t">Diagnóstico</div><div class="d">Roteiro da consulta: perguntas, providências, honorário e objeções</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/conteudo"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário de 30 dias por canal (terceiros, Instagram, LinkedIn) e sugestões das notícias</div></div>' + ic('seta', 's') + '</a>' +
@@ -2385,5 +2387,6 @@ async function calendarioPrazos(el, forcar) {
   desenhar();
 }
 </script>
+<script src="diagnostico.js?v=1"></script>
 </body>
 </html>
