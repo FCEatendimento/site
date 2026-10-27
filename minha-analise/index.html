@@ -351,6 +351,9 @@ section#atendimento{background:var(--veu2),url(/img/predio-fundo.jpg) center 35%
 :root[data-theme="dark"] .top{background:linear-gradient(rgba(0,0,0,.06),rgba(0,0,0,.14)),url(/img/textura-topo2.jpg) center 40%/cover #1E2023}
 /* Tema B: rodapé em couro preto (foto enviada em 26/10) */
 body footer{background:linear-gradient(rgba(0,0,0,.05),rgba(0,0,0,.25)),url(/img/rodape-couro.jpg) center top/1200px 580px repeat,#1E1F21;border-top:1px solid #000}
+/* Tema B: "ADVOGADOS" ao lado do FCE também no celular */
+@media (max-width:760px){.top .logo-txt{gap:.55rem}.top .logo-txt .logo-adv{display:block;height:calc(1.4rem * .291);width:auto}}
+@media (max-width:329px){.top .logo-txt .logo-adv{display:none}}
 </style>
 <style>
 .art{padding-block:clamp(2rem,5vw,3.5rem)}
