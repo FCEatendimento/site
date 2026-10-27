@@ -747,7 +747,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['diagnostico', 'Diagnóstico', 'balanca'], ['processos', 'Processos', 'martelo'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['conteudo', 'Conteúdo', 'insta'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Marketing', 'mega']
+  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['diagnostico', 'Diagnóstico', 'balanca'], ['processos', 'Processos', 'martelo'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['conteudo', 'Conteúdo', 'insta'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Google Ads', 'google']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -1520,7 +1520,7 @@ VIEWS.financeiro = async (_, forcar) => {
 // ---------- MARKETING ----------
 VIEWS.marketing = async (_, forcar) => {
   S.diasMk = S.diasMk || 30;
-  titulo('Marketing', '<div class="seg" data-seg-own id="dMk">' + [7, 30, 90].map((n) => '<button data-n="' + n + '" class="' + (S.diasMk === n ? 'on' : '') + '">' + n + ' dias</button>').join('') + '</div>');
+  titulo('Google Ads', '<div class="seg" data-seg-own id="dMk">' + [7, 30, 90].map((n) => '<button data-n="' + n + '" class="' + (S.diasMk === n ? 'on' : '') + '">' + n + ' dias</button>').join('') + '</div>');
   $$('#dMk button').forEach((b) => b.onclick = () => { S.diasMk = +b.dataset.n; VIEWS.marketing(); });
   if (!S.cache['mk' + S.diasMk]) carregando(4);
   const d = await dados('mk' + S.diasMk, 'marketing', { dias: S.diasMk }, forcar);
@@ -1627,7 +1627,7 @@ VIEWS.mais = async () => {
     '<a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/conteudo"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário de 30 dias por canal (terceiros, Instagram, LinkedIn) e sugestões das notícias</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('google', 's') + '</div><div class="mid"><div class="t">Google Ads</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a>' +
     '<a class="item" href="https://fceadvogados.com.br/calculadora/" target="_blank" rel="noopener"><div class="ic-circ info">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Simulador da calculadora</div><div class="d">Abre o simulador do site (quanto do imóvel está em jogo)</div></div>' + ic('link', 's') + '</a></div>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
