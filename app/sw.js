@@ -1,5 +1,5 @@
 // Service worker do app FCE: a tela vem da internet (versão mais nova), com a cópia do aparelho como reserva; o resto abre do aparelho e atualiza em segundo plano.
-const CACHE = 'fce-app-v25';
+const CACHE = 'fce-app-v26';
 const ARQS = ['./', './index.html', './manifest.json', './icon-192.png', './apple.png', './fabio.jpg'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
