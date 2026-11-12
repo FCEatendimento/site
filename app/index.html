@@ -2751,7 +2751,7 @@ function faixaVermelha(l) {
   const it = (l || []).slice(0, 14);
   if (!it.length) return '';
   const um = it.map((n) => '<a href="' + esc(n.url) + '" target="_blank" rel="noopener"><b>' + esc((Object.fromEntries(TEMAS_NT))[n.tema] || '') + '</b> ' + esc(n.titulo) + '</a>').join('<i>•</i>');
-  return '<div class="nx-faixa" role="region" aria-label="Últimas notícias"><span class="nx-ult">ÚLTIMAS</span><div class="nx-rolo"><div class="nx-trilho">' + um + '<i>•</i>' + um + '</div></div></div>';
+  return '<div class="nx-faixa" role="region" aria-label="News"><span class="nx-ult">NEWS</span><div class="nx-rolo"><div class="nx-trilho">' + um + '<i>•</i>' + um + '</div></div></div>';
 }
 function cardNt(n, grande) {
   const nome = Object.fromEntries(TEMAS_NT);
