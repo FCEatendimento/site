@@ -725,11 +725,12 @@ function tituloEtapa(id) { return ({ abertura: 'Abertura e conexão', situacao: 
 function telaEditor() {
   const a = A();
   const voltar = D.caso_id ? '<a class="btn fant sm" href="#/caso/' + D.caso_id + '">' + ic('voltar', 's') + '<span class="so-desk"> Caso</span></a>' : '<a class="btn fant sm" href="#/diagnostico">' + ic('voltar', 's') + '<span class="so-desk"> Diagnósticos</span></a>';
-  titulo('Diagnóstico' + (a.nome ? ' · ' + a.nome.split(' ')[0] : ''), voltar);
-  $('#cont').innerHTML = '<div class="dg" id="dg"><div class="card dg-c" style="padding:12px 16px"><div class="dg-top" id="dgTop"></div></div>' +
+  titulo((D.caso_id ? 'Consulta' : 'Diagnóstico') + (a.nome ? ' · ' + a.nome.split(' ')[0] : ''), voltar);
+  $('#cont').innerHTML = '<div class="dg" id="dg"><div id="dgMomento"></div><div class="card dg-c" style="padding:12px 16px"><div class="dg-top" id="dgTop"></div></div>' +
     (D.helena && D.helena.length && !D.id ? '<div class="dg-al info" id="dgHel"><b>Respostas trazidas da conversa com a Helena.</b><span>Confira cada uma com o cliente: estão preenchidas, mas podem estar incompletas.</span></div>' : '') +
-    '<div class="dg-etapas" id="dgEtapas"></div><div class="dg-grid"><div class="dg-main" id="dgMain"></div><div class="dg-side" id="dgSide"></div></div></div>';
-  renderTudo();
+    '<div class="dg-prep" id="dgPrep" hidden></div><div id="dgDepois" hidden></div><div class="dg-etapas" id="dgEtapas"></div><div class="dg-grid" id="dgGrid"><div class="dg-main" id="dgMain"></div><div class="dg-side" id="dgSide"></div></div></div>';
+  if (D.momento === 'depois') D.etapa = 'proposta';
+  renderTudo(); renderMomento();
 }
 function renderTudo(semMain) { renderTop(); renderEtapas(); if (!semMain) renderMain(); renderPainel(); }
 function renderTop() {
@@ -968,10 +969,190 @@ function alternaMic() {
 }
 window.addEventListener('hashchange', () => { if (gravando && rec && !/^#\/diagnostico/.test(location.hash)) { rec.continuar = false; rec.stop(); } });
 
+// ---------- Preparar consulta (12/11/2026): antes (documentos + roteiro), durante (consulta) e depois (proposta) na mesma tela ----------
+(function cssPrep() {
+  if (document.getElementById('dg-prep-css')) return;
+  const st = document.createElement('style'); st.id = 'dg-prep-css';
+  st.textContent = `
+.dg-mom{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dg-mom .info{flex:1;min-width:240px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.dg-passos{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line-2);border-radius:99px;padding:4px}
+.dg-passos button{border:0;background:transparent;border-radius:99px;padding:7px 14px;font-weight:600;font-size:13.5px;color:var(--mut);cursor:pointer;white-space:nowrap}
+.dg-passos button.on{background:var(--navy,#1F2328);color:#fff}
+.dg-meet[disabled]{opacity:.6;cursor:default}
+.dg-prep{display:grid;grid-template-columns:270px minmax(0,1fr) 400px;gap:14px;align-items:start}
+.dg-prep>.card{min-width:0}
+.dg-docs{padding:12px;display:grid;gap:4px;position:sticky;top:calc(var(--top,64px) + 12px)}
+.dg-docs .barra{height:6px;border-radius:9px;background:color-mix(in srgb,var(--txt) 8%,transparent);overflow:hidden;margin:2px 0 8px}.dg-docs .barra i{display:block;height:100%;background:linear-gradient(90deg,#C9A462,#2E7D57)}
+.dg-doc{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border-radius:11px;border:1px solid transparent;background:none;text-align:left;cursor:pointer;width:100%;font:inherit;color:inherit}
+.dg-doc:hover{background:var(--surface-2)}.dg-doc.on{background:color-mix(in srgb,var(--gold) 10%,var(--surface));border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
+.dg-doc .t{font-weight:600;font-size:13.5px;line-height:1.3}.dg-doc .d{font-size:12px;color:var(--mut)}
+.dg-doc .pt{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:none;background:var(--ok)}.dg-doc .pt.lendo{background:var(--gold)}.dg-doc .pt.falta{background:none;border:2px solid var(--bad)}
+.dg-ver{display:grid;grid-template-columns:minmax(0,1fr) 280px;min-height:560px;overflow:hidden;padding:0}
+.dg-ver .folha{background:color-mix(in srgb,var(--txt) 6%,var(--surface-2));display:flex;align-items:center;justify-content:center;min-height:560px;position:relative}
+.dg-ver iframe,.dg-ver img{width:100%;height:100%;min-height:560px;border:0;object-fit:contain;background:#fff}
+.dg-ver .fatos{padding:14px;border-left:1px solid var(--line);display:grid;gap:8px;align-content:start;max-height:640px;overflow:auto}
+.dg-fato{font-size:13px;line-height:1.4;display:grid;gap:3px;padding:8px 10px;border-radius:10px;background:var(--surface-2)}
+.dg-fato .ac{display:flex;gap:6px;flex-wrap:wrap}.dg-fato .ac button{border:1px solid var(--line-2);background:var(--surface);border-radius:7px;font-size:11.5px;padding:3px 8px;cursor:pointer;color:var(--txt)}
+.dg-fato .ac button:hover{border-color:var(--gold)}
+.dg-tl{display:flex;gap:10px 18px;flex-wrap:wrap;align-items:center;padding:12px 16px;font-size:13px}.dg-tl b{font-variant-numeric:tabular-nums}.dg-tl .w{color:var(--bad)}
+.dg-rot{padding:14px;display:grid;gap:10px;position:sticky;top:calc(var(--top,64px) + 12px);max-height:calc(100vh - var(--top,64px) - 24px);overflow:auto}
+.dg-sab{background:var(--ok-soft);border-radius:12px;padding:10px 12px;font-size:13px}.dg-sab summary{cursor:pointer;font-weight:600;color:var(--ok)}
+.dg-sab ul{margin:6px 0 0;padding-left:18px;display:grid;gap:3px}
+.dg-pq{border:1px solid var(--line-2);border-radius:12px;padding:10px 12px;display:grid;gap:5px;text-align:left;background:var(--surface);cursor:pointer;font:inherit;color:inherit;width:100%}
+.dg-pq:hover{border-color:var(--gold)}.dg-pq b{font-size:13.5px;line-height:1.35}.dg-pq .tg{justify-self:start}
+.dg-tg{font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap}.dg-tg.doc{background:var(--bad-soft);color:var(--bad)}.dg-tg.hel{background:var(--warn-soft);color:var(--warn)}.dg-tg.rot{background:var(--info-soft);color:var(--info)}
+.dg-notas{min-height:110px;width:100%}
+.dg-depois{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.dg-depois .card{padding:12px 14px;display:grid;gap:4px}
+@media (max-width:1250px){.dg-prep{grid-template-columns:240px minmax(0,1fr)}.dg-rot{grid-column:1/-1;position:static;max-height:none}}
+@media (max-width:860px){.dg-prep{grid-template-columns:minmax(0,1fr)}.dg-docs{position:static}.dg-ver{grid-template-columns:minmax(0,1fr)}.dg-ver .folha,.dg-ver iframe,.dg-ver img{min-height:380px}.dg-ver .fatos{border-left:0;border-top:1px solid var(--line);max-height:none}}
+`;
+  document.head.appendChild(st);
+})();
+const brData = (s) => { const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? m[3] + '/' + m[2] + '/' + m[1] : String(s || ''); };
+async function carregarPrep(forcar) {
+  if (!D || !D.caso_id) return null;
+  if (D.prep && !forcar) return D.prep;
+  try { D.prep = await api('preparar', { caso_id: D.caso_id }); } catch (e) { D.prep = { erro: e.message, documentos: [], pendencias: [] }; }
+  return D.prep;
+}
+function momentoPadrao() {
+  if (D.status === 'CONCLUIDO') return 'depois';
+  const c = D.prep && D.prep.consulta;
+  if (c && c.inicio) { const min = (new Date(c.inicio) - Date.now()) / 6e4; if (min > 15) return 'preparar'; if (min > -360) return 'consulta'; }
+  return D.id ? 'consulta' : 'preparar';
+}
+function faixaMomento() {
+  const a = A(), p = D.prep || {}, c = p.consulta, docs = p.documentos || [], pend = p.pendencias || [];
+  const pr = (typeof prazos === 'function' && a.area) ? prazos(a) : [];
+  const prox = pr.filter((x) => x.data && diasAte(x.data) != null && diasAte(x.data) >= 0).sort((x, y) => x.data < y.data ? -1 : 1)[0];
+  let meet = '';
+  if (c && c.inicio) {
+    const min = (new Date(c.inicio) - Date.now()) / 6e4, abre = c.meet && min <= 10 && min > -240;
+    meet = abre ? '<a class="btn pri sm dg-meet" href="' + esc(c.meet) + '" target="_blank" rel="noopener">' + ic('video', 's') + ' Entrar no Meet</a>'
+      : '<button class="btn sm dg-meet" type="button" disabled>' + ic('video', 's') + ' ' + (min > 10 ? 'Meet abre 10 min antes' : 'Sem link do Meet') + '</button>';
+  }
+  const chips = [
+    c && c.inicio ? '<span class="dg-chip neutro">' + esc((c.numero > 1 ? c.numero + 'ª consulta · ' : 'Consulta · ') + fmtD(c.inicio, { weekday: 'short', day: '2-digit', month: '2-digit' }) + ' às ' + hora(c.inicio)) + (c.status === 'RESERVADO' ? ' · aguardando pagamento' : '') + '</span>' : '<span class="dg-chip neutro">Sem consulta marcada</span>',
+    prox ? '<span class="dg-chip ' + (diasAte(prox.data) <= 7 ? 'crit' : 'alta') + '">' + esc(prox.nome) + ' ' + (diasAte(prox.data) === 0 ? 'hoje' : 'em ' + diasAte(prox.data) + ' dias') + ' (' + dataBR(prox.data) + ')</span>' : '',
+    D.caso_id ? '<span class="dg-chip neutro">' + docs.length + ' documento(s)' + (pend.length ? ' · faltam ' + pend.length : '') + '</span>' : ''
+  ].filter(Boolean).join('');
+  const passos = [['preparar', '1 · Preparar'], ['consulta', '2 · Consulta'], ['depois', '3 · Depois']].map(([k, t]) => '<button type="button" data-mom="' + k + '" class="' + (D.momento === k ? 'on' : '') + '">' + t + '</button>').join('');
+  return '<div class="dg-mom"><div class="info">' + chips + '</div><div class="dg-passos" role="tablist" aria-label="Momento da consulta">' + passos + '</div>' + meet + '</div>';
+}
+// fatos que o sistema leu do documento (dados_extraidos), mostrados de forma genérica
+function fatosDoc(d) {
+  const x = d && d.dados; const out = [];
+  if (!x || typeof x !== 'object') return out;
+  const add = (titulo, texto, extra) => { if (texto != null && String(texto).trim() && String(texto) !== '[object Object]') out.push({ titulo, texto: String(texto), extra: extra || {} }); };
+  (Array.isArray(x.datas) ? x.datas : []).forEach((dt) => add(brData(dt.data) + (dt.hora ? ' ' + dt.hora : ''), dt.descricao || dt.tipo, { data: /^\d{4}-\d{2}-\d{2}/.test(dt.data || '') ? dt.data.slice(0, 10) : null, leilao: /leil/i.test(dt.descricao || '') }));
+  const plano = (obj, pre) => Object.entries(obj || {}).forEach(([k, v]) => {
+    if (v == null || v === '') return;
+    const rot = (pre ? pre + ' · ' : '') + k.replace(/_/g, ' ');
+    if (Array.isArray(v)) { if (v.length && typeof v[0] !== 'object') add(rot, v.join(', ')); else v.slice(0, 6).forEach((it) => add(rot, typeof it === 'object' ? Object.values(it).filter((z) => z != null && typeof z !== 'object').join(' · ') : it)); }
+    else if (typeof v === 'object') plano(v, rot);
+    else add(rot, typeof v === 'number' && /valor|saldo|divida|preco|avalia/i.test(k) ? brl(v) : v, { valor: typeof v === 'number' ? v : null, chave: k });
+  });
+  Object.entries(x).forEach(([k, v]) => { if (k !== 'datas') plano({ [k]: v }); });
+  return out.slice(0, 40);
+}
+function anotar(txt) { const a = A(); a.prep_notas = ((a.prep_notas || '').trim() + '\n' + txt).trim(); marcarSujo(); const n = q$('#prepNotas'); if (n) n.value = a.prep_notas; toast('Anotado.'); }
+function renderPrep() {
+  const box = q$('#dgPrep'); if (!box) return;
+  const a = A(), p = D.prep || {}, docs = p.documentos || [], pend = p.pendencias || [];
+  if (D.docSel == null && docs.length) D.docSel = 0;
+  const lidos = docs.filter((d) => d.lido).length, tot = docs.length + pend.length;
+  let col1 = '<div class="card dg-docs"><div style="display:flex;justify-content:space-between;align-items:center"><span class="dg-eye">Documentos · ' + docs.length + (tot ? ' de ' + tot : '') + '</span>' + (D.caso_id ? '<a class="pp" style="font-weight:600;color:var(--gold)" href="#/caso/' + D.caso_id + '?aba=docs">pedir</a>' : '') + '</div>' +
+    (tot ? '<div class="barra"><i style="width:' + Math.round(100 * docs.length / tot) + '%"></i></div>' : '');
+  if (!D.caso_id) col1 += '<div class="dg-hint">Abra o diagnóstico a partir de um caso para ver os documentos que o lead mandou.</div>';
+  else if (!docs.length) col1 += '<div class="dg-hint" style="padding:8px 4px">Nenhum documento recebido ainda. Os arquivos que o lead mandar pelo WhatsApp aparecem aqui.</div>';
+  docs.forEach((d, i) => { col1 += '<button type="button" class="dg-doc' + (D.docSel === i ? ' on' : '') + '" data-docsel="' + i + '"><span class="pt' + (d.lido ? '' : ' lendo') + '"></span><span><span class="t">' + esc(d.tipo || d.nome || 'Documento') + '</span><br><span class="d">' + esc(d.lido ? 'lido · ' + fatosDoc(d).length + ' ponto(s)' : 'ainda não lido') + ' · ' + esc(quando(d.em, true)) + '</span></span></button>'; });
+  if (pend.length) col1 += '<div class="dg-eye" style="margin-top:8px">Faltam</div>' + pend.map((x) => '<div class="dg-doc" style="cursor:default"><span class="pt falta"></span><span><span class="t">' + esc(x.tipo || '') + '</span><br><span class="d">' + esc(x.pedido ? 'pedido ' + quando(x.pedido, true) : 'não pedido') + '</span></span></div>').join('');
+  col1 += '</div>';
+  // documento aberto + o que ele diz
+  const d = docs[D.docSel];
+  let col2 = '<div style="display:grid;gap:12px;min-width:0">';
+  if (d) {
+    const f = fatosDoc(d);
+    col2 += '<div class="card dg-ver"><div class="folha" id="prepFolha">' + (D.docUrl && D.docUrl.id === d.id ? (/^image\//.test(d.mime || '') ? '<img src="' + esc(D.docUrl.url) + '" alt="' + esc(d.tipo || 'Documento') + '">' : '<iframe src="' + esc(D.docUrl.url) + '" title="' + esc(d.tipo || 'Documento') + '"></iframe>')
+      : (d.tem_arquivo ? '<button class="btn pri" type="button" data-docabrir="' + d.id + '">' + ic('olho', 's') + ' Abrir o arquivo aqui</button>' : '<div class="dg-hint" style="padding:20px;text-align:center">O arquivo original não foi guardado.<br>Veja ao lado o que o sistema leu dele.</div>')) + '</div>' +
+      '<div class="fatos"><span class="dg-eye">O que este documento diz</span><b style="font-size:14px">' + esc(d.tipo || d.nome || 'Documento') + '</b>' +
+      (f.length ? f.map((x, i) => '<div class="dg-fato"><span><b>' + esc(x.titulo) + ':</b> ' + esc(x.texto) + '</span><span class="ac"><button type="button" data-anotar="' + i + '">anotar</button>' +
+        (x.extra.leilao && x.extra.data ? '<button type="button" data-leilao="1|' + x.extra.data + '">é o 1º leilão</button><button type="button" data-leilao="2|' + x.extra.data + '">é o 2º leilão</button>' : '') + '</span></div>').join('')
+        : (d.texto ? '<div class="dg-fato" style="white-space:pre-wrap;max-height:420px;overflow:auto">' + esc(d.texto) + '</div>' : '<div class="dg-hint">O sistema ainda não leu este documento.</div>')) + '</div></div>';
+  } else col2 += '<div class="card dg-c"><div class="dg-hint">Escolha um documento à esquerda.</div></div>';
+  // linha do tempo com as datas do caso
+  const pr = a.area ? prazos(a) : [];
+  const marcos = [];
+  docs.forEach((x) => fatosDoc(x).forEach((y) => { if (y.extra.data) marcos.push({ data: y.extra.data, t: y.texto.slice(0, 50) }); }));
+  pr.forEach((x) => x.data && marcos.push({ data: x.data, t: x.nome, w: true }));
+  const vistos = new Set(); const tl = marcos.filter((m) => { const k = m.data + m.t; if (vistos.has(k)) return false; vistos.add(k); return true; }).sort((x, y) => x.data < y.data ? -1 : 1).slice(-7);
+  if (tl.length) col2 += '<div class="card dg-tl"><span class="dg-eye">Linha do tempo</span>' + tl.map((m) => '<span class="' + (m.w ? 'w' : '') + '">' + esc(m.t) + ' <b>' + dataBR(m.data) + '</b></span>').join('<span class="mut">—</span>') + '</div>';
+  col2 += '</div>';
+  // roteiro: já sabemos + perguntar + anotações
+  const sab = Q.filter((q) => q.e !== 'proposta' && visivel(q, a) && respondida(q, a) && q.id !== 'consulta_paga');
+  const falta = Q.filter((q) => q.e !== 'proposta' && q.e !== 'abertura' && visivel(q, a) && !respondida(q, a));
+  const tagQ = (q) => (D.helena && !D.helena.includes(q.id) && q.e !== 'abertura' ? '<span class="dg-tg hel">Helena não perguntou</span>' : '<span class="dg-tg rot">roteiro</span>');
+  let col3 = '<div class="card dg-rot"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Roteiro da consulta</h3><span class="dg-hint">' + falta.length + ' pergunta(s)</span></div>';
+  if (sab.length) col3 += '<details class="dg-sab"><summary>Já sabemos (Helena, documentos e respostas) · ' + sab.length + '</summary><ul>' + sab.slice(0, 30).map((q) => '<li><b>' + esc(q.l.replace(/\?$/, '')) + ':</b> ' + esc(rotulo(q.id, a[q.id])) + '</li>').join('') + '</ul></details>';
+  if (!a.area) col3 += '<div class="dg-al info"><b>Comece pela situação do cliente.</b><span>As perguntas se ajustam ao tipo de caso.</span></div>';
+  const docQ = [];
+  docs.forEach((x) => fatosDoc(x).forEach((y) => { if (/intima|notifica|ci[eê]ncia/i.test(y.titulo + ' ' + y.texto)) docQ.push('Confirmar com o cliente: ' + y.titulo + ' — ' + y.texto.slice(0, 80)); }));
+  col3 += docQ.slice(0, 3).map((t) => '<div class="dg-pq" style="cursor:default"><span class="dg-tg doc tg">do documento</span><b>' + esc(t) + '</b></div>').join('');
+  col3 += falta.slice(0, 8).map((q) => '<button type="button" class="dg-pq" data-perg="' + q.id + '">' + tagQ(q).replace('dg-tg', 'dg-tg tg') + '<b>' + esc(q.fala || q.l) + '</b>' + (q.porque ? '<span class="dg-hint">' + esc(q.porque) + '</span>' : '') + '</button>').join('');
+  if (falta.length > 8) col3 += '<div class="dg-hint">+ ' + (falta.length - 8) + ' outra(s) no roteiro completo da consulta.</div>';
+  col3 += '<label class="dg-eye" for="prepNotas" style="margin-top:4px">Minhas perguntas e anotações</label><textarea class="inp dg-notas" id="prepNotas" placeholder="O que quero confirmar na consulta…">' + esc(a.prep_notas || '') + '</textarea>' +
+    '<button class="btn pri" type="button" data-mom="consulta">' + ic('seta', 's') + ' Começar a consulta</button><div class="dg-hint" style="text-align:center">Tudo fica salvo no diagnóstico deste caso.</div></div>';
+  box.innerHTML = col1 + col2 + col3;
+}
+function renderDepoisExtra() {
+  const el = q$('#dgDepois'); if (!el) return;
+  const p = D.prep || {}, pend = p.pendencias || [];
+  el.innerHTML = '<div class="dg-depois">' +
+    '<div class="card"><b>Documentos que faltam</b><span class="dg-hint">' + (pend.length ? esc(pend.map((x) => x.tipo).join(', ')) : 'Nenhum pendente.') + '</span>' + (D.caso_id && pend.length ? '<a class="btn sm" href="#/caso/' + D.caso_id + '?aba=docs">Pedir pela Helena (você confirma)</a>' : '') + '</div>' +
+    '<div class="card"><b>Segunda consulta</b><span class="dg-hint">Se precisar de outra conversa, encaixe um horário no caso.</span>' + (D.caso_id ? '<a class="btn sm" href="#/caso/' + D.caso_id + '">Abrir o caso</a>' : '') + '</div>' +
+    '<div class="card"><b>Proposta</b><span class="dg-hint">Ajuste os valores abaixo e registre. A situação do caso muda sozinha.</span><a class="btn sm pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div>' +
+    (A().prep_notas ? '<div class="card"><b>Anotações do preparo</b><span class="dg-hint" style="white-space:pre-wrap">' + esc(A().prep_notas.slice(0, 500)) + '</span></div>' : '') + '</div>';
+}
+function renderMomento() {
+  const f = q$('#dgMomento'); if (f) f.innerHTML = faixaMomento();
+  const prep = D.momento === 'preparar';
+  const mostrar = (id, sim) => { const el = q$('#' + id); if (el) { el.hidden = !sim; el.style.display = sim ? '' : 'none'; } };
+  mostrar('dgEtapas', !prep); mostrar('dgGrid', !prep); mostrar('dgPrep', prep); mostrar('dgDepois', D.momento === 'depois');
+  if (prep) renderPrep();
+  if (D.momento === 'depois') renderDepoisExtra();
+}
+document.addEventListener('click', async (ev) => {
+  if (!D || !ev.target.closest || !ev.target.closest('#dg')) return;
+  const t = ev.target.closest('[data-mom],[data-docsel],[data-docabrir],[data-anotar],[data-leilao],[data-perg]'); if (!t) return;
+  if (t.dataset.mom) {
+    D.momento = t.dataset.mom;
+    if (D.momento === 'depois') { D.etapa = 'proposta'; renderTudo(); }
+    if (D.momento === 'consulta' && D.etapa === 'proposta') { const v = etapasVisiveis(); D.etapa = (v[1] || v[0]).id; renderTudo(); }
+    renderMomento(); window.scrollTo(0, 0); return;
+  }
+  if (t.dataset.docsel) { D.docSel = Number(t.dataset.docsel); renderPrep(); return; }
+  if (t.dataset.docabrir) {
+    try { const r = await agir(t, () => api('doc_link', { id: t.dataset.docabrir, baixar: false })); if (r && r.url) { D.docUrl = { id: t.dataset.docabrir, url: r.url }; renderPrep(); } else toast('O arquivo original deste documento não está guardado.', true); } catch (e) {}
+    return;
+  }
+  if (t.dataset.anotar) { const d = (D.prep.documentos || [])[D.docSel]; const x = fatosDoc(d)[Number(t.dataset.anotar)]; if (x) anotar('• ' + (d.tipo || 'Documento') + ': ' + x.titulo + ' — ' + x.texto); return; }
+  if (t.dataset.leilao) { const [n, dt] = t.dataset.leilao.split('|'); setResp(n === '1' ? 'data_leilao1' : 'data_leilao2', dt); toast('Data do ' + n + 'º leilão gravada no diagnóstico.'); renderTudo(); renderMomento(); return; }
+  if (t.dataset.perg) {
+    const q = QI[t.dataset.perg]; D.momento = 'consulta'; D.etapa = q.e; renderTudo(); renderMomento();
+    const el = document.getElementById('dgq-' + q.id); if (el) { el.scrollIntoView({ block: 'center' }); const i = el.querySelector('input,textarea'); if (i) i.focus(); }
+  }
+});
+document.addEventListener('input', (ev) => { if (D && ev.target && ev.target.id === 'prepNotas') { A().prep_notas = ev.target.value; marcarSujo(); } });
+
+
 // ---------- rota ----------
 VIEWS.diagnostico = async (arg, forcar) => {
   if (!arg) { D = null; return telaLista(forcar); }
   await abrir(arg, forcar);
+  if (D.caso_id) await carregarPrep(forcar);
+  if (!D.momento) D.momento = D.caso_id ? momentoPadrao() : 'consulta';
   telaEditor();
 };
 if (/^#\/diagnostico/.test(location.hash) && S.token) rota();
