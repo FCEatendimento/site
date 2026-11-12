@@ -781,6 +781,36 @@ a:hover .nx-foto img{transform:scale(1.03)}
 .nt-ini-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
 .nt-ini-grade .nx-card .nx-foto{aspect-ratio:16/8}
 @media (max-width:900px){.nx-topo{grid-template-columns:1fr}.nx-sobre h2{font-size:20px}.nx-mini{grid-template-columns:110px minmax(0,1fr)}}
+/* Início em duas colunas (12/11/2026) */
+.ini-topo{margin:14px 2px 12px;color:var(--txt)}
+.ini-topo .dt{color:var(--mut)!important}
+.ini-topo h2{text-shadow:none!important;color:var(--txt)}
+.ini-topo .rs a{color:var(--txt)!important;background:var(--surface)!important;border:1px solid var(--line-2)!important;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.ini2{display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:18px}
+.ini2 .hero3d.ini-fases{margin:0;position:sticky;top:calc(var(--nav-h,64px) + 64px)}
+.ini2 .hero3d.ini-fases .hero-in{padding:16px}
+.ini2 .fases3d{grid-template-columns:1fr;gap:12px;margin-top:0}
+.ini2 .fase3d{padding:14px 16px 8px}
+.ini2 .fase3d .fn b{font-size:34px}
+.nt-bolha{position:relative;border-radius:24px;overflow:hidden;isolation:isolate;box-shadow:0 18px 40px rgba(0,0,0,.12)}
+.nt-bolha::before{content:"";position:absolute;inset:-20px;z-index:-2;background:url(fundos/lounge.jpg) center/cover;filter:blur(2px) saturate(1.05);transform:scale(1.04)}
+.nt-bolha::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 62%,transparent),color-mix(in srgb,var(--bg) 80%,transparent))}
+.nt-bolha-in{padding:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.nt-bolha,.nt-bolha-in>*,#ntConteudo{min-width:0}.nt-bolha .nx-faixa{max-width:100%}
+.nt-bolha .msgs-card.compacta{margin:0!important;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px)}
+.nt-cab{display:flex;align-items:center;gap:10px}.nt-cab h2{margin:0;flex:1;font-size:17px;display:flex;align-items:center;gap:8px}
+.nt-bolha .nx-faixa{margin-top:10px}
+.nt-bolha .nt-pills{margin:10px 0 0;background:color-mix(in srgb,var(--surface) 70%,transparent);backdrop-filter:blur(8px);width:max-content;max-width:100%}
+.nt-linhas{display:grid;gap:10px;margin-top:12px}
+.nt-lin{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;background:var(--surface);border-radius:14px;overflow:hidden;color:var(--txt);box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 22px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s}
+.nt-lin:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.06),0 14px 30px rgba(0,0,0,.10)}
+.nt-lin .nx-foto{aspect-ratio:auto;height:100%;min-height:96px}.nt-lin .nx-selo{display:none}
+.nt-lin-t{padding:11px 14px 12px 0;display:grid;gap:5px;align-content:start}
+.nt-lin-t>b{font-size:14.5px;line-height:1.33}.nt-lin:hover .nt-lin-t>b{color:var(--gold)}
+.nt-lin .nt-i{display:block}
+.nt-todas{justify-self:center;font-weight:600;font-size:13.5px;color:var(--gold);display:inline-flex;gap:6px;align-items:center;margin-top:4px;background:color-mix(in srgb,var(--surface) 80%,transparent);padding:7px 14px;border-radius:99px}
+.nt-vazio{background:var(--surface);border-radius:14px;padding:22px;text-align:center;color:var(--mut);margin-top:12px}
+@media (max-width:1100px){.ini2{grid-template-columns:340px minmax(0,1fr)}}
+@media (max-width:900px){.ini2{grid-template-columns:minmax(0,1fr)}.ini2 .hero3d.ini-fases{position:relative;top:auto;margin:0}.ini2 .fases3d{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:82%;overflow-x:auto;scroll-snap-type:x mandatory}.ini2 .fase3d{scroll-snap-align:start}.nt-lin{grid-template-columns:96px minmax(0,1fr);gap:10px}.nt-lin-t>b{font-size:13.5px}.nt-lin .nt-i{display:none}.nt-bolha-in{padding:12px}}
 </style>
 </head>
 <body>
@@ -2713,26 +2743,36 @@ trocarFundo();
 const TEMAS_NT = [['', 'Todas'], ['BANCARIO', 'Bancário'], ['IMOBILIARIO', 'Imobiliário'], ['AGRO', 'Agro e rural'], ['ECONOMIA', 'Economia'], ['TRIBUNAIS', 'Tribunais']];
 const COR_NT = { BANCARIO: '#4F7BC0', IMOBILIARIO: '#B38A45', AGRO: '#2E7D57', ECONOMIA: '#7E62B5', TRIBUNAIS: '#B5470F' };
 S.ntTema = S.ntTema || ''; S.ntMais = false;
+function linhaNt(n) {
+  const nome = Object.fromEntries(TEMAS_NT);
+  return '<a class="nt-lin" href="' + esc(n.url) + '" target="_blank" rel="noopener" style="--nc:' + (COR_NT[n.tema] || '#7E858E') + '">' + fotoNt(n, 'lin') +
+    '<span class="nt-lin-t"><span class="nt-top"><span class="nt-tema">' + esc(nome[n.tema] || 'Geral') + '</span><span class="pp mut">' + esc(n.fonte || '') + ' · ' + esc(quando(n.em, true)) + '</span>' + (Number(n.relevancia) >= 5 ? '<span class="nt-imp">importante</span>' : '') + '</span>' +
+    '<b>' + esc(n.titulo) + '</b>' + (n.impacto ? '<span class="nt-i"><b>Para o escritório:</b> ' + esc(n.impacto) + '</span>' : '') + '</span></a>';
+}
 function cartaoNoticias(l) {
   const lista = (l || []).filter((n) => !S.ntTema || n.tema === S.ntTema);
-  let h = '<div class="cab"><h2>' + ic('jornal', 's') + ' Notícias que afetam o escritório</h2><div class="dir"><a class="btn sm" href="#/noticias">Abrir noticiário ' + ic('seta', 's') + '</a></div></div>' +
+  let h = '<div class="nt-cab"><h2>' + ic('jornal', 's') + ' Notícias que afetam o escritório</h2><a class="btn sm" href="#/noticias">Abrir noticiário ' + ic('seta', 's') + '</a></div>' +
     faixaVermelha((l || []).slice().sort((a, b) => new Date(b.em) - new Date(a.em))) +
     '<div class="pills nt-pills" role="group" aria-label="Tema">' + TEMAS_NT.map(([k, t]) => '<button type="button" data-nt="' + k + '" class="' + (S.ntTema === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>';
-  if (!lista.length) h += '<div class="vazio" style="padding:18px">' + ic('jornal') + '<div>Nenhuma notícia deste tema nos últimos dias. As buscas rodam às 6h10 e às 12h40.</div></div>';
-  else h += '<div class="nt-ini-grade">' + lista.slice(0, 6).map((n) => cardNt(n)).join('') + '</div>';
-  return h + '<p class="pp mut" style="margin:10px 2px 0">Resumos feitos por IA a partir do trecho publicado: abra a fonte antes de citar.</p>';
+  if (!lista.length) h += '<div class="nt-vazio">' + ic('jornal') + '<div>Nenhuma notícia deste tema nos últimos dias. As buscas rodam às 6h10 e às 12h40.</div></div>';
+  else h += '<div class="nt-linhas">' + lista.slice(0, 6).map(linhaNt).join('') + '</div><a class="nt-todas" href="#/noticias">Abrir noticiário completo ' + ic('seta', 's') + '</a>';
+  return h;
 }
+// Início em duas colunas: fases na bolha da esquerda (fixa) e notícias numa bolha à direita, ambas com fotos ao fundo
 async function secaoNoticias(forcar) {
-  const ref = $('#cont .fases3d'); if (!ref || $('#secNt')) return;
-  const box = document.createElement('section'); box.id = 'secNt'; box.className = 'card t3d nt-card';
-  box.innerHTML = '<div class="cab"><h2>' + ic('jornal', 's') + ' Notícias que afetam o escritório</h2></div><div class="esq" style="height:90px;margin-top:10px"></div>';
-  const ancora = () => $('#cont .msgs-card') || ($('#cont .fases3d') && $('#cont .fases3d').closest('section'));
-  const pos = ancora(); if (pos) pos.after(box); else $('#cont').appendChild(box);
+  const hero = $('#cont .hero3d'); if (!hero || $('#ini2')) return;
+  const topo = $('.hero-top', hero);
+  const lay = document.createElement('div'); lay.id = 'ini2'; lay.className = 'ini2';
+  if (topo) { topo.classList.add('ini-topo'); hero.before(topo); }
+  hero.before(lay); lay.appendChild(hero); hero.classList.add('ini-fases');
+  const bolha = document.createElement('section'); bolha.className = 'nt-bolha'; bolha.id = 'secNt'; bolha.setAttribute('aria-label', 'Mensagens e notícias');
+  bolha.innerHTML = '<div class="nt-bolha-in"><div id="ntMsgs"></div><div id="ntConteudo"><div class="esq" style="height:90px;margin-top:10px"></div><div class="esq" style="height:90px;margin-top:10px"></div></div></div>';
+  lay.appendChild(bolha);
+  const ms = $('#cont .msgs-card'); if (ms) { ms.classList.add('compacta'); $('#ntMsgs', bolha).appendChild(ms); }
   let l = [];
-  try { l = await dados('noticias', 'noticias', null, forcar); } catch (e) { box.innerHTML = '<div class="vazio">Não foi possível carregar as notícias agora.</div>'; return; }
-  const pintar = () => { if (!box.isConnected) return; box.innerHTML = cartaoNoticias(l);
-    $$('[data-nt]', box).forEach((b) => b.onclick = () => { S.ntTema = b.dataset.nt; S.ntMais = false; pintar(); });
-    const ms = $('#cont .msgs-card'); if (ms && ms.nextElementSibling !== box) ms.after(box); };
+  try { l = await dados('noticias', 'noticias', null, forcar); } catch (e) { const c = $('#ntConteudo', bolha); if (c) c.innerHTML = '<div class="nt-vazio">Não foi possível carregar as notícias agora.</div>'; return; }
+  const pintar = () => { const c = $('#ntConteudo', bolha); if (!c || !c.isConnected) return; c.innerHTML = cartaoNoticias(l);
+    $$('[data-nt]', c).forEach((b) => b.onclick = () => { S.ntTema = b.dataset.nt; pintar(); }); };
   pintar();
 }
 {
