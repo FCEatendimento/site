@@ -1236,6 +1236,19 @@ function ligarAba(k, c) {
     const be = $('#bEnviarMsg');
     if (be) be.onclick = async () => {
       const t = $('#msgTxt').value.trim(); if (!t) return $('#msgTxt').focus();
+      // Texto que fala com a Helena ("Helena, peça...") quase sempre é orientação: confirma antes de mandar ao cliente.
+      if (/\bhelena\b/i.test(t)) {
+        const destino = await modal({ titulo: 'Isso é para a Helena?', corpo: '<p class="pq" style="margin:0">A mensagem menciona a Helena. Se for uma orientação para ela, envie como orientação: <b>o cliente não vê</b>. Se mandar ao cliente, ele recebe o texto exatamente como está.</p>',
+          botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Mandar ao cliente', c: '', v: 'cliente' }, { t: 'Orientar a Helena', c: 'pri', v: 'helena' }] });
+        if (!destino) return;
+        if (destino === 'helena') {
+          be.dataset.lento = '1';
+          let d; try { d = await agir(be, () => api('orientar', { id: c.id, texto: t, agir: true, aprender: false })); } catch (e) { return; }
+          toast((d && d.mensagem) || 'Orientação enviada à Helena');
+          S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
+          return;
+        }
+      }
       await agir(be, () => api('responder', { id: c.id, texto: t }), 'Mensagem enviada ao cliente');
       S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
     };
