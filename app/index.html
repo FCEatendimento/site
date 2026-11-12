@@ -522,6 +522,142 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn:not(.pri):not(.esc){background-image:linear-gradient(rgba(255,255,255,.06),rgba(255,255,255,0) 55%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 5px rgba(0,0,0,.4)}}
 :root[data-theme="dark"] .btn:not(.pri):not(.esc){background-image:linear-gradient(rgba(255,255,255,.06),rgba(255,255,255,0) 55%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 5px rgba(0,0,0,.4)}
 @media (prefers-reduced-motion:reduce){.card,.kcard,.kpi,.nav a,.modal{transition:none!important;animation:none!important;transform:none!important}}
+/* ===== Novo visual (12/11/2026): menu no topo, painel por fases e indicadores, com profundidade 3D ===== */
+:root{--sh3d:0 1px 0 rgba(255,255,255,.9) inset,0 1px 2px rgba(16,24,40,.06),0 8px 18px -8px rgba(16,24,40,.18),0 26px 48px -26px rgba(16,24,40,.32);--nav-h:64px}
+:root[data-tema="escuro"]{--sh3d:0 1px 0 rgba(255,255,255,.06) inset,0 1px 2px rgba(0,0,0,.5),0 10px 22px -8px rgba(0,0,0,.6),0 30px 52px -24px rgba(0,0,0,.75)}
+@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]){--sh3d:0 1px 0 rgba(255,255,255,.06) inset,0 1px 2px rgba(0,0,0,.5),0 10px 22px -8px rgba(0,0,0,.6),0 30px 52px -24px rgba(0,0,0,.75)}}
+body{background:radial-gradient(1200px 520px at 80% -10%,rgba(201,164,98,.10),transparent 60%),var(--bg)}
+.card{box-shadow:var(--sh3d);border-color:color-mix(in srgb,var(--line) 70%,transparent)}
+/* menu no topo (computador) */
+@media (min-width:901px){
+  .side{position:sticky;top:0;inset:auto;width:auto;height:var(--nav-h);flex-direction:row;align-items:center;gap:18px;padding:0 22px;z-index:40;
+    background:linear-gradient(180deg,rgba(18,21,25,.86),rgba(24,28,33,.94)),url(../img/predio-fundo.jpg) center 40%/cover;
+    box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 10px 30px -14px rgba(0,0,0,.55);border-bottom:1px solid rgba(209,174,108,.22)}
+  .marca{flex-direction:row;align-items:center;gap:10px;padding:0;margin-right:6px}
+  .marca .lg{width:118px}
+  .marca span{display:none}
+  .nav{flex-direction:row;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{padding:8px 11px;gap:7px;font-size:13.5px;white-space:nowrap;border-radius:10px}
+  .nav a svg.i{width:16px;height:16px;opacity:.85}
+  .nav a.on{background:linear-gradient(180deg,rgba(209,174,108,.24),rgba(209,174,108,.10));box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 6px 14px -8px rgba(0,0,0,.6)}
+  .nav a.on::before{left:12px;right:12px;top:auto;bottom:-1px;height:2px;width:auto;border-radius:2px}
+  .nav .bdg{margin-left:4px}
+  .side .rodape{margin:0;border:0;padding:0;gap:8px}
+  .side .rodape .e{display:none}
+  .main{margin-left:0}
+  .topo{top:var(--nav-h)}
+  .rod{left:0}
+  .conteudo{max-width:1320px;margin:0 auto}
+}
+/* hero do início com as fotos do site */
+.hero3d{position:relative;margin:12px 0 18px;border-radius:24px;overflow:hidden;color:#F2F2EE;isolation:isolate;
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 30px 60px -30px rgba(10,12,16,.75),0 12px 26px -14px rgba(10,12,16,.5)}
+.hero3d .hb{position:absolute;inset:-20px;background-size:cover;background-position:center;filter:blur(3px) saturate(1.1) brightness(.95);transform:scale(1.04);opacity:0;transition:opacity 1.6s ease;z-index:-2}
+.hero3d .hb.on{opacity:1}
+.hero3d::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(14,16,20,.42),rgba(18,21,25,.66) 45%,rgba(18,21,25,.86)),radial-gradient(900px 300px at 85% 0,rgba(209,174,108,.22),transparent 70%)}
+.hero-in{padding:26px 28px 26px}
+.hero-top{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.hero-top h2{font:700 32px/1.1 var(--serif);margin:4px 0 0;letter-spacing:.2px;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.hero-top .dt{font-size:13.5px;color:#D6D9DE}
+.hero-top .rs{margin-left:auto;font-size:13.5px;color:#D6D9DE;display:flex;gap:8px;flex-wrap:wrap}
+.hero-top .rs a{color:#F2F2EE;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:5px 11px;backdrop-filter:blur(6px)}
+.hero-top .rs a:hover{background:rgba(255,255,255,.14)}
+.fases3d{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px;perspective:1200px}
+.fase3d{position:relative;border-radius:20px;padding:18px 18px 12px;color:#F2F2EE;transform-style:preserve-3d;
+  background:linear-gradient(160deg,rgba(255,255,255,.13),rgba(255,255,255,.04) 42%,rgba(0,0,0,.18)),rgba(34,39,45,.62);
+  border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);
+  box-shadow:0 1px 0 rgba(255,255,255,.22) inset,0 -1px 0 rgba(0,0,0,.35) inset,0 18px 36px -18px rgba(0,0,0,.8),0 4px 10px -4px rgba(0,0,0,.5);transition:transform .25s ease,box-shadow .25s ease}
+.fase3d::before{content:"";position:absolute;left:18px;right:18px;top:0;height:3px;border-radius:0 0 4px 4px;background:var(--fc);box-shadow:0 0 18px var(--fc)}
+.fase3d .fh{display:flex;align-items:center;gap:9px;transform:translateZ(18px)}
+.fase3d .fh i{width:10px;height:10px;border-radius:50%;background:var(--fc);box-shadow:0 0 0 4px color-mix(in srgb,var(--fc) 22%,transparent)}
+.fase3d .fh span{font-size:12px;font-weight:700;letter-spacing:1px;color:#C9CDD3;flex:1}
+.fase3d .fh a{font-size:12.5px;color:#D6D9DE;padding:4px 8px;border-radius:8px}
+.fase3d .fh a:hover{background:rgba(255,255,255,.1)}
+.fase3d .fn{display:flex;align-items:baseline;gap:10px;margin-top:10px;transform:translateZ(34px)}
+.fase3d .fn b{font:700 46px/1 var(--serif);text-shadow:0 6px 18px rgba(0,0,0,.45)}
+.fase3d .fn em{font-style:normal;font-size:16px;font-weight:600}
+.fase3d .fd{font-size:13px;color:#B9BEC6;margin-top:4px;transform:translateZ(20px)}
+.fsubs{margin-top:12px;border-top:1px solid rgba(255,255,255,.1);padding-top:6px;display:flex;flex-direction:column;gap:2px;transform:translateZ(14px)}
+.fsub{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:11px;color:#E6E7E9;font-size:14px;transition:background .15s,transform .15s}
+.fsub:hover{background:rgba(255,255,255,.09);transform:translateX(2px)}
+.fsub i{width:6px;height:6px;border-radius:50%;background:#8B929B;flex:none}
+.fsub span{flex:1;min-width:0}
+.fsub b{min-width:22px;text-align:right;font-variant-numeric:tabular-nums}
+.fsub.zero{opacity:.55}
+.fsub.alerta{background:rgba(224,107,42,.16)}.fsub.alerta i{background:#F08A4B;box-shadow:0 0 10px #F08A4B}
+.fsub.alerta.zero{background:transparent}.fsub.alerta.zero i{background:#8B929B;box-shadow:none}
+@media (max-width:1100px){.fases3d{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.fsub.zero{display:none}.hero3d{margin:8px -4px 14px;border-radius:20px}.hero-in{padding:20px 16px}.hero-top h2{font-size:25px}.hero-top .rs{margin-left:0}.fase3d .fn b{font-size:38px}}
+/* cartões 3D genéricos */
+.t3d{transition:transform .2s ease,box-shadow .2s ease;will-change:transform}
+.t3d[data-t3]{box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 26px 50px -22px rgba(10,12,16,.6)}
+.meta3d{position:relative;overflow:hidden}
+.meta3d .barra{height:12px;border-radius:99px;background:color-mix(in srgb,var(--txt) 9%,transparent);box-shadow:inset 0 1px 2px rgba(0,0,0,.18);overflow:hidden}
+.meta3d .barra i{display:block;height:100%;border-radius:99px;background:linear-gradient(180deg,#E3C68E,#B38A45);box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 0 14px rgba(201,164,98,.55)}
+.rz{display:flex;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.rz span{flex:1;color:var(--mut)}.rz b{font-variant-numeric:tabular-nums}
+/* telas por fase */
+.fseg{display:flex;gap:6px;background:color-mix(in srgb,var(--txt) 6%,transparent);padding:5px;border-radius:16px;margin:12px 0 12px;width:max-content;max-width:100%;overflow-x:auto;box-shadow:inset 0 1px 3px rgba(0,0,0,.12)}
+.fseg a{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;font-weight:600;font-size:14px;color:var(--mut);white-space:nowrap}
+.fseg a i{width:8px;height:8px;border-radius:50%;background:var(--fc)}
+.fseg a.on{background:var(--surface);color:var(--txt);box-shadow:var(--sh3d)}
+.fseg a b{color:var(--mut);font-weight:600}
+.subchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.subchips a{border:1px solid var(--line-2);background:var(--surface);color:var(--txt);border-radius:99px;padding:7px 13px;font-size:13px;font-weight:600;display:flex;gap:7px;align-items:center;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 2px 6px -3px rgba(16,24,40,.2)}
+.subchips a b{color:var(--mut)}
+.subchips a.on{background:var(--navy);border-color:var(--navy);color:#fff}.subchips a.on b{color:#D1AE6C}
+.subchips a.alerta:not(.on){border-color:color-mix(in srgb,#E06B2A 45%,transparent);color:#B5470F}
+:root[data-tema="escuro"] .subchips a.alerta:not(.on){color:#F5A26F}
+.casos3d{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.casos3d{grid-template-columns:minmax(0,1fr)}}
+.caso3d{display:flex;flex-direction:column;gap:9px;padding:16px 16px 14px;color:var(--txt);border-radius:18px;position:relative}
+.caso3d .ch{display:flex;align-items:center;gap:12px}
+.caso3d .ch .mid{flex:1;min-width:0}
+.caso3d .ch .t{font-weight:700;font-size:15.5px}
+.caso3d .ch .d{font-size:12.5px;color:var(--mut)}
+.caso3d .ult{font-size:13.5px;color:var(--txt);opacity:.86;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.caso3d .ult em{font-style:normal;color:var(--mut)}
+.caso3d .rod3{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.caso3d::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--fc)}
+/* indicadores */
+.ind-filtros{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0 16px}
+.pills{display:flex;background:color-mix(in srgb,var(--txt) 6%,transparent);border-radius:14px;padding:4px;gap:2px;box-shadow:inset 0 1px 3px rgba(0,0,0,.12);flex-wrap:wrap}
+.pills button{border:0;background:transparent;color:var(--mut);font:600 13px var(--sans);padding:8px 13px;border-radius:10px;cursor:pointer}
+.pills button.on{background:var(--surface);color:var(--txt);box-shadow:var(--sh3d)}
+.ind-sec{font-size:12px;font-weight:700;letter-spacing:1.3px;color:var(--mut);margin:22px 2px 10px;display:flex;align-items:center;gap:8px}
+.ind-sec i{width:8px;height:8px;border-radius:50%;background:var(--fc)}
+.ind-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+@media (max-width:1200px){.ind-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.ind-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+.kp3{padding:14px 15px;display:flex;flex-direction:column;gap:6px;min-height:112px;border-radius:16px}
+.kp3 .r{font-size:11.5px;font-weight:700;letter-spacing:.7px;color:var(--mut);text-transform:uppercase}
+.kp3 .v{font:700 26px/1.05 var(--serif);font-variant-numeric:tabular-nums}
+.kp3 .s{margin-top:auto;font-size:12px;color:var(--mut)}
+.kp3 .s b.up{color:var(--ok)}.kp3 .s b.dn{color:var(--bad)}
+.meta-hero{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;padding:20px 22px;border-radius:22px;color:#F2F2EE;position:relative;overflow:hidden;isolation:isolate;
+  background:linear-gradient(135deg,rgba(18,21,25,.86),rgba(30,34,40,.92)),url(../img/biblioteca-fundo.jpg) center/cover;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 26px 50px -26px rgba(10,12,16,.8)}
+.meta-hero h2{font:700 15px var(--sans);letter-spacing:1px;text-transform:uppercase;color:#C9CDD3;margin:0}
+.meta-hero .big{font:700 40px/1.05 var(--serif);margin-top:6px}
+.meta-hero .sub{color:#B9BEC6;font-size:13.5px;margin-top:6px}
+.meta-hero .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff}
+.anel{width:118px;height:118px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
+@media (max-width:700px){.meta-hero{grid-template-columns:auto 1fr;gap:14px}.meta-hero .btn{grid-column:1/-1}.meta-hero .big{font-size:30px}.anel{width:92px;height:92px}}
+.graf{padding:16px 18px 12px}
+.graf h3{margin:0 0 2px;font-size:15px}
+.graf .gsub{font-size:12.5px;color:var(--mut);margin-bottom:10px}
+.graf svg{width:100%;height:auto;display:block;overflow:visible}
+.graf .leg{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-top:6px;flex-wrap:wrap}
+.graf .leg span{display:flex;align-items:center;gap:6px}
+.graf .leg i{width:12px;height:3px;border-radius:2px;display:inline-block}
+.gtip{position:fixed;z-index:90;pointer-events:none;background:var(--surface);color:var(--txt);border:1px solid var(--line-2);border-radius:10px;padding:7px 10px;font-size:12.5px;box-shadow:var(--sh-lg);display:none;max-width:240px}
+.hb3{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:5px 0}
+.hb3 .n{width:150px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb3 .b{flex:1;height:12px;border-radius:99px;background:color-mix(in srgb,var(--txt) 7%,transparent);overflow:hidden}
+.hb3 .b i{display:block;height:100%;border-radius:99px;background:var(--fc);box-shadow:0 1px 0 rgba(255,255,255,.35) inset}
+.hb3 b{width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.hb3 em{font-style:normal;color:var(--mut);width:52px;text-align:right;font-size:12.5px}
+@media (max-width:560px){.hb3 .n{width:110px}}
 </style>
 </head>
 <body>
@@ -747,17 +883,16 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['diagnostico', 'Diagnóstico', 'balanca'], ['processos', 'Processos', 'martelo'], ['aprovacoes', 'Aprovações', 'checks'], ['agenda', 'Agenda', 'cal'], ['conteudo', 'Conteúdo', 'insta'], ['financeiro', 'Financeiro', 'din'], ['despesas', 'Despesas', 'recibo'], ['marketing', 'Google Ads', 'google']
+  ['inicio', 'Início', 'home'], ['whatsapp', 'WhatsApp', 'zap'], ['analise', 'Em análise', 'balanca'], ['clientes', 'Clientes', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['indicadores', 'Indicadores', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['mais', 'Mais', 'mais']
 ];
 function montar() {
   const eu = S.eu || {};
   const av = '<img src="fabio.jpg" alt="Dr. Fábio">';
   document.body.innerHTML = '<div class="app"><aside class="side"><div class="marca">' + logo('lg', '#ECECE8') + '<span>Gestão do escritório</span></div><nav class="nav">' +
-    MENU.map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + (k === 'casos' ? '<span class="bdg" data-bdg-msg hidden></span>' : '') + '</a>').join('') +
-    '<a href="https://fceadvogados.com.br/calculadora/" target="_blank" rel="noopener">' + ic('grafico') + '<span>Simulador</span></a>' +
+    MENU.map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + (k === 'whatsapp' ? '<span class="bdg" data-bdg-msg hidden></span>' : '') + '</a>').join('') +
     '</nav><div class="rodape"><div class="av">' + av + '</div><div style="min-width:0"><div class="n">' + esc((eu.nome || '').split(' ')[0] || 'Fábio') + '</div><div class="e">' + esc(eu.email || '') + '</div></div><button title="Sair" data-sair>' + ic('sair') + '</button></div></aside>' +
     '<div class="main"><header class="topo"><span class="topo-marca">' + logoMarca('lm') + '</span><h1 id="tit">Início</h1><div class="acoes" id="topoAcoes"></div><button class="btn fant ico" id="btnTema" title="Tema">' + ic('lua') + '</button><button class="btn fant ico" id="btnAtt" title="Atualizar">' + ic('att') + '</button></header><div class="conteudo" id="cont"></div>' + RODAPE + '</div>' +
-    '<nav class="tabbar">' + [['inicio', 'Início', 'home'], ['casos', 'Casos', 'casos'], ['aprovacoes', 'Aprovar', 'checks'], ['agenda', 'Agenda', 'cal'], ['mais', 'Mais', 'mais']].map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'aprovacoes' ? '<span class="bdg" data-bdg hidden></span>' : '') + (k === 'casos' ? '<span class="bdg" data-bdg-msg hidden></span>' : '') + '</a>').join('') + '</nav></div>';
+    '<nav class="tabbar">' + [['inicio', 'Início', 'home'], ['whatsapp', 'WhatsApp', 'zap'], ['analise', 'Análise', 'balanca'], ['clientes', 'Clientes', 'pessoa'], ['mais', 'Mais', 'mais']].map(([k, t, i]) => '<a href="#/' + k + '" data-k="' + k + '">' + ic(i) + '<span>' + t + '</span>' + (k === 'mais' ? '<span class="bdg" data-bdg hidden></span>' : '') + (k === 'whatsapp' ? '<span class="bdg" data-bdg-msg hidden></span>' : '') + '</a>').join('') + '</nav></div>';
   $('[data-sair]').onclick = async () => { if (await confirmar('Sair do app?', 'Você vai precisar entrar de novo com o Google.', 'Sair')) sair(); };
   const rb = $('.rod-lin'); if (rb) rb.onclick = () => $('.rod').classList.toggle('aberto');
   $('#btnAtt').onclick = () => { S.cache = {}; rota(true); };
@@ -776,7 +911,8 @@ async function rota(forcar) {
   const h = location.hash.replace(/^#\/?/, '') || 'inicio';
   const [nome, arg] = h.split('?')[0].split('/');
   const k = VIEWS[nome] ? nome : 'inicio';
-  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || (k === 'caso' && a.dataset.k === 'casos') || (k === 'processo' && a.dataset.k === 'processos') || (a.dataset.k === 'mais' && ['financeiro', 'marketing', 'despesas', 'processos', 'processo', 'diagnostico'].includes(k))));
+  const MAIS_NAV = ['casos', 'marketing', 'despesas', 'diagnostico', 'conteudo'], MAIS_TAB = MAIS_NAV.concat(['agenda', 'aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro']);
+  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || (k === 'processo' && a.dataset.k === 'processos') || (a.dataset.k === 'mais' && (a.closest('.tabbar') ? MAIS_TAB : MAIS_NAV).includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
   rotaAtual = h;
   try { await VIEWS[k](arg, forcar); } catch (e) { erroTela(e, () => rota(true)); }
@@ -809,7 +945,7 @@ async function dados(chave, acao, extra, forcar) {
 }
 // depois de abrir, deixa as outras telas prontas em segundo plano
 async function preCarregar() {
-  const lista = [['painel', 'painel'], ['aprov', 'aprovacoes'], ['agenda', 'agenda'], ['fin', 'financeiro'], ['desp', 'despesas'], ['mk30', 'marketing', { dias: 30 }], ['conteudo', 'conteudo'], ['proc', 'processos'], ['casos:' + JSON.stringify({ q: '', etapa: '', perfil: '' }), 'casos', { q: '', etapa: '', perfil: '' }]];
+  const lista = [['painel', 'painel'], ['fases', 'fases'], ['aprov', 'aprovacoes'], ['agenda', 'agenda'], ['fin', 'financeiro'], ['desp', 'despesas'], ['mk30', 'marketing', { dias: 30 }], ['conteudo', 'conteudo'], ['proc', 'processos'], ['casos:' + JSON.stringify({ q: '', etapa: '', perfil: '' }), 'casos', { q: '', etapa: '', perfil: '' }]];
   for (const [k, a, x] of lista) {
     if (!S.token) return;
     const m = S.cache[k]; if (m && Date.now() - m.t < 45000) continue;
@@ -881,6 +1017,277 @@ VIEWS.inicio = async (_, forcar) => {
   $('#cont').innerHTML = h;
   ligarCartaoMsgs();
   $$('[data-href]').forEach((el) => el.onclick = (e) => { if (!e.target.closest('a')) location.hash = el.dataset.href; });
+};
+// ---------- PAINEL POR FASES (12/11/2026): WhatsApp · Em análise · Clientes, com subcategorias ----------
+const FASES = {
+  whatsapp: { t: 'WhatsApp', passo: '1 · WHATSAPP', cor: '#3DBE7A', d: 'Ainda não pagaram a consulta', un: ['em atendimento', 'em atendimento'] },
+  analise: { t: 'Em análise', passo: '2 · EM ANÁLISE', cor: '#C9A462', d: 'Consulta paga · do diagnóstico à assinatura', un: ['consulta paga', 'consultas pagas'] },
+  clientes: { t: 'Clientes', passo: '3 · CLIENTES', cor: '#6E9BE0', d: 'Contrato assinado · processo e honorários', un: ['cliente', 'clientes'] }
+};
+// [nome, fase, pede ação sua]
+const SUBCAT = {
+  wa_helena: ['Em atendimento (Helena)', 'whatsapp', 0], wa_humano: ['Em atendimento humano', 'whatsapp', 1], wa_pagamento: ['Aguardando pagamento', 'whatsapp', 0],
+  wa_documentos: ['Aguardando documentos', 'whatsapp', 0], wa_sem_resposta: ['Sem resposta (retomada)', 'whatsapp', 0],
+  an_agendado: ['Diagnóstico agendado', 'analise', 0], an_documentos: ['Aguardando documentos', 'analise', 1], an_preparo: ['Diagnóstico em preparo', 'analise', 1],
+  an_segunda: ['Segunda consulta agendada', 'analise', 0], an_proposta: ['Proposta enviada', 'analise', 0], an_assinatura: ['Aguardando assinatura do contrato', 'analise', 0],
+  cl_documentos: ['Aguardando documentos', 'clientes', 1], cl_execucao: ['Em execução', 'clientes', 0], cl_protocolado: ['Processo protocolado', 'clientes', 0], cl_liminar: ['Aguardando decisão (liminar)', 'clientes', 0]
+};
+const DICA_SUB = {
+  wa_helena: 'A Helena está conversando e qualificando o caso.', wa_humano: 'A pessoa pediu atendente ou você assumiu a conversa: a Helena está pausada.',
+  wa_pagamento: 'Recebeu o link da consulta (ou reservou horário) e ainda não pagou.', wa_documentos: 'Falta documento pedido antes da consulta.',
+  wa_sem_resposta: 'Parou de responder há mais de 24h; a cadência de retomada está em andamento.',
+  an_agendado: 'Consulta paga e primeira reunião marcada.', an_documentos: 'Falta documento para fechar o diagnóstico.', an_preparo: 'Primeira consulta feita (ou paga sem horário): diagnóstico e proposta com você.',
+  an_segunda: 'Segunda consulta (entrega do diagnóstico) marcada.', an_proposta: 'Proposta enviada; aguardando os dados do cliente.', an_assinatura: 'Contrato gerado; falta assinatura do cliente ou sua.',
+  cl_documentos: 'Procuração, hipossuficiência ou outro documento pendente.', cl_execucao: 'Contrato assinado; peça e providências em preparação.', cl_protocolado: 'Processo ajuizado e em andamento.', cl_liminar: 'Liminar pedida, aguardando decisão.'
+};
+const ORDEM_SUB = { whatsapp: ['wa_humano', 'wa_helena', 'wa_pagamento', 'wa_documentos', 'wa_sem_resposta'], analise: ['an_agendado', 'an_documentos', 'an_preparo', 'an_segunda', 'an_proposta', 'an_assinatura'], clientes: ['cl_documentos', 'cl_execucao', 'cl_protocolado', 'cl_liminar'] };
+const FOTOS_HERO = ['../img/saguao-fundo.jpg', '../img/recepcao-fundo.jpg', '../img/biblioteca-fundo.jpg'];
+function contaSubs(casos) { const n = {}; Object.keys(SUBCAT).forEach((k) => { n[k] = 0; }); (casos || []).forEach((c) => { n[c.sub] = (n[c.sub] || 0) + 1; }); return n; }
+function faseCard(f, casos, n) {
+  const F = FASES[f], tot = casos.filter((c) => c.fase === f).length;
+  return '<div class="fase3d t3d" style="--fc:' + F.cor + '"><div class="fh"><i></i><span>' + F.passo + '</span><a href="#/' + f + '">Ver todos</a></div>' +
+    '<div class="fn"><b>' + tot + '</b><em>' + (tot === 1 ? F.un[0] : F.un[1]) + '</em></div><div class="fd">' + esc(F.d) + '</div><div class="fsubs">' +
+    ORDEM_SUB[f].map((k) => '<a class="fsub' + (SUBCAT[k][2] ? ' alerta' : '') + (n[k] ? '' : ' zero') + '" href="#/' + f + '?sub=' + k + '" title="' + esc(DICA_SUB[k]) + '"><i></i><span>' + esc(SUBCAT[k][0]) + '</span><b>' + n[k] + '</b></a>').join('') + '</div></div>';
+}
+function heroFotos() {
+  const hb = $$('.hero3d .hb'); if (!hb.length) return;
+  let i = 0; hb[0].classList.add('on');
+  clearInterval(S.heroT); S.heroT = setInterval(() => { if (!document.body.contains(hb[0])) return clearInterval(S.heroT); hb[i].classList.remove('on'); i = (i + 1) % hb.length; hb[i].classList.add('on'); }, 7000);
+}
+VIEWS.inicio = async (_, forcar) => {
+  titulo('Início');
+  if (!S.cache.painel || !S.cache.fases) carregando(5);
+  const [d, fz] = await Promise.all([dados('painel', 'painel', null, forcar), dados('fases', 'fases', null, forcar)]);
+  const ap = d.aprovacoes || {}; atualizaBadge(ap);
+  const casos = fz.casos || [], n = contaSubs(casos), mes = fz.mes || {}, metas = fz.metas || {};
+  const hr = Number(fmtD(new Date(), { hour: 'numeric', hour12: false }));
+  const saud = hr < 12 ? 'Bom dia' : hr < 18 ? 'Boa tarde' : 'Boa noite';
+  const nome = ((S.eu && S.eu.nome) || 'Fábio').split(' ')[0];
+  const nAprov = Number(ap.anuncios || 0) + Number(ap.google || 0) + Number(ap.posts || 0) + Number(ap.decisoes || 0);
+  const at = d.atencao || [];
+  const hojeK = hojeChave();
+  const consultasHoje = (fz.agenda || []).filter((a) => diaChave(a.inicio) === hojeK).length;
+  const prazos3 = at.filter((a) => a.tipo === 'prazo' && a.nivel !== 'normal').length;
+  let h = '<section class="hero3d">' + FOTOS_HERO.map((f) => '<div class="hb" style="background-image:url(' + f + ')"></div>').join('') + '<div class="hero-in">' +
+    '<div class="hero-top"><div><div class="dt">' + esc((() => { const t = fmtD(new Date(), { weekday: 'long', day: 'numeric', month: 'long' }); return t.charAt(0).toUpperCase() + t.slice(1); })()) + '</div><h2>' + saud + ', Dr. ' + esc(nome) + '</h2></div><div class="rs">' +
+    '<a href="#/agenda">' + consultasHoje + ' consulta' + (consultasHoje === 1 ? '' : 's') + ' hoje</a><a href="#/aprovacoes">' + nAprov + ' aprova' + (nAprov === 1 ? 'ção' : 'ções') + '</a>' + (prazos3 ? '<a href="#/processos">' + prazos3 + ' prazo' + (prazos3 === 1 ? '' : 's') + ' em até 3 dias</a>' : '') + '</div></div>' +
+    '<div class="fases3d">' + ['whatsapp', 'analise', 'clientes'].map((f) => faseCard(f, casos, n)).join('') + '</div></div></section>';
+  h += cartaoMsgs();
+  h += '<div class="grid g3" style="margin-top:16px">';
+  // precisa de você
+  const ICO = { prazo: ['alerta', 'bad'], assinar: ['caneta', 'warn'], humano: ['pessoa', 'warn'], decisao: ['martelo', 'ouro'], consulta_paga: ['din', 'ok'] };
+  h += '<div class="card t3d"><div class="cab"><h2>Precisa de você hoje</h2><div class="dir">' + (at.length ? '<span class="bdg r">' + at.length + '</span>' : '') + '</div></div><div class="lista" style="margin-top:8px">';
+  if (nAprov) h += '<a class="item" href="#/aprovacoes"><div class="ic-circ ouro">' + ic('checks', 's') + '</div><div class="mid"><div class="t">' + nAprov + ' ' + (nAprov === 1 ? 'item para aprovar' : 'itens para aprovar') + '</div><div class="d">' +
+    [ap.decisoes ? ap.decisoes + ' decisão(ões) de caso' : '', ap.anuncios ? ap.anuncios + ' anúncio(s) da Meta' : '', ap.google ? ap.google + ' sugestão(ões) do Google' : '', ap.posts ? ap.posts + ' post(s)' : ''].filter(Boolean).join(' · ') + '</div></div>' + ic('seta', 's') + '</a>';
+  at.filter((a) => a.tipo !== 'decisao').slice(0, 6).forEach((a) => {
+    const [i, c] = ICO[a.tipo] || ['alerta', ''];
+    const qt = a.tipo === 'prazo' ? (faltam(a.quando).t + ' · ' + dataCurta(a.quando) + ' ' + hora(a.quando)) : quando(a.quando);
+    const href = a.tipo === 'assinar' && a.ref ? a.ref : (a.caso_id ? '#/caso/' + a.caso_id : '#/aprovacoes');
+    h += '<a class="item" href="' + esc(href) + '"' + (a.tipo === 'assinar' && a.ref ? ' target="_blank" rel="noopener"' : '') + '><div class="ic-circ ' + (a.nivel === 'vencido' ? 'bad' : c) + '">' + ic(i, 's') + '</div><div class="mid"><div class="t">' + esc(trataPrazoTit(a.titulo)) + '</div><div class="d">' + esc(a.sub || '') + (qt ? ' · ' + esc(qt) : '') + '</div></div>' + ic('seta', 's') + '</a>';
+  });
+  if (!nAprov && !at.length) h += '<div class="vazio">' + ic('check') + '<div>Nada pendente com você agora.</div></div>';
+  h += '</div></div>';
+  // agenda
+  const pr = d.proximos || [];
+  h += '<div class="card t3d"><div class="cab"><h2>Próximos 7 dias</h2><div class="dir"><a class="btn sm fant" href="#/agenda">Agenda ' + ic('seta', 's') + '</a></div></div><div class="lista" style="margin-top:8px">';
+  if (!pr.length) h += '<div class="vazio">' + ic('cal') + '<div>Nenhuma consulta ou publicação marcada.</div></div>';
+  pr.slice(0, 6).forEach((p) => {
+    h += '<a class="item" href="' + (p.caso_id ? '#/caso/' + p.caso_id : '#/agenda') + '"><div class="ic-circ ' + (p.tipo === 'consulta' ? 'info' : 'ouro') + '">' + ic(p.tipo === 'consulta' ? 'video' : 'cal', 's') + '</div><div class="mid"><div class="t">' + esc(p.titulo) + '</div><div class="d">' + esc(quando(p.quando)) + '</div></div>' + ic('seta', 's') + '</a>';
+  });
+  h += '</div></div>';
+  // resumo do mês
+  const meta = Number(metas.recebido_mes || 40000), rec = Number(mes.recebido || 0), pct = Math.min(100, Math.round(100 * rec / Math.max(1, meta)));
+  const mc = Number(metas.contratos_mes || 5);
+  h += '<div class="card t3d meta3d"><div class="cab"><h2>Resumo do mês</h2><div class="dir"><a class="btn sm fant" href="#/indicadores">Indicadores ' + ic('seta', 's') + '</a></div></div><div class="corpo" style="padding-top:4px">' +
+    '<div class="rz"><span>Novos leads</span><b>' + num(mes.novos) + '</b></div><div class="rz"><span>Consultas pagas</span><b>' + num(mes.consultas) + '</b></div>' +
+    '<div class="rz"><span>Contratos assinados</span><b>' + num(mes.contratos) + ' de ' + num(mc) + '</b></div><div class="rz" style="border:0"><span>Recebido no mês</span><b>' + brl(rec) + '</b></div>' +
+    '<div style="display:flex;font-size:12.5px;color:var(--mut);margin:8px 0 6px"><span style="flex:1">Meta de faturamento: ' + brlc(meta) + '</span><b style="color:var(--txt)">' + pct + '%</b></div><div class="barra"><i style="width:' + Math.max(2, pct) + '%"></i></div></div></div>';
+  h += '</div>';
+  $('#cont').innerHTML = h;
+  heroFotos(); ligarCartaoMsgs();
+};
+// ---------- telas de cada fase ----------
+function linhaFase(c) {
+  const F = FASES[c.fase], s = SUBCAT[c.sub] || ['', '', 0];
+  const ult = c.ult || {};
+  const extra = [];
+  if (c.prox_consulta) extra.push('<span class="chip info">' + ic('video', 's') + esc(quando(c.prox_consulta)) + '</span>');
+  if (c.processo && c.processo.numero) extra.push('<span class="chip nav">' + ic('martelo', 's') + esc(c.processo.numero) + '</span>');
+  if (c.critica) { const cr = faltam(c.critica); if (cr.c) extra.push('<span class="chip ' + cr.c + '">' + ic('alerta', 's') + esc(cr.t) + '</span>'); }
+  if (c.manual) extra.push('<span class="chip" title="Situação marcada por você">manual</span>');
+  return '<a class="card caso3d t3d" style="--fc:' + F.cor + '" href="#/caso/' + c.id + '"><div class="ch"><div class="av">' + esc(iniciais(c.nome)) + '</div><div class="mid"><div class="t">' + esc(c.nome) + '</div><div class="d">' +
+    [c.cidade, c.perfil ? PERFIL[c.perfil] || c.perfil : '', c.veiculo ? 'Veículo' : '', c.origem ? CANAL[c.origem] || c.origem : ''].filter(Boolean).map(esc).join(' · ') + '</div></div><span class="pp mut">' + esc(quando(c.ult_in || c.criado, true)) + '</span></div>' +
+    (ult.t ? '<div class="ult"><em>' + (ult.d === 'INBOUND' ? 'Cliente: ' : 'Escritório: ') + '</em>' + esc(String(ult.t).replace(/^\[DOCUMENTO LIDO: ([^\]]+)\].*/, 'Documento: $1').replace(/\s*\([A-Z_]+\)$/, '')) + '</div>' : '') +
+    '<div class="rod3"><span class="chip' + (s[2] ? ' warn' : '') + '">' + esc(s[0]) + '</span>' + extra.join('') + '</div></a>';
+}
+async function viewFase(f, forcar) {
+  const F = FASES[f];
+  titulo(F.t, '<a class="btn fant sm" href="#/casos">' + ic('lista', 's') + '<span class="so-desk"> Todos os casos</span></a>');
+  if (!S.cache.fases) carregando(4);
+  const fz = await dados('fases', 'fases', null, forcar);
+  const casos = fz.casos || [], n = contaSubs(casos);
+  const sub = (location.hash.match(/[?&]sub=([a-z_]+)/) || [])[1] || '';
+  const daFase = casos.filter((c) => c.fase === f), lista = sub ? daFase.filter((c) => c.sub === sub) : daFase;
+  let h = '<div class="fseg">' + ['whatsapp', 'analise', 'clientes'].map((k) => '<a href="#/' + k + '" class="' + (k === f ? 'on' : '') + '" style="--fc:' + FASES[k].cor + '"><i></i>' + FASES[k].t + ' <b>' + casos.filter((c) => c.fase === k).length + '</b></a>').join('') + '</div>';
+  h += '<div class="subchips"><a href="#/' + f + '" class="' + (sub ? '' : 'on') + '">Todos <b>' + daFase.length + '</b></a>' +
+    ORDEM_SUB[f].map((k) => '<a href="#/' + f + '?sub=' + k + '" title="' + esc(DICA_SUB[k]) + '" class="' + (sub === k ? 'on' : '') + (SUBCAT[k][2] && n[k] ? ' alerta' : '') + '">' + esc(SUBCAT[k][0]) + ' <b>' + n[k] + '</b></a>').join('') + '</div>';
+  if (sub) h += '<p class="pq mut" style="margin:-6px 2px 12px">' + esc(DICA_SUB[sub]) + '</p>';
+  h += lista.length ? '<div class="casos3d">' + lista.map(linhaFase).join('') + '</div>' : '<div class="card"><div class="vazio">' + ic('check') + '<div>Nenhum caso ' + (sub ? 'nesta situação' : 'nesta fase') + ' agora.</div></div></div>';
+  $('#cont').innerHTML = h;
+}
+VIEWS.whatsapp = (_, forcar) => viewFase('whatsapp', forcar);
+VIEWS.analise = (_, forcar) => viewFase('analise', forcar);
+VIEWS.clientes = (_, forcar) => viewFase('clientes', forcar);
+// situação manual do caso (botão no cabeçalho do caso)
+async function mudarSituacao(id, nome) {
+  let fz; try { fz = await dados('fases', 'fases', null, true); } catch (e) { return toast(e.message, true); }
+  const c = (fz.casos || []).find((x) => x.id === id);
+  if (!c) return toast('Este caso está encerrado ou fora do perfil: não entra nas fases.', true);
+  const op = ORDEM_SUB[c.fase];
+  const r = await modal({ titulo: 'Situação de ' + nome, corpo: '<p class="mut pq" style="margin:0 0 12px">Fase: <b>' + esc(FASES[c.fase].t) + '</b>. O sistema escolhe a situação sozinho (pagamento, agenda, contrato, processo); aqui você corrige quando precisar. Para voltar ao automático, escolha a primeira opção.</p>' +
+    '<div class="lista">' + ['<label class="item" style="cursor:pointer"><input type="radio" name="sit" value=""' + (c.manual ? '' : ' checked') + '><div class="mid"><div class="t">Automático</div><div class="d">Hoje: ' + esc((SUBCAT[c.auto] || [''])[0]) + '</div></div></label>']
+      .concat(op.map((k) => '<label class="item" style="cursor:pointer"><input type="radio" name="sit" value="' + k + '"' + (c.manual === k ? ' checked' : '') + '><div class="mid"><div class="t">' + esc(SUBCAT[k][0]) + '</div><div class="d">' + esc(DICA_SUB[k]) + '</div></div></label>')).join('') + '</div>',
+    botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Salvar', c: 'pri', v: (m) => { const x = $('input[name=sit]:checked', m); return x ? { sub: x.value } : false; } }] });
+  if (!r) return;
+  try { await agir(null, () => api('situacao', { id, sub: r.sub }), r.sub ? 'Situação: ' + SUBCAT[r.sub][0] : 'Situação de volta ao automático'); } catch (e) { return; }
+  delete S.cache.fases; try { localStorage.removeItem(LSK + 'fases'); } catch (e) {}
+}
+// ---------- INDICADORES ----------
+const ind = { per: 'mes', serv: '', de: '', ate: '' };
+function periodoInd() {
+  const hoje = hojeChave(), [y, m] = hoje.split('-').map(Number);
+  const z = (v) => String(v).padStart(2, '0');
+  const menos = (n) => { const d = new Date(hoje + 'T12:00:00'); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
+  if (ind.per === 'hoje') return [hoje, hoje];
+  if (ind.per === '7d') return [menos(6), hoje];
+  if (ind.per === 'mes') return [y + '-' + z(m) + '-01', hoje];
+  if (ind.per === 'mesant') { const pm = m === 1 ? 12 : m - 1, py = m === 1 ? y - 1 : y; const ult = new Date(py, pm, 0).getDate(); return [py + '-' + z(pm) + '-01', py + '-' + z(pm) + '-' + z(ult)]; }
+  if (ind.per === '12m') { return [(y - 1) + '-' + z(m) + '-01', hoje]; }
+  return [ind.de || (y + '-' + z(m) + '-01'), ind.ate || hoje];
+}
+const CANAL_IND = { GOOGLE_ADS: 'Google Ads', META_ADS: 'Meta Ads', SITE: 'Site', CALCULADORA: 'Calculadora do site', DIRETO: 'Direto no WhatsApp', GOOGLE_MAPS: 'Google Maps', INDICACAO: 'Indicação', INSTAGRAM: 'Instagram', LINKEDIN: 'LinkedIn' };
+const MOTIVO_IND = { SEM_CASO: 'Sem caso', SEM_VERBA: 'Sem verba', ESCOLHEU_OUTRO: 'Escolheu outro escritório', SUMIU: 'Sumiu (sem resposta)', FORA_DO_PERFIL: 'Fora do perfil', PRAZO_PERDIDO: 'Prazo perdido', RESOLVEU_SOZINHA: 'Resolveu sozinho(a)', RESOLVEU_SOZINHO: 'Resolveu sozinho(a)', OUTRO: 'Outro' };
+const MESES_C = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+function variacao(a, b, inverso) {
+  a = Number(a || 0); b = Number(b || 0); if (!b) return '';
+  const p = Math.round(100 * (a - b) / b); if (!p) return '<b>=</b> vs. período anterior';
+  const bom = inverso ? p < 0 : p > 0;
+  return '<b class="' + (bom ? 'up' : 'dn') + '">' + (p > 0 ? '+' : '') + p + '%</b> vs. período anterior';
+}
+const tempo = (s) => s == null ? '—' : s < 60 ? Math.round(s) + ' s' : s < 3600 ? Math.round(s / 60) + ' min' : (Math.round(s / 360) / 10).toLocaleString('pt-BR') + ' h';
+function kp(r, v, s, cor) { return '<div class="card kp3 t3d"><div class="r">' + r + '</div><div class="v"' + (cor ? ' style="color:' + cor + '"' : '') + '>' + v + '</div><div class="s">' + (s || '&nbsp;') + '</div></div>'; }
+// gráfico de barras com linha de referência (meta), SVG desenhado aqui
+function grafBarras(pts, o) {
+  const W = 640, H = 220, L = 46, R = 10, T = 14, B = 26, iw = W - L - R, ih = H - T - B;
+  const ref = Number(o.ref || 0), mx = Math.max(1, ref, ...pts.map((p) => Number(p.v))) * 1.1;
+  const passo = iw / pts.length, bw = Math.min(34, passo * .56);
+  const y = (v) => T + ih - ih * v / mx;
+  const ticks = [0, mx / 3, 2 * mx / 3, mx].map((v) => Math.round(v));
+  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.titulo) + '">';
+  ticks.forEach((t) => { s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t) + '" y2="' + y(t) + '" stroke="currentColor" stroke-opacity=".08"/><text x="' + (L - 8) + '" y="' + (y(t) + 4) + '" text-anchor="end" font-size="11" fill="currentColor" fill-opacity=".55">' + esc(o.fmtEixo ? o.fmtEixo(t) : num(t)) + '</text>'; });
+  s += '<defs><linearGradient id="gb' + o.id + '" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="' + o.cor + '" stop-opacity="1"/><stop offset="1" stop-color="' + o.cor + '" stop-opacity=".62"/></linearGradient></defs>';
+  pts.forEach((p, i) => {
+    const x = L + passo * i + (passo - bw) / 2, v = Number(p.v), yy = y(v), hh = Math.max(v ? 3 : 0, T + ih - yy);
+    s += '<g class="gp" data-tip="' + esc(p.tip) + '"><rect x="' + (L + passo * i) + '" y="' + T + '" width="' + passo + '" height="' + ih + '" fill="transparent"/>' +
+      (hh ? '<path d="M' + x + ',' + (T + ih) + 'v' + (-(hh - 4)) + 'q0,-4 4,-4h' + (bw - 8) + 'q4,0 4,4v' + (hh - 4) + 'z" fill="url(#gb' + o.id + ')"/>' : '') +
+      '<text x="' + (L + passo * i + passo / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="currentColor" fill-opacity=".6">' + esc(p.r) + '</text></g>';
+  });
+  if (ref) s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(ref) + '" y2="' + y(ref) + '" stroke="' + (o.refCor || '#B5470F') + '" stroke-width="2" stroke-dasharray="6 5"/><text x="' + (W - R) + '" y="' + (y(ref) - 6) + '" text-anchor="end" font-size="11.5" font-weight="700" fill="' + (o.refCor || '#B5470F') + '">' + esc(o.refRot) + '</text>';
+  return s + '</svg>';
+}
+function grafLinha(pts, o) {
+  const W = 640, H = 200, L = 34, R = 12, T = 14, B = 26, iw = W - L - R, ih = H - T - B;
+  const mx = Math.max(1, ...pts.map((p) => Number(p.v))) * 1.15, n = pts.length;
+  const x = (i) => L + (n === 1 ? iw / 2 : iw * i / (n - 1)), y = (v) => T + ih - ih * v / mx;
+  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.titulo) + '">';
+  [0, Math.round(mx / 2), Math.round(mx)].forEach((t) => { s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t) + '" y2="' + y(t) + '" stroke="currentColor" stroke-opacity=".08"/><text x="' + (L - 8) + '" y="' + (y(t) + 4) + '" text-anchor="end" font-size="11" fill="currentColor" fill-opacity=".55">' + t + '</text>'; });
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(Number(p.v)).toFixed(1)).join('');
+  s += '<defs><linearGradient id="ga' + o.id + '" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="' + o.cor + '" stop-opacity=".28"/><stop offset="1" stop-color="' + o.cor + '" stop-opacity="0"/></linearGradient></defs>';
+  s += '<path d="' + d + 'L' + x(n - 1) + ',' + (T + ih) + 'L' + x(0) + ',' + (T + ih) + 'z" fill="url(#ga' + o.id + ')"/><path d="' + d + '" fill="none" stroke="' + o.cor + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  pts.forEach((p, i) => { s += '<g class="gp" data-tip="' + esc(p.tip) + '"><rect x="' + (x(i) - iw / n / 2) + '" y="' + T + '" width="' + (iw / n) + '" height="' + ih + '" fill="transparent"/><circle cx="' + x(i) + '" cy="' + y(Number(p.v)) + '" r="4.5" fill="var(--surface)" stroke="' + o.cor + '" stroke-width="2.5"/>' + (i % 2 === (n - 1) % 2 ? '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="currentColor" fill-opacity=".6">' + esc(p.r) + '</text>' : '') + '</g>'; });
+  return s + '</svg>';
+}
+function barrasH(itens, cor) {
+  const mx = Math.max(1, ...itens.map((i) => Number(i.n)));
+  if (!itens.length) return '<div class="vazio" style="padding:12px">Sem dados no período.</div>';
+  return itens.map((i) => '<div class="hb3" style="--fc:' + cor + '"><span class="n" title="' + esc(i.t) + '">' + esc(i.t) + '</span><span class="b"><i style="width:' + Math.max(3, 100 * Number(i.n) / mx) + '%"></i></span><b>' + num(i.n) + '</b>' + (i.x !== undefined ? '<em>' + esc(i.x) + '</em>' : '') + '</div>').join('');
+}
+function ligarTips(el) {
+  let tip = $('.gtip'); if (!tip) { tip = document.createElement('div'); tip.className = 'gtip'; document.body.appendChild(tip); }
+  $$('.gp', el).forEach((g) => {
+    g.onmousemove = (e) => { tip.innerHTML = esc(g.dataset.tip).replace(/\n/g, '<br>'); tip.style.display = 'block'; tip.style.left = Math.min(innerWidth - 250, e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px'; };
+    g.onmouseleave = () => { tip.style.display = 'none'; };
+    g.onclick = (e) => g.onmousemove(e);
+  });
+}
+async function editarMetas(metas) {
+  const r = await modal({ titulo: 'Metas do escritório', corpo: '<label class="pq mut" style="display:block;margin-bottom:6px">Meta de faturamento mensal (líquido, em R$)</label><input class="inp" id="mRec" type="number" min="1" step="100" value="' + Number(metas.recebido_mes || 40000) + '">' +
+    '<label class="pq mut" style="display:block;margin:12px 0 6px">Meta de contratos por mês</label><input class="inp" id="mCon" type="number" min="0" step="1" value="' + Number(metas.contratos_mes || 5) + '">',
+    botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Salvar', c: 'pri', v: (m) => ({ recebido_mes: Number($('#mRec', m).value), contratos_mes: Number($('#mCon', m).value) }) }] });
+  if (!r) return false;
+  try { await agir(null, () => api('metas_salvar', r), 'Metas salvas'); } catch (e) { return false; }
+  Object.keys(S.cache).filter((k) => k.startsWith('ind:') || k === 'fases').forEach((k) => delete S.cache[k]); limparLS();
+  return true;
+}
+VIEWS.indicadores = async (_, forcar) => {
+  titulo('Indicadores');
+  const [de, ate] = periodoInd();
+  const chave = 'ind:' + de + ':' + ate + ':' + ind.serv;
+  if (!S.cache[chave]) carregando(6);
+  const d = await dados(chave, 'indicadores', { de, ate, servico: ind.serv }, forcar);
+  const a = d.atual || {}, p = d.anterior || {}, ag = d.agora || {}, fu = d.funil || {}, metas = d.metas || {};
+  const metaRec = Number(metas.recebido_mes || 40000), metaCon = Number(metas.contratos_mes || 5);
+  const dias = Math.round((new Date(ate) - new Date(de)) / 864e5) + 1;
+  const metaPer = ['mes', 'mesant'].includes(ind.per) || (dias >= 28 && dias <= 31) ? metaRec : Math.round(metaRec * dias / 30.4);
+  const rec = Number(a.recebido || 0), pct = Math.round(100 * rec / Math.max(1, metaPer));
+  const ads = Number(a.ads_google || 0) + Number(a.ads_meta || 0), desp = Number(a.despesas_fixas || 0) + ads;
+  const dataBR = (s) => s.split('-').reverse().join('/');
+  const PER = [['hoje', 'Hoje'], ['7d', '7 dias'], ['mes', 'Este mês'], ['mesant', 'Mês passado'], ['12m', '12 meses'], ['per', 'Período']];
+  const SERV = [['', 'Todos'], ['imovel', 'Imóvel'], ['veiculo', 'Veículo'], ['investidor', 'Investidor']];
+  let h = '<div class="ind-filtros"><div class="pills" role="group" aria-label="Período">' + PER.map(([k, t]) => '<button data-per="' + k + '" class="' + (ind.per === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>' +
+    '<div class="pills" role="group" aria-label="Serviço">' + SERV.map(([k, t]) => '<button data-serv="' + k + '" class="' + (ind.serv === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>' +
+    (ind.per === 'per' ? '<span style="display:flex;gap:6px;align-items:center"><input class="inp" type="date" id="iDe" value="' + de + '" style="width:auto"><span class="mut">até</span><input class="inp" type="date" id="iAte" value="' + ate + '" style="width:auto"></span>' : '<span class="pq mut">' + dataBR(de) + ' a ' + dataBR(ate) + '</span>') + '</div>';
+  // meta de faturamento
+  const R = 50, C = 2 * Math.PI * R, fr = Math.min(1, rec / Math.max(1, metaPer));
+  h += '<div class="meta-hero t3d"><svg class="anel" viewBox="0 0 120 120" role="img" aria-label="' + pct + '% da meta"><defs><linearGradient id="anelG" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#F0D9A8"/><stop offset="1" stop-color="#B38A45"/></linearGradient></defs><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="12"/><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="url(#anelG)" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + (C * fr).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 60 60)"/><text x="60" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="#F2F2EE" font-family="Source Serif 4, serif">' + pct + '%</text></svg>' +
+    '<div><h2>Faturamento no período</h2><div class="big">' + brl(rec) + '</div><div class="sub">Meta ' + (metaPer === metaRec ? 'mensal' : 'proporcional ao período') + ': ' + brl(metaPer, false) + ' · ' + (rec >= metaPer ? 'meta batida' : 'faltam ' + brl(metaPer - rec, false)) + ' · contratos: ' + num(a.contratos) + ' de ' + num(metaCon) + ' por mês</div></div>' +
+    '<button class="btn" id="bMetas">' + ic('caneta', 's') + ' Editar metas</button></div>';
+  // blocos
+  h += '<div class="ind-sec" style="--fc:#3DBE7A"><i></i>ATENDIMENTO NO WHATSAPP</div><div class="ind-grid">' +
+    kp('Novos leads', num(a.novos), variacao(a.novos, p.novos)) + kp('Mensagens recebidas', num(a.msgs), variacao(a.msgs, p.msgs)) +
+    kp('Resposta da Helena', tempo(a.resp_helena), 'tempo médio até responder') + kp('Sua resposta', tempo(a.resp_fabio), 'quando a conversa está com você') +
+    kp('Pediram atendente', num(a.humano), 'no período') + kp('Fora do perfil', num(a.fora), a.novos ? Math.round(100 * a.fora / a.novos) + '% dos leads' : '') + '</div>';
+  const pLC = a.novos ? Math.round(100 * a.consultas / a.novos) : 0, pCC = a.consultas ? Math.round(100 * a.contratos / a.consultas) : 0, comp = (Number(a.realizadas) + Number(a.faltas)) ? Math.round(100 * a.realizadas / (Number(a.realizadas) + Number(a.faltas))) : null;
+  h += '<div class="ind-sec" style="--fc:#C9A462"><i></i>CONVERSÃO</div><div class="ind-grid">' +
+    kp('Lead → consulta paga', pLC + '%', num(a.consultas) + ' de ' + num(a.novos) + ' leads') + kp('Consultas pagas', num(a.consultas), [brl(a.consultas_valor, false), variacao(a.consultas, p.consultas)].filter(Boolean).join(' · ')) +
+    kp('Comparecimento', comp == null ? '—' : comp + '%', num(a.realizadas) + ' realizadas · ' + num(a.faltas) + ' faltas') + kp('Consulta → contrato', pCC + '%', num(a.contratos) + ' de ' + num(a.consultas)) +
+    kp('Contratos assinados', num(a.contratos), 'meta ' + num(metaCon) + ' por mês', Number(a.contratos) >= metaCon ? 'var(--ok)' : '') + kp('Até contratar', a.dias_contratar == null ? '—' : num(a.dias_contratar) + ' dias', 'do 1º contato à assinatura') + '</div>';
+  h += '<div class="ind-sec" style="--fc:#6E9BE0"><i></i>FINANCEIRO</div><div class="ind-grid">' +
+    kp('Recebido', brl(rec, false), variacao(rec, p.recebido)) + kp('Contratos fechados', brl(a.contratos_valor, false), 'honorários fixos assinados') +
+    kp('A receber (30 dias)', brl(ag.a_receber_30, false), num(ag.a_receber_parcelas) + ' parcela(s)') + kp('Em atraso', brl(ag.atraso, false), num(ag.atraso_parcelas) + ' parcela(s)', Number(ag.atraso) ? 'var(--bad)' : '') +
+    kp('Despesas', brl(desp, false), 'fixas ' + brl(a.despesas_fixas, false) + ' + anúncios ' + brl(ads, false)) + kp('Resultado', brl(rec - desp, false), 'recebido − despesas', rec - desp < 0 ? 'var(--bad)' : 'var(--ok)') + '</div>';
+  h += '<div class="ind-sec" style="--fc:#B9BEC6"><i></i>MARKETING E PROCESSOS</div><div class="ind-grid">' +
+    kp('Investimento em anúncios', brl(ads, false), 'Google ' + brl(a.ads_google, false) + ' · Meta ' + brl(a.ads_meta, false)) + kp('Custo por lead', a.novos ? brl(ads / a.novos, false) : '—', 'anúncios ÷ novos leads') +
+    kp('Custo por contrato', a.contratos ? brl(ads / a.contratos, false) : '—', 'anúncios ÷ contratos') + kp('Processos ativos', num(ag.processos_ativos), num(a.protocolados) + ' protocolado(s) no período · ' + num(ag.liminares_pedidas) + ' liminar(es) pedida(s)') +
+    kp('Prazos em 7 dias', num(ag.prazos_7d), num(ag.prazos_3d) + ' em até 3 dias', Number(ag.prazos_3d) ? 'var(--bad)' : '') + kp('Patrimônio defendido', brlc(ag.patrimonio), num(ag.clientes) + ' cliente(s) · êxito previsto ' + brlc(ag.exito_previsto)) + '</div>';
+  // gráficos
+  const meses = d.meses || [], sem = d.semanas || [];
+  const rot = (m) => MESES_C[Number(m.slice(5, 7)) - 1];
+  h += '<div class="grid g2" style="margin-top:22px">' +
+    '<div class="card graf t3d"><h3>Faturamento mês a mês</h3><div class="gsub">Recebido nos últimos 12 meses (Asaas, líquido) e a meta mensal</div>' + grafBarras(meses.map((m) => ({ r: rot(m.mes), v: m.recebido, tip: rot(m.mes) + '/' + m.mes.slice(2, 4) + ': ' + brl(m.recebido) + '\n' + m.consultas + ' consulta(s) · ' + m.contratos + ' contrato(s)' })), { id: 'fat', titulo: 'Faturamento mês a mês', cor: '#B38A45', ref: metaRec, refRot: 'Meta ' + brlc(metaRec), fmtEixo: (v) => v >= 1000 ? Math.round(v / 1000) + ' mil' : String(v) }) + '<div class="leg"><span><i style="background:#B38A45"></i>Recebido</span><span><i style="background:#B5470F"></i>Meta mensal</span></div></div>' +
+    '<div class="card graf t3d"><h3>Novos leads por semana</h3><div class="gsub">Últimas 12 semanas</div>' + grafLinha(sem.map((s) => ({ r: s.ini, v: s.novos, tip: 'Semana de ' + s.ini + ': ' + s.novos + ' lead(s)\n' + s.msgs + ' mensagens recebidas' })), { id: 'sem', titulo: 'Novos leads por semana', cor: '#2E7D57' }) + '</div>' +
+    '<div class="card graf t3d"><h3>Investimento em anúncios por mês</h3><div class="gsub">Google Ads + Meta</div>' + grafBarras(meses.map((m) => ({ r: rot(m.mes), v: m.ads, tip: rot(m.mes) + ': ' + brl(m.ads) + '\n' + m.novos + ' lead(s) · ' + m.contratos + ' contrato(s)' })), { id: 'ads', titulo: 'Investimento em anúncios', cor: '#4F7BC0', fmtEixo: (v) => 'R$ ' + num(v) }) + '</div>' +
+    '<div class="card graf t3d"><h3>Funil do período</h3><div class="gsub">Leads que chegaram no período e até onde foram</div>' +
+    barrasH([{ t: 'Novos leads', n: fu.novos, x: '100%' }, { t: 'No perfil', n: fu.qualificados }, { t: 'Consulta paga', n: fu.consulta }, { t: 'Segunda consulta', n: fu.segunda }, { t: 'Contrato assinado', n: fu.contrato }].map((i, k) => k ? Object.assign(i, { x: fu.novos ? Math.round(100 * i.n / fu.novos) + '%' : '' }) : i), '#B38A45') + '</div>' +
+    '<div class="card graf t3d"><h3>De onde vêm os leads</h3><div class="gsub">Canal de origem dos leads do período</div>' + barrasH((d.origens || []).map((o) => ({ t: CANAL_IND[o.origem] || CANAL[o.origem] || o.origem, n: o.n })), '#4F7BC0') + '</div>' +
+    '<div class="card graf t3d"><h3>Por que perdemos leads</h3><div class="gsub">Motivos registrados no período</div>' + barrasH((d.perdas || []).map((o) => ({ t: MOTIVO_IND[o.motivo] || String(o.motivo).replace(/_/g, ' ').toLowerCase(), n: o.n })), '#7E858E') + '</div></div>';
+  $('#cont').innerHTML = h;
+  ligarTips($('#cont'));
+  $$('[data-per]').forEach((b) => b.onclick = () => { ind.per = b.dataset.per; rota(); });
+  $$('[data-serv]').forEach((b) => b.onclick = () => { ind.serv = b.dataset.serv; rota(); });
+  const iDe = $('#iDe'), iAte = $('#iAte');
+  if (iDe) { const mud = () => { if (iDe.value && iAte.value) { ind.de = iDe.value; ind.ate = iAte.value; rota(); } }; iDe.onchange = mud; iAte.onchange = mud; }
+  $('#bMetas').onclick = async () => { if (await editarMetas(metas)) rota(true); };
 };
 // ---------- quadro por fase (kanban) ----------
 const COR_ETAPA = { NOVO_LEAD: 'info', EM_ATENDIMENTO: 'info', EM_ANALISE: 'ouro', DECISAO_FABIO: 'warn', PROPOSTA_ENVIADA: 'ouro', CONTRATADO: 'ok', EM_EXECUCAO: 'ok', ACOMPANHAMENTO: 'ok', ENCERRADO: '', ENCERRADO_SEM_CONTRATO: '', FORA_DO_PERFIL: '' };
@@ -1031,7 +1438,7 @@ VIEWS.caso = async (id, forcar) => {
     '<div class="chips">' + chipEtapa(c.etapa) + (c.perfil ? '<span class="chip nav">' + esc(PERFIL[c.perfil] || c.perfil) + '</span>' : '') + (u && c.urgencia !== 'NORMAL' ? '<span class="chip ' + u[1] + '">Urgência ' + u[0].toLowerCase() + '</span>' : '') +
     (c.origem_canal ? '<span class="chip">' + ic('link', 's') + esc(CANAL[c.origem_canal] || c.origem_canal) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">' + ic('pessoa', 's') + 'com você (Helena pausada)</span>' : '') + '</div></div>' +
     '<div class="acoes">' + (tel ? '<a class="btn" href="https://wa.me/' + tel + '" target="_blank" rel="noopener">' + ic('zap', 's') + ' WhatsApp</a>' : '') +
-    (c.conversa_id ? '<button class="btn" id="bEncaixe">' + ic('cal', 's') + ' Encaixar horário</button>' : '') + '<a class="btn" href="#/diagnostico/c-' + c.id + '">' + ic('balanca', 's') + ' Diagnóstico</a><button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
+    (c.conversa_id ? '<button class="btn" id="bEncaixe">' + ic('cal', 's') + ' Encaixar horário</button>' : '') + '<a class="btn" href="#/diagnostico/c-' + c.id + '">' + ic('balanca', 's') + ' Diagnóstico</a><button class="btn" id="bSituacao">' + ic('lista', 's') + ' Situação</button><button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
   const abas = [['resumo', 'Resumo', 'doc'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['processos', 'Processos e assinaturas', 'martelo'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
   const cont = { conversa: (c.mensagens || []).length, docs: (c.documentos || []).length, prazos: (c.prazos || []).filter((p) => p.status === 'ABERTO').length, notas: (c.notas || []).length };
   S.abaCaso = S.abaCaso || 'resumo';
@@ -1042,6 +1449,7 @@ VIEWS.caso = async (id, forcar) => {
   mostrar(S.abaCaso);
   const be = $('#bEncaixe');
   if (be) be.onclick = () => encaixarHorario(c, be);
+  $('#bSituacao').onclick = () => mudarSituacao(c.id, c.nome);
   $('#bEtapa').onclick = async () => {
     const r = await modal({ titulo: 'Mudar etapa do caso', corpo: '<label class="pq mut">Nova etapa</label><select class="sel" id="me" style="margin:6px 0 12px">' + ETAPAS.map((e) => '<option value="' + e + '"' + (e === c.etapa ? ' selected' : '') + '>' + ETAPA[e] + '</option>').join('') + '</select><label class="pq mut">Motivo (opcional)</label><input class="inp" id="mm" style="margin-top:6px" placeholder="Ex.: consulta realizada, cliente decidiu não seguir">' +
       '<p class="pp mut" style="margin:10px 0 0">A mudança fica registrada no histórico e aciona o agente responsável pela nova etapa (por exemplo, a análise jurídica em "Em análise").</p>',
@@ -1637,14 +2045,17 @@ VIEWS.mais = async () => {
   titulo('Mais');
   const eu = S.eu || {};
   $('#cont').innerHTML = '<div class="card cab-caso" style="margin-top:12px"><div class="av">' + '<img src="fabio.jpg" alt="Dr. Fábio">' + '</div><div><h2>' + esc(eu.nome || 'Fábio') + '</h2><div class="mut pq">' + esc(eu.email || '') + '</div></div></div>' +
-    '<div class="card lista" style="margin-top:14px"><a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
+    '<div class="card lista" style="margin-top:14px"><a class="item" href="#/indicadores"><div class="ic-circ ouro">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Indicadores</div><div class="d">Meta de faturamento, conversão, financeiro e gráficos</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/aprovacoes"><div class="ic-circ warn">' + ic('checks', 's') + '</div><div class="mid"><div class="t">Aprovações</div><div class="d">Decisões de caso, anúncios e posts</div></div><span class="bdg" data-bdg hidden></span>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/agenda"><div class="ic-circ info">' + ic('cal', 's') + '</div><div class="mid"><div class="t">Agenda</div><div class="d">Consultas e compromissos</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/casos"><div class="ic-circ nav">' + ic('casos', 's') + '</div><div class="mid"><div class="t">Todos os casos</div><div class="d">Lista e quadro por etapa, inclusive encerrados</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/diagnostico"><div class="ic-circ ouro">' + ic('balanca', 's') + '</div><div class="mid"><div class="t">Diagnóstico</div><div class="d">Roteiro da consulta: perguntas, providências, honorário e objeções</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/conteudo"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário de 30 dias por canal (terceiros, Instagram, LinkedIn) e sugestões das notícias</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('google', 's') + '</div><div class="mid"><div class="t">Google Ads</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a>' +
-    '<a class="item" href="https://fceadvogados.com.br/calculadora/" target="_blank" rel="noopener"><div class="ic-circ info">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Simulador da calculadora</div><div class="d">Abre o simulador do site (quanto do imóvel está em jogo)</div></div>' + ic('link', 's') + '</a></div>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
     '<button class="item" id="mSair" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:var(--bad);cursor:pointer"><div class="ic-circ bad">' + ic('sair', 's') + '</div><div class="mid"><div class="t">Sair</div></div></button></div>' +
     '<div class="card" style="margin-top:14px"><div class="corpo" style="display:flex;flex-direction:column;gap:14px">' + logo('lg-mais') + '<div class="rod-mais">' + blocosFCE() + '</div></div></div><p class="pp mut" style="text-align:center;margin-top:18px">Dica: no iPhone, toque em Compartilhar › "Adicionar à Tela de Início".</p>';
@@ -2437,7 +2848,7 @@ async function calendarioPrazos(el, forcar) {
 <script>
 /* Efeito 3D: inclinação leve dos indicadores ao passar o mouse */
 (function(){if(matchMedia('(prefers-reduced-motion: reduce)').matches||!matchMedia('(hover:hover)').matches)return;
-document.addEventListener('mousemove',function(e){var k=e.target.closest&&e.target.closest('.kpi');document.querySelectorAll('.kpi[data-t3]').forEach(function(x){if(x!==k){x.style.transform='';x.removeAttribute('data-t3')}});if(!k)return;var r=k.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;k.setAttribute('data-t3','');k.style.transition='transform .08s';k.style.transform='perspective(700px) rotateX('+((.5-py)*7).toFixed(2)+'deg) rotateY('+((px-.5)*9).toFixed(2)+'deg) translateY(-2px)';k.style.setProperty('--gx',(px*100).toFixed(1)+'%');k.style.setProperty('--gy',(py*100).toFixed(1)+'%')},{passive:true});})();
+document.addEventListener('mousemove',function(e){var k=e.target.closest&&e.target.closest('.kpi,.t3d');document.querySelectorAll('[data-t3]').forEach(function(x){if(x!==k){x.style.transform='';x.removeAttribute('data-t3')}});if(!k)return;var r=k.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;k.setAttribute('data-t3','');k.style.transition='transform .08s';k.style.transform='perspective(700px) rotateX('+((.5-py)*(k.offsetWidth>500?3:6)).toFixed(2)+'deg) rotateY('+((px-.5)*(k.offsetWidth>500?3:8)).toFixed(2)+'deg) translateY(-2px)';k.style.setProperty('--gx',(px*100).toFixed(1)+'%');k.style.setProperty('--gy',(py*100).toFixed(1)+'%')},{passive:true});})();
 </script>
 </body>
 </html>
