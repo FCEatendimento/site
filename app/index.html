@@ -1140,7 +1140,9 @@ const ABAS = {
         const out = String(x.dir).toUpperCase() === 'OUTBOUND', eu = out && x.autor === 'fabio';
         const TIPO = { audio: 'Áudio', image: 'Imagem', document: 'Documento', video: 'Vídeo', sticker: 'Figurinha', template: 'Modelo' };
         const txt = x.tipo === 'audio' ? String(x.texto || '').replace(/^\(mensagem de voz\)\s*/i, '').replace(/^\[ÁUDIO\]$/i, '') : x.texto;
-        const corpo = x.tipo && x.tipo !== 'text' ? '<span class="doc">' + ic('doc', 's') + esc(TIPO[x.tipo] || x.tipo) + '</span>' + (txt ? esc(txt) : '') : esc(x.texto || '');
+        // Mensagens da Helena e do sistema: sem linha em branco entre frases (igual ao que o cliente recebe).
+        const semVazia = (t) => out && !eu ? String(t || '').replace(/\n[ \t]*\n+/g, '\n') : String(t || '');
+        const corpo = x.tipo && x.tipo !== 'text' ? '<span class="doc">' + ic('doc', 's') + esc(TIPO[x.tipo] || x.tipo) + '</span>' + (txt ? esc(semVazia(txt)) : '') : esc(semVazia(x.texto));
         h += '<div class="bolha ' + (out ? 'out' : 'in') + (eu ? ' eu' : '') + '">' + (eu ? '<span class="quem">Você</span>' : '') + corpo + '<span class="h">' + esc(hora(x.t)) + (out && x.origem === 'CHAT_TESTE' ? ' · teste' : '') + (out && !eu ? ' · Helena' : '') + '</span></div>';
       });
       h += '</div>';
