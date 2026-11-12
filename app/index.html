@@ -811,6 +811,41 @@ a:hover .nx-foto img{transform:scale(1.03)}
 .nt-vazio{background:var(--surface);border-radius:14px;padding:22px;text-align:center;color:var(--mut);margin-top:12px}
 @media (max-width:1100px){.ini2{grid-template-columns:340px minmax(0,1fr)}}
 @media (max-width:900px){.ini2{grid-template-columns:minmax(0,1fr)}.ini2 .hero3d.ini-fases{position:relative;top:auto;margin:0}.ini2 .fases3d{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:82%;overflow-x:auto;scroll-snap-type:x mandatory}.ini2 .fase3d{scroll-snap-align:start}.nt-lin{grid-template-columns:96px minmax(0,1fr);gap:10px}.nt-lin-t>b{font-size:13.5px}.nt-lin .nt-i{display:none}.nt-bolha-in{padding:12px}}
+/* Início: extras e balões de baixo menores */
+.ini-baixo{gap:12px!important;margin-top:4px!important}
+.ini-baixo>.card{padding:12px 14px}
+.ini-baixo .cab h2{font-size:14.5px}
+.ini-baixo .cab .btn{padding:4px 9px;font-size:12px}
+.ini-baixo .lista{margin-top:4px!important;max-height:210px;overflow:auto}
+.ini-baixo .item{padding:7px 4px;gap:9px}
+.ini-baixo .item .t{font-size:13.5px}.ini-baixo .item .d{font-size:12px}
+.ini-baixo .ic-circ{width:30px;height:30px}
+.ini-baixo .kv,.ini-baixo .linha,.ini-baixo .rz{padding:4px 0!important;font-size:13px}.ini-baixo{align-items:start}.ini-baixo .corpo{padding:2px 0 0!important}.ini-baixo .meta3d .barra{height:8px}.ini-baixo .vazio{padding:12px 6px}
+.ini-extra{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px;align-items:start}
+.ini-x{padding:12px 14px;display:grid;gap:8px;align-content:start}
+.ini-x .cab{display:flex;align-items:center;gap:8px}.ini-x .cab h2{font-size:14.5px;margin:0;flex:1;display:flex;gap:7px;align-items:center}.ini-x .cab .pp{color:var(--gold);font-weight:600}
+.rit-barra{position:relative;height:10px;border-radius:9px;background:color-mix(in srgb,var(--txt) 9%,transparent);margin-top:4px}
+.rit-barra i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#C9A462,#B38A45)}
+.rit-barra b{position:absolute;top:-4px;width:2px;height:18px;background:var(--txt);opacity:.55;border-radius:2px}
+.rit-leg{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+.rit-msg{font-size:13px;font-weight:600;border-radius:9px;padding:6px 9px}.rit-msg.ok{background:var(--ok-soft);color:var(--ok)}.rit-msg.bad{background:var(--bad-soft);color:var(--bad)}
+.rit-l{display:flex;justify-content:space-between;gap:10px;font-size:13px;border-top:1px solid var(--line);padding-top:6px}.rit-l b{font-variant-numeric:tabular-nums;text-align:right}
+.vem{display:grid;gap:6px;max-height:230px;overflow:auto}
+.vem-i{display:flex;gap:10px;align-items:center;color:var(--txt);padding:4px 2px;border-radius:9px}.vem-i:hover{background:var(--surface-2)}
+.vem-d{flex:none;width:42px;text-align:center;border-radius:9px;background:color-mix(in srgb,var(--nc) 12%,transparent);color:var(--nc);font-size:11px;text-transform:uppercase;font-weight:700;padding:4px 0;line-height:1.1}.vem-d b{display:block;font-size:17px}
+.vem-t{display:grid;gap:1px;min-width:0}.vem-t>b{font-size:13px;line-height:1.3}
+.sau{display:grid;gap:2px}
+.sau-i{display:flex;gap:9px;align-items:flex-start;color:var(--txt);padding:5px 2px;border-radius:8px}.sau-i:hover{background:var(--surface-2)}
+.sau-i>span{display:grid;min-width:0}.sau-i b{font-size:13px}.sau-i .pp{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sau-p{flex:none;width:9px;height:9px;border-radius:50%;margin-top:5px;background:var(--mut)}.sau-p.ok{background:var(--ok)}.sau-p.warn{background:#D9822B}.sau-p.bad{background:var(--bad);box-shadow:0 0 0 3px var(--bad-soft)}
+.sau-geral{font-size:11.5px;font-weight:700;border-radius:99px;padding:2px 9px}.sau-geral.ok{background:var(--ok-soft);color:var(--ok)}.sau-geral.warn{background:var(--warn-soft);color:var(--warn)}.sau-geral.bad{background:var(--bad-soft);color:var(--bad)}
+.ind-rapidos{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
+.ind-q{flex:1;min-width:96px;display:grid;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(8px);border-radius:11px;padding:6px 10px;line-height:1.2}
+.ind-q small{font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--mut)}.ind-q b{font-size:15px;font-variant-numeric:tabular-nums}.ind-q b i{font-style:normal;font-size:10px;margin-left:4px}.ind-q b i.up{color:var(--ok)}.ind-q b i.dn{color:var(--bad)}
+.ind-q em{font-style:normal;font-size:10.5px;color:var(--mut)}
+.ind-fonte{align-self:center;font-size:10.5px;color:var(--mut);padding:0 4px}
+@media (max-width:1100px){.ini-extra{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.ini-extra{grid-template-columns:minmax(0,1fr)}.ind-q{min-width:30%}}
 </style>
 </head>
 <body>
@@ -2825,6 +2860,75 @@ VIEWS.noticias = async (_, forcar) => {
   $$('[data-nx]').forEach((b) => b.onclick = () => { S.nxTema = b.dataset.nx; VIEWS.noticias(); });
 };
 FUNDOS.noticias = 'vista';
+// ---------- Início: indicadores rápidos, ritmo da meta, o que vem por aí e saúde do sistema (12/11/2026) ----------
+const fmtN = (v, c) => Number(v).toLocaleString('pt-BR', { minimumFractionDigits: c, maximumFractionDigits: c });
+function faixaIndicadores(l) {
+  if (!l || !l.length) return '';
+  const it = l.map((i) => {
+    const v = Number(i.valor), a = i.anterior == null ? null : Number(i.anterior);
+    const val = i.chave === 'dolar' ? 'R$ ' + fmtN(v, 2) : fmtN(v, 2) + '%';
+    const dif = a == null || a === v ? '' : '<i class="' + (v > a ? 'dn' : 'up') + '">' + (v > a ? '▲' : '▼') + '</i>';
+    const quandoI = i.chave === 'selic' ? 'vigente' : i.chave === 'dolar' ? fmtD(i.data + 'T12:00:00', { day: '2-digit', month: '2-digit' }) : fmtD(i.data + 'T12:00:00', { month: 'short', year: '2-digit' });
+    return '<span class="ind-q" title="' + esc(i.nome + ' · ' + i.fonte + (a != null ? ' · anterior: ' + (i.chave === 'dolar' ? 'R$ ' + fmtN(a, 2) : fmtN(a, 2) + '%') : '')) + '"><small>' + esc({ selic: 'Selic', ipca12: 'IPCA 12m', dolar: 'Dólar', inad_pf: 'Inadimpl. PF', inad_pj: 'Inadimpl. PJ' }[i.chave] || i.nome) + '</small><b>' + val + dif + '</b><em>' + esc(quandoI) + '</em></span>';
+  }).join('');
+  return '<div class="ind-rapidos" aria-label="Indicadores rápidos">' + it + '<span class="ind-fonte">Banco Central</span></div>';
+}
+function cartaoRitmo(mes, metas) {
+  const meta = Number(metas.recebido_mes || 40000), metaC = Number(metas.contratos_mes || 5);
+  const rec = Number(mes.recebido || 0), con = Number(mes.contratos || 0);
+  const hoje = new Date(), d = Number(fmtD(hoje, { day: 'numeric' })), ano = hoje.getFullYear(), mesN = hoje.getMonth();
+  const D = new Date(ano, mesN + 1, 0).getDate(), rest = Math.max(1, D - d + 1), semanas = Math.max(1, rest / 7);
+  const proj = d > 0 ? rec / d * D : 0, falta = Math.max(0, meta - rec), faltaC = Math.max(0, metaC - con);
+  const noRitmo = proj >= meta, pctTempo = Math.round(100 * d / D), pct = Math.min(100, Math.round(100 * rec / Math.max(1, meta)));
+  return '<div class="card ini-x"><div class="cab"><h2>' + ic('grafico', 's') + ' Ritmo da meta</h2><a class="pp" href="#/indicadores">Indicadores ›</a></div>' +
+    '<div class="rit-barra" title="' + pct + '% da meta · ' + pctTempo + '% do mês"><i style="width:' + pct + '%"></i><b style="left:' + pctTempo + '%"></b></div>' +
+    '<div class="rit-leg"><span>' + brl(rec, false) + ' de ' + brl(meta, false) + '</span><span>dia ' + d + ' de ' + D + '</span></div>' +
+    '<div class="rit-msg ' + (noRitmo ? 'ok' : 'bad') + '">' + (falta <= 0 ? 'Meta do mês batida.' : noRitmo ? 'No ritmo: a projeção é de ' + brl(proj, false) + '.' : 'Abaixo do ritmo: no passo atual o mês fecha em ' + brl(proj, false) + '.') + '</div>' +
+    (falta > 0 ? '<div class="rit-l"><span>Para bater a meta</span><b>' + brl(falta / semanas, false) + ' por semana</b></div>' : '') +
+    '<div class="rit-l"><span>Contratos</span><b>' + con + ' de ' + metaC + (faltaC ? ' · faltam ' + faltaC + ' em ' + rest + ' dia(s)' : ' ✓') + '</b></div>' +
+    (faltaC && falta > 0 ? '<div class="rit-l"><span>Ticket necessário</span><b>' + brl(falta / faltaC, false) + ' por contrato</b></div>' : '') + '</div>';
+}
+function cartaoAgendaMercado(ev) {
+  const nome = Object.fromEntries(TEMAS_NT);
+  return '<div class="card ini-x"><div class="cab"><h2>' + ic('cal', 's') + ' O que vem por aí</h2><a class="pp" href="#/noticias">Notícias ›</a></div><div class="vem">' +
+    (ev && ev.length ? ev.map((e) => { const dt = new Date(e.data + 'T12:00:00'), dias = Math.round((dt - new Date(hojeChave() + 'T12:00:00')) / 864e5);
+      return '<a class="vem-i" href="' + esc(e.url || '#/noticias') + '" target="_blank" rel="noopener" style="--nc:' + (COR_NT[e.tema] || '#7E858E') + '"><span class="vem-d"><b>' + dt.getDate() + '</b>' + esc(fmtD(dt, { month: 'short' }).replace('.', '')) + '</span><span class="vem-t"><b>' + esc(e.titulo) + '</b><span class="pp mut">' + esc(nome[e.tema] || '') + ' · ' + (dias === 0 ? 'hoje' : dias === 1 ? 'amanhã' : 'em ' + dias + ' dias') + ' · ' + esc(e.fonte || '') + '</span></span></a>'; }).join('')
+      : '<div class="pq mut" style="padding:8px 2px">As datas aparecem aqui quando as notícias trazem um evento marcado (Copom, balanços de bancos, prazos de renegociação, julgamentos). Só entram datas escritas na própria matéria.</div>') + '</div></div>';
+}
+function cartaoSaude(s) {
+  const agora = Date.now(), h = (t) => t ? (agora - new Date(t)) / 36e5 : null;
+  const ha = (t) => { const x = h(t); if (x == null) return 'sem registro'; if (x < 1) return 'há ' + Math.max(1, Math.round(x * 60)) + ' min'; if (x < 48) return 'há ' + Math.round(x) + ' h'; return 'há ' + Math.round(x / 24) + ' dias'; };
+  const dia = (d) => d ? Math.round((new Date(hojeChave() + 'T12:00:00') - new Date(String(d).slice(0, 10) + 'T12:00:00')) / 864e5) : null;
+  const L = [];
+  L.push(['Helena respondendo', s.sem_resposta > 0 ? 'bad' : 'ok', s.sem_resposta > 0 ? s.sem_resposta + ' lead(s) esperando há mais de 10 min' : 'nenhum lead esperando · última resposta ' + ha(s.helena_ult_out), '#/whatsapp']);
+  if (s.com_voce > 0) L.push(['Conversas com você', 'warn', s.com_voce + ' cliente(s) aguardando sua resposta', '#/whatsapp?sub=wa_humano']);
+  L.push(['WhatsApp recebendo', h(s.whats_ult_in) == null || h(s.whats_ult_in) > 48 ? 'warn' : 'ok', 'última mensagem recebida ' + ha(s.whats_ult_in), '#/whatsapp']);
+  L.push(['Erros nas automações (24 h)', s.erros_24h > 0 ? 'warn' : 'ok', s.erros_24h > 0 ? s.erros_24h + ' aviso(s)' + (s.ult_erro ? ': ' + (s.ult_erro.titulo ? s.ult_erro.titulo + ' — ' : '') + s.ult_erro.resumo : '') : 'nenhum erro', '#/aprovacoes']);
+  L.push(['Pagamentos (Asaas)', s.asaas_ult ? 'ok' : 'warn', 'último aviso ' + ha(s.asaas_ult), '#/financeiro']);
+  L.push(['Assinaturas (ZapSign)', 'neutro', 'último aviso ' + ha(s.zapsign_ult), '#/clientes']);
+  const g = dia(s.google_ult); L.push(['Métricas do Google Ads', g == null ? 'warn' : g > 2 ? 'warn' : 'ok', g == null ? 'sem dados' : 'dados até ' + fmtD(String(s.google_ult).slice(0, 10) + 'T12:00:00', { day: '2-digit', month: '2-digit' }) + (g > 2 ? ' · atrasado' : ''), '#/marketing']);
+  L.push(['Notícias e indicadores', h(s.noticias_ult) != null && h(s.noticias_ult) < 14 && h(s.indicadores_ult) != null && h(s.indicadores_ult) < 26 ? 'ok' : 'warn', 'notícias ' + ha(s.noticias_ult) + ' · indicadores ' + ha(s.indicadores_ult), '#/noticias']);
+  const pior = L.some((x) => x[1] === 'bad') ? 'bad' : L.some((x) => x[1] === 'warn') ? 'warn' : 'ok';
+  return '<div class="card ini-x"><div class="cab"><h2>' + ic('check', 's') + ' Saúde do sistema</h2><span class="sau-geral ' + pior + '">' + (pior === 'ok' ? 'tudo funcionando' : pior === 'warn' ? 'atenção' : 'precisa de você') + '</span></div><div class="sau">' +
+    L.map(([t, st, d, href]) => '<a class="sau-i" href="' + href + '"><i class="sau-p ' + st + '"></i><span><b>' + esc(t) + '</b><span class="pp mut">' + esc(d) + '</span></span></a>').join('') + '</div></div>';
+}
+async function extrasInicio(forcar) {
+  const g = $('#cont .grid.g3'); if (g) g.classList.add('ini-baixo');
+  if ($('#iniExtra')) return;
+  const box = document.createElement('div'); box.id = 'iniExtra'; box.className = 'ini-extra';
+  box.innerHTML = '<div class="esq" style="height:180px"></div><div class="esq" style="height:180px"></div><div class="esq" style="height:180px"></div>';
+  if (g) g.after(box); else $('#cont').appendChild(box);
+  let x = {}, fz = {};
+  try { [x, fz] = await Promise.all([dados('iniextra', 'inicio_extra', null, forcar), dados('fases', 'fases', null, false)]); } catch (e) { box.innerHTML = ''; return; }
+  if (!box.isConnected) return;
+  box.innerHTML = cartaoRitmo(fz.mes || {}, fz.metas || {}) + cartaoAgendaMercado(x.eventos || []) + cartaoSaude(x.saude || {});
+  const bolha = $('#secNt .nt-bolha-in');
+  if (bolha && !$('#ntInd') && (x.indicadores || []).length) { const d = document.createElement('div'); d.id = 'ntInd'; d.innerHTML = faixaIndicadores(x.indicadores); const m = $('#ntMsgs', bolha); (m || bolha.firstChild).after(d); }
+}
+{
+  const baseIni3 = VIEWS.inicio;
+  VIEWS.inicio = async (a, f) => { await baseIni3(a, f); if (/^(#\/?(inicio)?)?$/.test(location.hash.split('?')[0])) extrasInicio(f); };
+}
 (function boot() {
   try { const t = localStorage.getItem('fce_tema'); if (t) document.documentElement.dataset.tema = t; } catch (e) {}
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;
