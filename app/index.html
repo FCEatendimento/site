@@ -190,14 +190,14 @@ ul.lim{margin:6px 0 0;padding-left:18px}ul.lim li{margin:3px 0}
 .dia-ag h3{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px;display:flex;gap:8px;align-items:center}
 .dia-ag h3 .hoje{color:var(--gold)}
 .hora{font:600 13px var(--sans);font-variant-numeric:tabular-nums;color:var(--mut);width:48px;flex:none;padding-top:1px}
-.mes{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.mes{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .mes .cab{font-size:11.5px;font-weight:700;color:var(--mut);text-align:center;padding:4px 0;text-transform:uppercase}
-.mes .dia{min-height:78px;border-radius:10px;background:var(--surface);border:1px solid var(--line);padding:6px;font-size:12px;cursor:pointer;display:flex;flex-direction:column;gap:3px}
+.mes .dia{height:112px;min-width:0;overflow:hidden;border-radius:10px;background:var(--surface);border:1px solid var(--line);padding:6px;font-size:12px;cursor:pointer;display:flex;flex-direction:column;gap:3px}
 .mes .dia.fora{opacity:.4}
 .mes .dia.hoje{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)}
 .mes .dia .n{font-weight:700;font-size:12.5px}
-.mes .dia .ev{font-size:10.5px;padding:1px 5px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-@media (max-width:760px){.mes .dia{min-height:54px}.mes .dia .ev{display:none}.mes .dia .pts{display:flex;gap:3px}}
+.mes .dia .ev{font-size:10.5px;line-height:1.25;padding:1px 5px;border-radius:5px;white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:600;flex:none}
+@media (max-width:760px){.mes .dia{height:58px}.mes .dia .ev{display:none}.mes .dia .pts{display:flex;gap:3px}}
 .mes .dia .pts{display:none}
 .mes .dia .pts i{width:6px;height:6px;border-radius:50%}
 .t-consulta{background:var(--info-soft);color:var(--info)}.t-prazo{background:var(--bad-soft);color:var(--bad)}.t-leilao{background:var(--warn-soft);color:var(--warn)}.t-post{background:var(--gold-soft);color:var(--gold)}.t-insta{background:var(--gold-soft);color:var(--gold)}
@@ -530,7 +530,7 @@ body{background:radial-gradient(1200px 520px at 80% -10%,rgba(201,164,98,.10),tr
 .card{box-shadow:var(--sh3d);border-color:color-mix(in srgb,var(--line) 70%,transparent)}
 /* menu no topo (computador) */
 @media (min-width:901px){
-  .side{position:sticky;top:0;inset:auto;width:auto;height:var(--nav-h);flex-direction:row;align-items:center;gap:18px;padding:0 22px;z-index:40;
+  .side{position:fixed;top:0;left:0;right:0;width:auto;height:var(--nav-h);flex-direction:row;align-items:center;gap:18px;padding:0 22px;z-index:40;
     background:linear-gradient(180deg,rgba(18,21,25,.86),rgba(24,28,33,.94)),url(../img/predio-fundo.jpg) center 40%/cover;
     box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 10px 30px -14px rgba(0,0,0,.55);border-bottom:1px solid rgba(209,174,108,.22)}
   .marca{flex-direction:row;align-items:center;gap:10px;padding:0;margin-right:6px}
@@ -545,7 +545,7 @@ body{background:radial-gradient(1200px 520px at 80% -10%,rgba(201,164,98,.10),tr
   .nav .bdg{margin-left:4px}
   .side .rodape{margin:0;border:0;padding:0;gap:8px}
   .side .rodape .e{display:none}
-  .main{margin-left:0}
+  .main{margin-left:0;padding-top:var(--nav-h)}
   .topo{top:var(--nav-h)}
   .rod{left:0}
   .conteudo{max-width:1320px;margin:0 auto}
@@ -658,6 +658,28 @@ body{background:radial-gradient(1200px 520px at 80% -10%,rgba(201,164,98,.10),tr
 .hb3 b{width:34px;text-align:right;font-variant-numeric:tabular-nums}
 .hb3 em{font-style:normal;color:var(--mut);width:52px;text-align:right;font-size:12.5px}
 @media (max-width:560px){.hb3 .n{width:110px}}
+/* conversa com as cores do WhatsApp (12/11/2026) */
+.chat{background-color:#EFEAE2;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22140%22%20height%3D%22140%22%20viewBox%3D%220%200%20140%20140%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-opacity%3D%22.07%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2030l10-8%2010%208v10H20z%22/%3E%3Cpath%20d%3D%22M27%2040v-6h6v6%22/%3E%3Cpath%20d%3D%22M92%2018v18M86%2036h12M84%2022h16M84%2022l-4%208h8zM100%2022l-4%208h8z%22/%3E%3Crect%20x%3D%2218%22%20y%3D%2286%22%20width%3D%2216%22%20height%3D%2220%22%20rx%3D%222%22/%3E%3Cpath%20d%3D%22M22%2092h8M22%2097h8M22%20102h5%22/%3E%3Ccircle%20cx%3D%2296%22%20cy%3D%2294%22%20r%3D%226%22/%3E%3Cpath%20d%3D%22M101%2098l10%2010M106%20104l3-3%22/%3E%3Cpath%20d%3D%22M58%2060c4-6%2014-6%2018%200M60%2066h14%22/%3E%3Cpath%20d%3D%22M118%2062l4%204%208-8%22/%3E%3Cpath%20d%3D%22M60%20118a6%206%200%201%200%2012%200a6%206%200%201%200-12%200M66%20112v-4%22/%3E%3Cpath%20d%3D%22M8%2066l6%206M14%2066l-6%206%22/%3E%3Ccircle%20cx%3D%22128%22%20cy%3D%22124%22%20r%3D%222%22/%3E%3Ccircle%20cx%3D%2246%22%20cy%3D%2210%22%20r%3D%222%22/%3E%3C/g%3E%3C/svg%3E");border-color:#E2DCD3}
+.bolha{color:#111B21;box-shadow:0 1px .5px rgba(11,20,26,.13);border-radius:8px;position:relative;font-size:14.2px}
+.bolha.in{background:#FFFFFF;border-top-left-radius:0}
+.bolha.out,.bolha.out.eu{background:#D9FDD3;border-top-right-radius:0}
+.bolha.in::before,.bolha.out::before{content:"";position:absolute;top:0;width:8px;height:13px}
+.bolha.in::before{left:-8px;background:#FFFFFF;clip-path:polygon(100% 0,0 0,100% 100%)}
+.bolha.out::before{right:-8px;background:#D9FDD3;clip-path:polygon(0 0,100% 0,0 100%)}
+.bolha .h{color:#667781;font-size:11px}
+.bolha.out .h::after{content:"";display:inline-block;width:16px;height:10px;margin-left:4px;vertical-align:-1px;background:no-repeat center/16px 10px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath d='M1 5.5l2.6 2.6L9.5 2M6 7.6l.5.5L12.4 2' fill='none' stroke='%2353BDEB' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.bolha .quem{color:#1F7A5A}
+.dia-sep{background:#FFFFFF;color:#54656F;border:0;box-shadow:0 1px .5px rgba(11,20,26,.13);border-radius:8px;text-transform:uppercase;font-size:11px;letter-spacing:.3px}
+.bolha.nota{background:#FFF3C4;color:#3B3218}.bolha.nota::before{display:none}
+:root[data-tema="escuro"] .chat{background-color:#0B141A;border-color:#1F2C34}
+:root[data-tema="escuro"] .bolha{color:#E9EDEF}
+:root[data-tema="escuro"] .bolha.in,:root[data-tema="escuro"] .bolha.in::before{background:#202C33}
+:root[data-tema="escuro"] .bolha.out,:root[data-tema="escuro"] .bolha.out::before{background:#005C4B}
+:root[data-tema="escuro"] .bolha .h{color:#8696A0}
+:root[data-tema="escuro"] .bolha .quem{color:#53BDEB}
+:root[data-tema="escuro"] .dia-sep{background:#182229;color:#8696A0}
+@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]) .chat{background-color:#0B141A;border-color:#1F2C34}:root:not([data-tema="claro"]) .bolha{color:#E9EDEF}:root:not([data-tema="claro"]) .bolha.in,:root:not([data-tema="claro"]) .bolha.in::before{background:#202C33}:root:not([data-tema="claro"]) .bolha.out,:root:not([data-tema="claro"]) .bolha.out::before{background:#005C4B}:root:not([data-tema="claro"]) .bolha .h{color:#8696A0}:root:not([data-tema="claro"]) .bolha .quem{color:#53BDEB}:root:not([data-tema="claro"]) .dia-sep{background:#182229;color:#8696A0}}
+.fseg.secao{margin:14px 0 4px}.fseg.secao a{gap:7px}
 </style>
 </head>
 <body>
@@ -883,7 +905,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['whatsapp', 'WhatsApp', 'zap'], ['analise', 'Em análise', 'balanca'], ['clientes', 'Clientes', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['indicadores', 'Indicadores', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['mais', 'Mais', 'mais']
+  ['inicio', 'Início', 'home'], ['whatsapp', 'WhatsApp', 'zap'], ['analise', 'Em análise', 'balanca'], ['clientes', 'Clientes', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['marketing', 'Marketing', 'mega'], ['indicadores', 'Indicadores', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['mais', 'Mais', 'mais']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -911,8 +933,9 @@ async function rota(forcar) {
   const h = location.hash.replace(/^#\/?/, '') || 'inicio';
   const [nome, arg] = h.split('?')[0].split('/');
   const k = VIEWS[nome] ? nome : 'inicio';
-  const MAIS_NAV = ['casos', 'marketing', 'despesas', 'diagnostico', 'conteudo'], MAIS_TAB = MAIS_NAV.concat(['agenda', 'aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro']);
-  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || (k === 'processo' && a.dataset.k === 'processos') || (a.dataset.k === 'mais' && (a.closest('.tabbar') ? MAIS_TAB : MAIS_NAV).includes(k))));
+  const MAIS_NAV = ['casos', 'diagnostico'], MAIS_TAB = MAIS_NAV.concat(['agenda', 'aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
+  const GRUPO = { despesas: 'financeiro', redes: 'marketing', conteudo: 'marketing', processo: 'processos' };
+  $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || GRUPO[k] === a.dataset.k || (a.dataset.k === 'mais' && (a.closest('.tabbar') ? MAIS_TAB : MAIS_NAV).includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
   rotaAtual = h;
   try { await VIEWS[k](arg, forcar); } catch (e) { erroTela(e, () => rota(true)); }
@@ -1776,14 +1799,17 @@ function ligarInsta(lista, depois) {
 }
 // ---------- APROVAÇÕES ----------
 VIEWS.aprovacoes = async (_, forcar) => {
-  titulo('Aprovações', '<button class="btn sm" id="bNovoAd">' + ic('mais2', 's') + '<span class="so-desk"> Pedir anúncio novo</span></button>');
   if (!S.cache.aprov) carregando(4);
   const d = await dados('aprov', 'aprovacoes', null, forcar);
-  const dec = d.decisoes || [], an = d.anuncios || [], go = d.google || [], po = d.posts || [], ig = d.insta || [], av = d.avisos || [];
+  const redes = /^#\/redes/.test(location.hash);
+  let dec = d.decisoes || [], an = d.anuncios || [], go = d.google || [], po = d.posts || [], ig = d.insta || [], av = d.avisos || [];
   badge(dec.length + an.length + go.length + po.length + ig.length);
-  const pendAv = av.filter((a) => a.status === 'PENDENTE' && !dec.find((x) => x.id === a.id));
+  S.nMkt = an.length + go.length + po.length + ig.length;
+  if (redes) { dec = []; av = null; titulo('Marketing', '<button class="btn sm" id="bNovoAd">' + ic('mais2', 's') + '<span class="so-desk"> Pedir anúncio novo</span></button>'); }
+  else { an = []; go = []; po = []; ig = []; titulo('Aprovações', S.nMkt ? '<a class="btn sm fant" href="#/redes">' + ic('mega', 's') + '<span class="so-desk"> Marketing: ' + S.nMkt + ' para aprovar</span></a>' : ''); }
+  const pendAv = (av || []).filter((a) => a.status === 'PENDENTE' && !dec.find((x) => x.id === a.id));
   let h = '';
-  if (!dec.length && !an.length && !go.length && !po.length && !ig.length) h += '<div class="card" style="margin-top:14px"><div class="vazio">' + ic('checks') + '<div><b>Tudo em dia.</b><br>Nenhuma decisão ou aprovação esperando por você.</div></div></div>';
+  if (!dec.length && !an.length && !go.length && !po.length && !ig.length) h += '<div class="card" style="margin-top:14px"><div class="vazio">' + ic('checks') + '<div><b>Tudo em dia.</b><br>' + (redes ? 'Nenhum anúncio, post ou sugestão esperando por você.' : 'Nenhuma decisão de caso esperando por você.') + '</div></div></div>';
   if (dec.length) { h += '<div class="sec-tit">Decisões de casos <span class="bdg">' + dec.length + '</span></div>'; dec.forEach((x) => { h += cartaoDecisao(x); }); }
   if (an.length) {
     h += '<div class="sec-tit">Anúncios do Facebook e Instagram <span class="bdg">' + an.length + '</span></div>';
@@ -1815,14 +1841,14 @@ VIEWS.aprovacoes = async (_, forcar) => {
     h += '<div class="sec-tit">' + rede('insta', 'g') + rede('facebook', 'g') + 'Posts do Instagram e Facebook <span class="bdg">' + ig.length + '</span></div>';
     ig.forEach((p, i) => { h += cartaoInsta(p, i); });
   }
-  h += '<div class="sec-tit">Avisos recentes' + (pendAv.length ? ' <button class="btn sm fant" id="bCiente" style="margin-left:auto">' + ic('checks', 's') + ' Marcar todos como vistos</button>' : '') + '</div><div class="card lista">';
+  if (av) { h += '<div class="sec-tit">Avisos recentes' + (pendAv.length ? ' <button class="btn sm fant" id="bCiente" style="margin-left:auto">' + ic('checks', 's') + ' Marcar todos como vistos</button>' : '') + '</div><div class="card lista">';
   if (!av.length) h += '<div class="vazio">Nenhum aviso nos últimos 10 dias.</div>';
   av.slice(0, 40).forEach((a) => {
     const pend = a.status === 'PENDENTE';
     h += '<' + (a.caso_id ? 'a href="#/caso/' + a.caso_id + '"' : 'div') + ' class="item"><div class="dot ' + (pend ? 'ouro' : '') + '"></div><div class="mid"><div class="t" style="' + (pend ? '' : 'font-weight:500') + '">' + esc(a.titulo || APROV[a.tipo] || a.tipo) + '</div><div class="d">' + esc(APROV[a.tipo] || a.tipo) + (a.nome ? ' · ' + esc(a.nome) : '') + ' · ' + esc(quando(a.created_at, true)) + '</div></div>' +
       (pend ? '' : '<span class="chip">' + esc(String(a.status).toLowerCase().replace('_', ' ')) + '</span>') + '</' + (a.caso_id ? 'a' : 'div') + '>';
   });
-  h += '</div>';
+  h += '</div>'; }
   $('#cont').innerHTML = h;
   ajustarPrevs();
   const recarregar = () => { S.cache = {}; VIEWS.aprovacoes(null, true); };
@@ -1846,7 +1872,7 @@ VIEWS.aprovacoes = async (_, forcar) => {
   });
   ligarInsta(ig, recarregar);
   const bc = $('#bCiente'); if (bc) bc.onclick = async () => { await agir(bc, () => api('decidir', { tipo: 'ciente_todos' }), 'Avisos marcados como vistos'); recarregar(); };
-  $('#bNovoAd').onclick = async () => {
+  if ($('#bNovoAd')) $('#bNovoAd').onclick = async () => {
     const r = await modal({ titulo: 'Pedir anúncio novo à Marina', corpo: '<label class="pq mut">Formato</label><div class="seg" id="fmt" style="margin:6px 0 12px;display:flex"><button class="on" data-f="IMAGEM">Imagem</button><button data-f="CARROSSEL">Carrossel</button></div>' +
       '<label class="pq mut">Ideia ou orientação (opcional)</label><textarea class="inp" id="nid" style="margin-top:6px" placeholder="Ex.: focar em quem recebeu a notificação de consolidação"></textarea>',
       botoes: [{ t: 'Cancelar', c: 'fant', v: null }, { t: 'Pedir', c: 'pri', v: (m) => ({ formato: $('#fmt .on', m).dataset.f, obs: $('#nid', m).value.trim() }) }] });
@@ -1911,7 +1937,7 @@ VIEWS.agenda = async (_, forcar) => {
 };
 // ---------- FINANCEIRO ----------
 VIEWS.financeiro = async (_, forcar) => {
-  titulo('Financeiro', '<a class="btn sm pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + '<span class="so-desk"> Registrar proposta</span></a>');
+  titulo('Financeiro');
   if (!S.cache.fin) carregando(4);
   const d = await dados('fin', 'financeiro', null, forcar);
   const m = d.mes || {}, ms = d.meses || [], pr = d.propostas || [], ho = d.honorarios || [], co = d.consultas || [];
@@ -2048,14 +2074,11 @@ VIEWS.mais = async () => {
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/indicadores"><div class="ic-circ ouro">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Indicadores</div><div class="d">Meta de faturamento, conversão, financeiro e gráficos</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/aprovacoes"><div class="ic-circ warn">' + ic('checks', 's') + '</div><div class="mid"><div class="t">Aprovações</div><div class="d">Decisões de caso, anúncios e posts</div></div><span class="bdg" data-bdg hidden></span>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/agenda"><div class="ic-circ info">' + ic('cal', 's') + '</div><div class="mid"><div class="t">Agenda</div><div class="d">Consultas e compromissos</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/redes"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Anúncios e posts para aprovar, Google Ads e calendário de conteúdo</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/casos"><div class="ic-circ nav">' + ic('casos', 's') + '</div><div class="mid"><div class="t">Todos os casos</div><div class="d">Lista e quadro por etapa, inclusive encerrados</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/diagnostico"><div class="ic-circ ouro">' + ic('balanca', 's') + '</div><div class="mid"><div class="t">Diagnóstico</div><div class="d">Roteiro da consulta: perguntas, providências, honorário e objeções</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos e honorários</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="#/despesas"><div class="ic-circ warn">' + ic('recibo', 's') + '</div><div class="mid"><div class="t">Despesas</div><div class="d">Custos fixos do escritório e gastos com anúncios</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="#/conteudo"><div class="ic-circ rd">' + rede('insta', 'g') + '</div><div class="mid"><div class="t">Conteúdo</div><div class="d">Calendário de 30 dias por canal (terceiros, Instagram, LinkedIn) e sugestões das notícias</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="#/marketing"><div class="ic-circ info">' + ic('google', 's') + '</div><div class="mid"><div class="t">Google Ads</div><div class="d">Custo por atendimento, anúncios e LinkedIn</div></div>' + ic('seta', 's') + '</a>' +
-    '<a class="item" href="' + LINKS.proposta + '" target="_blank" rel="noopener"><div class="ic-circ ouro">' + ic('caneta', 's') + '</div><div class="mid"><div class="t">Registrar proposta</div><div class="d">Abre o formulário de proposta</div></div>' + ic('link', 's') + '</a>' +
+    '<a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos, honorários e despesas</div></div>' + ic('seta', 's') + '</a>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
     '<button class="item" id="mSair" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:var(--bad);cursor:pointer"><div class="ic-circ bad">' + ic('sair', 's') + '</div><div class="mid"><div class="t">Sair</div></div></button></div>' +
     '<div class="card" style="margin-top:14px"><div class="corpo" style="display:flex;flex-direction:column;gap:14px">' + logo('lg-mais') + '<div class="rod-mais">' + blocosFCE() + '</div></div></div><p class="pp mut" style="text-align:center;margin-top:18px">Dica: no iPhone, toque em Compartilhar › "Adicionar à Tela de Início".</p>';
@@ -2347,6 +2370,25 @@ if ('serviceWorker' in navigator) {
     });
   } catch (e) {}
 }
+// ---------- seções com abas (12/11/2026): Marketing (aprovar, Google Ads, calendário) e Financeiro (recebimentos, despesas) ----------
+const SECOES = {
+  marketing: [['redes', 'Para aprovar', 'checks'], ['marketing', 'Google Ads', 'google'], ['conteudo', 'Calendário de conteúdo', 'cal']],
+  financeiro: [['financeiro', 'Recebimentos', 'din'], ['despesas', 'Despesas', 'recibo']]
+};
+function abasSecao(sec, atual) {
+  const cont = $('#cont'); if (!cont || $('.secao', cont)) return;
+  const d = document.createElement('div'); d.className = 'fseg secao';
+  d.innerHTML = SECOES[sec].map(([k, t, i]) => '<a href="#/' + k + '" class="' + (k === atual ? 'on' : '') + '">' + ic(i, 's') + t + (k === 'redes' && S.nMkt ? ' <span class="bdg">' + S.nMkt + '</span>' : '') + '</a>').join('');
+  cont.prepend(d);
+}
+['marketing', 'conteudo', 'redes'].forEach((k) => {
+  const base = k === 'redes' ? (a, f) => VIEWS.aprovacoes(a, f) : VIEWS[k];
+  VIEWS[k] = async (a, f) => { await base(a, f); abasSecao('marketing', k); };
+});
+['financeiro', 'despesas'].forEach((k) => {
+  const base = VIEWS[k];
+  VIEWS[k] = async (a, f) => { await base(a, f); abasSecao('financeiro', k); };
+});
 (function boot() {
   try { const t = localStorage.getItem('fce_tema'); if (t) document.documentElement.dataset.tema = t; } catch (e) {}
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;

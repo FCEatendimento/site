@@ -628,7 +628,7 @@ const q$ = (s, el) => (el || document).querySelector(s);
 
 // ---------- tela: lista de diagnósticos ----------
 async function telaLista(forcar) {
-  titulo('Diagnóstico', '<a class="btn pri sm" href="#/diagnostico/novo">' + ic('caneta', 's') + '<span class="so-desk"> Novo diagnóstico</span></a>');
+  titulo('Diagnóstico', '<a class="btn sm" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('din', 's') + '<span class="so-desk"> Registrar proposta</span></a><a class="btn pri sm" href="#/diagnostico/novo">' + ic('caneta', 's') + '<span class="so-desk"> Novo diagnóstico</span></a>');
   if (!S.cache.diaglista) carregando(3);
   const d = await dados('diaglista', 'diag_lista', null, forcar);
   const diags = d.diagnosticos || [], casos = d.casos || [];
