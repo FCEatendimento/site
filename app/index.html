@@ -680,6 +680,55 @@ body{background:radial-gradient(1200px 520px at 80% -10%,rgba(201,164,98,.10),tr
 :root[data-tema="escuro"] .dia-sep{background:#182229;color:#8696A0}
 @media (prefers-color-scheme:dark){:root:not([data-tema="claro"]) .chat{background-color:#0B141A;border-color:#1F2C34}:root:not([data-tema="claro"]) .bolha{color:#E9EDEF}:root:not([data-tema="claro"]) .bolha.in,:root:not([data-tema="claro"]) .bolha.in::before{background:#202C33}:root:not([data-tema="claro"]) .bolha.out,:root:not([data-tema="claro"]) .bolha.out::before{background:#005C4B}:root:not([data-tema="claro"]) .bolha .h{color:#8696A0}:root:not([data-tema="claro"]) .bolha .quem{color:#53BDEB}:root:not([data-tema="claro"]) .dia-sep{background:#182229;color:#8696A0}}
 .fseg.secao{margin:14px 0 4px}.fseg.secao a{gap:7px}
+/* fundo das abas: fotos do prédio desfocadas, com véu para o conteúdo continuar legível (12/11/2026) */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(color-mix(in srgb,var(--bg) 80%,transparent),color-mix(in srgb,var(--bg) 90%,transparent)),var(--fundo-img,none) center 45%/cover no-repeat;transition:background-image .4s}
+body{background:var(--bg)}
+body[data-fundo=vista]{--fundo-img:url(fundos/vista.jpg)}body[data-fundo=elevadores]{--fundo-img:url(fundos/elevadores.jpg)}body[data-fundo=catracas]{--fundo-img:url(fundos/catracas.jpg)}
+body[data-fundo=lounge]{--fundo-img:url(fundos/lounge.jpg)}body[data-fundo=lounge2]{--fundo-img:url(fundos/lounge2.jpg)}body[data-fundo=balcao]{--fundo-img:url(fundos/balcao.jpg)}
+body[data-fundo=predio]{--fundo-img:url(fundos/predio.jpg)}body[data-fundo=saguao]{--fundo-img:url(fundos/saguao.jpg)}body[data-fundo=recepcao]{--fundo-img:url(fundos/recepcao.jpg)}body[data-fundo=biblioteca]{--fundo-img:url(fundos/biblioteca.jpg)}
+.app,.main{background:transparent}
+.topo{background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+@media print{body::before{display:none}}
+/* números clicáveis: discretos até passar o mouse */
+.clicavel{cursor:pointer;position:relative}
+.kp3.clicavel::after{content:"ver quem";position:absolute;top:10px;right:12px;font-size:10.5px;font-weight:600;letter-spacing:.2px;color:var(--gold);opacity:0;transform:translateY(-2px);transition:.18s}
+.kp3.clicavel:hover::after,.kp3.clicavel:focus-visible::after{opacity:1;transform:none}
+.kp3.clicavel:hover{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--gold) 55%,transparent),var(--sh3d,0 8px 24px rgba(0,0,0,.08))}
+@media (hover:none){.kp3.clicavel::after{content:"›";opacity:.45;font-size:18px;top:6px}}
+.hb3.clicavel{border-radius:8px;transition:background .15s}.hb3.clicavel:hover{background:color-mix(in srgb,var(--gold) 9%,transparent)}
+.meta-hero .big.clicavel{text-decoration:underline dotted rgba(255,255,255,.35);text-underline-offset:6px}
+.ind-dica{display:flex;align-items:center;gap:6px;margin:6px 2px 0}
+/* gaveta lateral */
+.gav-fundo{position:fixed;inset:0;z-index:80;background:rgba(10,12,15,0);transition:background .2s}
+.gav-fundo.on{background:rgba(10,12,15,.38)}
+.gav{position:absolute;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--bg);box-shadow:-18px 0 50px rgba(0,0,0,.22);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.gav-fundo.on .gav{transform:none}
+.gav header{display:flex;align-items:flex-start;gap:10px;padding:18px 18px 12px;border-bottom:1px solid var(--line)}
+.gav header h2{margin:0 0 2px;font-size:19px}.gav header div{flex:1;min-width:0}
+.gav-corpo{flex:1;overflow:auto;padding:14px 16px 28px}
+.gav-busca{margin-bottom:10px}
+.gav-lista .item{align-items:center}.gav-v{font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:8px}
+@media (max-width:760px){.gav{top:auto;left:0;width:100%;max-height:86vh;border-radius:18px 18px 0 0;transform:translateY(100%)}}
+/* cadastro do cliente */
+.cad-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.cad-form{padding:18px 20px}
+.cad-topo{display:flex;align-items:center;gap:16px;margin-bottom:6px}.cad-topo>div:first-child{flex:1}.cad-topo h3{margin:0}
+.cad-pct{display:flex;align-items:center;gap:8px;min-width:130px}.cad-pct b{font-size:15px;font-variant-numeric:tabular-nums}
+.cad-pct span{flex:1;height:7px;border-radius:9px;background:color-mix(in srgb,var(--txt) 9%,transparent);overflow:hidden}.cad-pct i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#C9A462,#2E7D57)}
+.cad-pct.mini{min-width:96px;margin-left:8px}.cad-pct.mini b{font-size:12.5px}
+.cad-form fieldset{border:0;padding:0;margin:16px 0 0}.cad-form legend{font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.cad-campos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
+.cad-c{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--mut);min-width:0}.cad-c.g2{grid-column:span 2}.cad-c.g3{grid-column:1/-1}
+.cad-c em{font-style:normal;font-size:10.5px;font-weight:700;color:#9A6B12;background:#FFF1CC;border-radius:6px;padding:0 5px;margin-left:4px}
+.cad-c .inp{width:100%}.cad-c select.inp{height:40px;padding:0 10px}
+@media (min-width:901px) and (max-width:1600px){.nav a{padding:7px 8px;gap:5px;font-size:13px}}
+@media (min-width:901px) and (max-width:1280px){.nav a svg{display:none}}.inp.sug{background:#FFF8E1;border-color:#EBCB7A}
+:root[data-tema="escuro"] .inp.sug{background:#3a3220;border-color:#7a6430}:root[data-tema="escuro"] .cad-c em{background:#4a3a14;color:#F0D9A8}
+.cad-acoes{display:flex;justify-content:flex-end;margin-top:18px}
+.cab-mini{display:flex;align-items:center;gap:8px;padding:12px 14px;font-weight:700;border-bottom:1px solid var(--line)}
+.cad-lado .card{padding:0;overflow:hidden}
+@media (max-width:1100px){.cad-grid{grid-template-columns:1fr}}
+@media (max-width:760px){.cad-campos{grid-template-columns:repeat(2,minmax(0,1fr))}.cad-c.g2{grid-column:1/-1}.cad-form{padding:14px}}
 </style>
 </head>
 <body>
@@ -905,7 +954,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['whatsapp', 'WhatsApp', 'zap'], ['analise', 'Em análise', 'balanca'], ['clientes', 'Clientes', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['marketing', 'Marketing', 'mega'], ['indicadores', 'Indicadores', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['mais', 'Mais', 'mais']
+  ['inicio', 'Início', 'home'], ['whatsapp', 'WhatsApp', 'zap'], ['analise', 'Em análise', 'balanca'], ['clientes', 'Clientes', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['marketing', 'Marketing', 'mega'], ['indicadores', 'Indicadores', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['diagnostico', 'Diagnóstico', 'lista']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -933,7 +982,7 @@ async function rota(forcar) {
   const h = location.hash.replace(/^#\/?/, '') || 'inicio';
   const [nome, arg] = h.split('?')[0].split('/');
   const k = VIEWS[nome] ? nome : 'inicio';
-  const MAIS_NAV = ['casos', 'diagnostico'], MAIS_TAB = MAIS_NAV.concat(['agenda', 'aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
+  const MAIS_NAV = [], MAIS_TAB = ['casos', 'diagnostico', 'cadastros'].concat(['agenda', 'aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
   const GRUPO = { despesas: 'financeiro', redes: 'marketing', conteudo: 'marketing', processo: 'processos' };
   $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || GRUPO[k] === a.dataset.k || (a.dataset.k === 'mais' && (a.closest('.tabbar') ? MAIS_TAB : MAIS_NAV).includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
@@ -1462,7 +1511,7 @@ VIEWS.caso = async (id, forcar) => {
     (c.origem_canal ? '<span class="chip">' + ic('link', 's') + esc(CANAL[c.origem_canal] || c.origem_canal) + '</span>' : '') + (c.conv_status === 'ENCAMINHADA_HUMANO' ? '<span class="chip warn">' + ic('pessoa', 's') + 'com você (Helena pausada)</span>' : '') + '</div></div>' +
     '<div class="acoes">' + (tel ? '<a class="btn" href="https://wa.me/' + tel + '" target="_blank" rel="noopener">' + ic('zap', 's') + ' WhatsApp</a>' : '') +
     (c.conversa_id ? '<button class="btn" id="bEncaixe">' + ic('cal', 's') + ' Encaixar horário</button>' : '') + '<a class="btn" href="#/diagnostico/c-' + c.id + '">' + ic('balanca', 's') + ' Diagnóstico</a><button class="btn" id="bSituacao">' + ic('lista', 's') + ' Situação</button><button class="btn" id="bEtapa">' + ic('filtro', 's') + ' Mudar etapa</button><a class="btn pri" href="' + LINKS.proposta + '" target="_blank" rel="noopener">' + ic('caneta', 's') + ' Registrar proposta</a></div></div>';
-  const abas = [['resumo', 'Resumo', 'doc'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['processos', 'Processos e assinaturas', 'martelo'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
+  const abas = [['resumo', 'Resumo', 'doc'], ['cadastro', 'Cadastro', 'pessoa'], ['conversa', 'Conversa', 'chat'], ['docs', 'Documentos', 'doc'], ['processos', 'Processos e assinaturas', 'martelo'], ['prazos', 'Prazos e consultas', 'cal'], ['fin', 'Financeiro', 'din'], ['notas', 'Notas e histórico', 'caneta']];
   const cont = { conversa: (c.mensagens || []).length, docs: (c.documentos || []).length, prazos: (c.prazos || []).filter((p) => p.status === 'ABERTO').length, notas: (c.notas || []).length };
   S.abaCaso = S.abaCaso || 'resumo';
   h += '<div class="abas" id="abas">' + abas.map(([k, t]) => '<button data-a="' + k + '" class="' + (S.abaCaso === k ? 'on' : '') + '">' + t + (cont[k] ? ' <span class="mut pp">' + cont[k] + '</span>' : '') + '</button>').join('') + '</div><div id="aba"></div>';
@@ -2074,6 +2123,7 @@ VIEWS.mais = async () => {
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/indicadores"><div class="ic-circ ouro">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Indicadores</div><div class="d">Meta de faturamento, conversão, financeiro e gráficos</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/aprovacoes"><div class="ic-circ warn">' + ic('checks', 's') + '</div><div class="mid"><div class="t">Aprovações</div><div class="d">Decisões de caso, anúncios e posts</div></div><span class="bdg" data-bdg hidden></span>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/agenda"><div class="ic-circ info">' + ic('cal', 's') + '</div><div class="mid"><div class="t">Agenda</div><div class="d">Consultas e compromissos</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/cadastros"><div class="ic-circ ouro">' + ic('pessoa', 's') + '</div><div class="mid"><div class="t">Cadastro de clientes</div><div class="d">CPF, RG, endereço e estado civil, com documentos e processos</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/redes"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Anúncios e posts para aprovar, Google Ads e calendário de conteúdo</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/casos"><div class="ic-circ nav">' + ic('casos', 's') + '</div><div class="mid"><div class="t">Todos os casos</div><div class="d">Lista e quadro por etapa, inclusive encerrados</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
@@ -2389,6 +2439,223 @@ function abasSecao(sec, atual) {
   const base = VIEWS[k];
   VIEWS[k] = async (a, f) => { await base(a, f); abasSecao('financeiro', k); };
 });
+// ---------- quem está por trás de cada número, follow-up, cadastro do cliente e fundos (12/11/2026) ----------
+// Gaveta lateral com a lista de leads/casos/processos de um número (no celular, sobe de baixo)
+function gaveta(tit, sub, corpo) {
+  fecharGaveta();
+  const g = document.createElement('div'); g.className = 'gav-fundo';
+  g.innerHTML = '<aside class="gav" role="dialog" aria-label="' + esc(tit) + '"><header><div><h2>' + esc(tit) + '</h2><div class="pq mut">' + sub + '</div></div><button class="btn fant ico" data-fgav title="Fechar">' + ic('x') + '</button></header><div class="gav-corpo">' + corpo + '</div></aside>';
+  document.body.appendChild(g);
+  requestAnimationFrame(() => g.classList.add('on'));
+  g.onclick = (e) => { if (e.target === g || e.target.closest('[data-fgav]') || e.target.closest('a[href^="#/"]')) fecharGaveta(); };
+  document.addEventListener('keydown', escGav);
+  return $('.gav-corpo', g);
+}
+function escGav(e) { if (e.key === 'Escape') fecharGaveta(); }
+function fecharGaveta() { $$('.gav-fundo').forEach((g) => g.remove()); document.removeEventListener('keydown', escGav); }
+function listaGaveta(itens, o) {
+  o = o || {};
+  if (!itens.length) return '<div class="vazio" style="padding:28px 8px">' + ic('checks') + '<div>Ninguém neste número no período.</div></div>';
+  const tot = itens.reduce((s, x) => s + (x.valor != null && o.soma ? Number(x.valor) : 0), 0);
+  let h = (itens.length > 8 ? '<input class="inp gav-busca" type="search" placeholder="Filtrar por nome">' : '') + '<div class="card lista gav-lista">';
+  itens.forEach((x) => {
+    const href = x.id ? (x.tipo === 'processo' ? '#/processo/' + x.id : '#/caso/' + x.id + (o.aba ? '?aba=' + o.aba : '')) : '';
+    h += '<' + (href ? 'a href="' + href + '"' : 'div') + ' class="item" data-nome="' + esc(String(x.nome || '').toLowerCase()) + '"><span class="av sm">' + esc(iniciais(x.nome || '?')) + '</span><div class="mid"><div class="t">' + esc(x.nome || 'Sem nome') + '</div><div class="d">' + esc(x.info || '') + (x.quando ? ' · ' + esc(quando(x.quando, true)) : '') + '</div></div>' +
+      (x.valor != null && o.valor !== false ? '<b class="gav-v">' + (o.fmt ? o.fmt(x.valor) : brl(x.valor, false)) + '</b>' : '') + (href ? ic('seta', 's') : '') + '</' + (href ? 'a' : 'div') + '>';
+  });
+  h += '</div>';
+  if (o.soma && itens.length > 1) h += '<div class="pq mut" style="text-align:right;margin-top:8px">Total: <b>' + brl(tot, false) + '</b></div>';
+  return h;
+}
+function ligarBusca(el) { const b = $('.gav-busca', el); if (b) b.oninput = () => { const q = b.value.trim().toLowerCase(); $$('.gav-lista .item', el).forEach((i) => { i.hidden = q && !i.dataset.nome.includes(q); }); }; }
+
+const IND_MET = {
+  'Novos leads': ['novos'], 'Mensagens recebidas': ['msgs', { fmt: (v) => num(v) + ' msg', soma: false }], 'Pediram atendente': ['humano'], 'Fora do perfil': ['fora'],
+  'Lead → consulta paga': ['lead_consulta'], 'Consultas pagas': ['consultas', { soma: true }], 'Comparecimento': ['comparecimento'], 'Consulta → contrato': ['consulta_contrato'],
+  'Contratos assinados': ['contratos', { soma: true }], 'Até contratar': ['dias_contratar'], 'Recebido': ['recebido', { soma: true }], 'Contratos fechados': ['contratos_valor', { soma: true }],
+  'A receber (30 dias)': ['a_receber_30', { soma: true }], 'Em atraso': ['atraso', { soma: true }], 'Processos ativos': ['processos_ativos', { valor: false }], 'Prazos em 7 dias': ['prazos_7d'],
+  'Patrimônio defendido': ['patrimonio', { soma: true }]
+};
+const FUNIL_MET = { 'Novos leads': 'f_novos', 'No perfil': 'f_qualificados', 'Consulta paga': 'f_consulta', 'Segunda consulta': 'f_segunda', 'Contrato assinado': 'f_contrato' };
+async function abrirLista(tit, met, o, chave) {
+  const [de, ate] = periodoInd();
+  const per = de === ate ? de.split('-').reverse().join('/') : de.split('-').reverse().join('/') + ' a ' + ate.split('-').reverse().join('/');
+  const corpo = gaveta(tit, per + (ind.serv ? ' · ' + ({ imovel: 'Imóvel', veiculo: 'Veículo', investidor: 'Investidor' })[ind.serv] : ''), '<div class="esq" style="height:56px"></div><div class="esq" style="height:56px;margin-top:8px"></div><div class="esq" style="height:56px;margin-top:8px"></div>');
+  try {
+    const l = await api('ind_lista', { metrica: met, de, ate, servico: ind.serv, chave: chave || '' });
+    if (!corpo.isConnected) return;
+    corpo.innerHTML = '<div class="pq mut" style="margin:0 2px 10px">' + (l || []).length + ' registro(s) · toque para abrir</div>' + listaGaveta(l || [], o);
+    ligarBusca(corpo);
+  } catch (e) { corpo.innerHTML = '<div class="vazio">' + esc(e.message || 'Não foi possível carregar a lista.') + '</div>'; }
+}
+function marcarClicavel(el, fn) { el.classList.add('clicavel'); el.tabIndex = 0; el.setAttribute('role', 'button'); el.onclick = fn; el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } }; }
+
+// Follow-up dos leads que ainda não chegaram ao diagnóstico
+const FU_FAIXAS = [['Até 1 dia', 0, 1], ['2 a 3 dias', 2, 3], ['4 a 7 dias', 4, 7], ['8 a 30 dias', 8, 30], ['Mais de 30 dias', 31, 99999]];
+function fuItem(l, info) { return { id: l.id, nome: l.nome, info, quando: l.espera === 'nos' ? l.ult_in : (l.ult_in || l.criado) }; }
+function fuInfo(l) {
+  return [l.espera === 'nos' ? 'O lead falou por último' : 'Sem resposta do lead há ' + l.dias_lead + ' dia(s)', l.toques ? l.toques + ' follow-up(s)' : 'nenhum follow-up', l.link ? 'link de pagamento enviado' : '', l.humano ? 'com você' : ''].filter(Boolean).join(' · ');
+}
+async function secaoFollowup(de, ate, forcar) {
+  const alvo = $$('.ind-sec').find((s) => /CONVERS/.test(s.textContent));
+  if (!alvo) return;
+  let f;
+  try { f = await dados('fu:' + de + ':' + ate, 'followup', { de, ate }, forcar); } catch (e) { return; }
+  if (!f || !alvo.isConnected || $('#secFu')) return;
+  const L = f.leads || [], nos = L.filter((l) => l.espera === 'nos'), sem = L.filter((l) => l.espera === 'lead' && l.dias_lead >= 1), sem3 = sem.filter((l) => l.dias_lead >= 3);
+  const tocados = f.lista_tocados || [], pRes = f.leads_tocados ? Math.round(100 * f.responderam / f.leads_tocados) : 0;
+  const w = document.createElement('div'); w.id = 'secFu';
+  w.innerHTML = '<div class="ind-sec" style="--fc:#D9822B"><i></i>FOLLOW-UP · LEADS QUE AINDA NÃO CHEGARAM AO DIAGNÓSTICO</div><div class="ind-grid">' +
+    kp('Leads sem diagnóstico', num(L.length), 'não pagaram a consulta e seguem abertos') +
+    kp('Esperando nossa resposta', num(nos.length), 'o lead falou por último', nos.length ? 'var(--bad)' : '') +
+    kp('Sem resposta do lead', num(sem.length), num(sem3.length) + ' há 3 dias ou mais', sem3.length ? '#B5470F' : '') +
+    kp('Follow-ups enviados', num(f.enviados), num(f.leads_tocados) + ' lead(s) no período') +
+    kp('Responderam ao follow-up', num(f.responderam), f.leads_tocados ? pRes + '% em até 72 h' : 'no período') +
+    kp('Viraram consulta paga', num(f.pagaram), 'depois de um follow-up') + '</div>' +
+    '<div class="card graf t3d" style="margin-top:14px"><h3>Há quanto tempo o lead não responde</h3><div class="gsub">Leads abertos antes do diagnóstico, pela última mensagem do lead · toque numa barra para ver quem é</div><div id="fuBarras">' +
+    barrasH(FU_FAIXAS.map(([t, a, z]) => ({ t, n: L.filter((l) => l.espera === 'lead' && l.dias_lead >= a && l.dias_lead <= z).length })), '#D9822B') + '</div></div>';
+  alvo.before(w);
+  const kps = $$('.kp3', w), porId = Object.fromEntries(L.map((l) => [l.id, l]));
+  const abrir = (tit, itens) => { const c = gaveta(tit, 'agora · leads antes do diagnóstico', '<div class="pq mut" style="margin:0 2px 10px">' + itens.length + ' lead(s)</div>' + listaGaveta(itens, { valor: false, aba: 'conversa' })); ligarBusca(c); };
+  marcarClicavel(kps[0], () => abrir('Leads sem diagnóstico', L.map((l) => fuItem(l, fuInfo(l)))));
+  marcarClicavel(kps[1], () => abrir('Esperando nossa resposta', nos.map((l) => fuItem(l, fuInfo(l)))));
+  marcarClicavel(kps[2], () => abrir('Sem resposta do lead', sem.sort((a, b) => b.dias_lead - a.dias_lead).map((l) => fuItem(l, fuInfo(l)))));
+  const tocItens = (filtro, info) => tocados.filter(filtro).map((t) => ({ id: t.id, nome: (porId[t.id] || {}).nome || 'Lead', info: info(t) }));
+  const semNome = async (itens) => { // leads que já saíram da lista de abertos: busca o nome nos novos leads
+    const falta = itens.filter((i) => i.nome === 'Lead'); if (!falta.length) return itens;
+    try { const [de2, ate2] = ['2020-01-01', ate]; const l = await api('ind_lista', { metrica: 'novos', de: de2, ate: ate2, servico: '' }); const m = Object.fromEntries((l || []).map((x) => [x.id, x.nome])); itens.forEach((i) => { if (m[i.id]) i.nome = m[i.id]; }); } catch (e) {}
+    return itens;
+  };
+  const abrirToc = async (tit, filtro, info) => { const c = gaveta(tit, de.split('-').reverse().join('/') + ' a ' + ate.split('-').reverse().join('/'), '<div class="esq" style="height:56px"></div>'); const it = await semNome(tocItens(filtro, info)); if (c.isConnected) { c.innerHTML = '<div class="pq mut" style="margin:0 2px 10px">' + it.length + ' lead(s)</div>' + listaGaveta(it, { valor: false, aba: 'conversa' }); ligarBusca(c); } };
+  marcarClicavel(kps[3], () => abrirToc('Receberam follow-up', () => true, (t) => t.pagou ? 'Respondeu e pagou a consulta' : t.respondeu ? 'Respondeu em até 72 h' : 'Ainda não respondeu'));
+  marcarClicavel(kps[4], () => abrirToc('Responderam ao follow-up', (t) => t.respondeu, (t) => t.pagou ? 'Respondeu e pagou a consulta' : 'Respondeu em até 72 h'));
+  marcarClicavel(kps[5], () => abrirToc('Pagaram a consulta depois do follow-up', (t) => t.pagou, () => 'Consulta paga depois do follow-up'));
+  $$('#fuBarras .hb3', w).forEach((b, i) => { const [t, a, z] = FU_FAIXAS[i]; marcarClicavel(b, () => abrir('Sem resposta: ' + t.toLowerCase(), L.filter((l) => l.espera === 'lead' && l.dias_lead >= a && l.dias_lead <= z).map((l) => fuItem(l, fuInfo(l))))); });
+}
+
+{
+  const baseInd = VIEWS.indicadores;
+  VIEWS.indicadores = async (a, forcar) => {
+    await baseInd(a, forcar);
+    if (!/^#\/indicadores/.test(location.hash)) return;
+    const [de, ate] = periodoInd();
+    $$('#cont .ind-grid .kp3').forEach((k) => { const r = $('.r', k); const m = r && IND_MET[r.textContent.trim()]; if (m) marcarClicavel(k, () => abrirLista(r.textContent.trim(), m[0], m[1])); });
+    const big = $('.meta-hero .big'); if (big) marcarClicavel(big, () => abrirLista('Recebido no período', 'recebido', { soma: true }));
+    $$('#cont .graf').forEach((g) => {
+      const h3 = ($('h3', g) || {}).textContent || '';
+      $$('.hb3', g).forEach((b) => {
+        const t = ($('.n', b) || {}).textContent || '';
+        if (/Funil/.test(h3) && FUNIL_MET[t]) marcarClicavel(b, () => abrirLista('Funil: ' + t, FUNIL_MET[t]));
+        if (/onde vêm/.test(h3)) { const k = Object.keys(CANAL_IND).find((c) => CANAL_IND[c] === t) || Object.keys(CANAL).find((c) => CANAL[c] === t) || t; marcarClicavel(b, () => abrirLista('Origem: ' + t, 'origem', null, k)); }
+        if (/perdemos/.test(h3)) { const k = Object.keys(MOTIVO_IND).find((c) => MOTIVO_IND[c] === t) || t.toUpperCase().replace(/ /g, '_'); marcarClicavel(b, () => abrirLista('Perda: ' + t, 'perda', null, k)); }
+      });
+    });
+    const dica = document.createElement('div'); dica.className = 'pq mut ind-dica'; dica.innerHTML = ic('lista', 's') + ' Toque em um número ou barra para ver quem está nele.';
+    const f = $('#cont .ind-filtros'); if (f) f.after(dica);
+    secaoFollowup(de, ate, forcar);
+  };
+}
+
+// ---------- cadastro do cliente ----------
+const CAD_SECOES = [
+  ['Identificação', [['nome', 'Nome completo', 'g2'], ['cpf', 'CPF'], ['cnpj', 'CNPJ (se empresa)'], ['rg', 'RG'], ['orgao_rg', 'Órgão emissor'], ['nascimento', 'Nascimento', '', 'date'], ['nacionalidade', 'Nacionalidade'], ['profissao', 'Profissão']]],
+  ['Estado civil', [['estado_civil', 'Estado civil', '', 'sel', ['', 'Solteiro(a)', 'Casado(a)', 'União estável', 'Divorciado(a)', 'Separado(a)', 'Viúvo(a)']], ['regime_bens', 'Regime de bens', '', 'sel', ['', 'Comunhão parcial', 'Comunhão universal', 'Separação total', 'Participação final nos aquestos']], ['conjuge_nome', 'Nome do cônjuge/companheiro(a)', 'g2'], ['conjuge_cpf', 'CPF do cônjuge']]],
+  ['Contato', [['telefone', 'WhatsApp'], ['telefone2', 'Outro telefone'], ['email', 'E-mail', 'g2', 'email']]],
+  ['Endereço', [['cep', 'CEP'], ['endereco', 'Rua/avenida', 'g2'], ['numero', 'Número'], ['complemento', 'Complemento'], ['bairro', 'Bairro'], ['cidade', 'Cidade'], ['uf', 'UF']]],
+  ['Para o processo', [['banco', 'Banco/credor'], ['gov_br', 'Conta gov.br', '', 'sel', ['', 'Ouro', 'Prata', 'Bronze', 'Não tem']], ['obs', 'Observações', 'g3', 'area']]]
+];
+const CAD_ESSENCIAIS = ['nome', 'cpf', 'rg', 'nascimento', 'nacionalidade', 'estado_civil', 'profissao', 'email', 'telefone', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'uf'];
+ABAS.cadastro = () => '<div id="abaCad"><div class="esq" style="height:220px"></div></div>';
+async function carregarCadastro(c, forcar) {
+  const box = $('#abaCad'); if (!box) return;
+  let d;
+  try { d = await dados('cad:' + c.id, 'cadastro', { caso_id: c.id }, forcar); } catch (e) { box.innerHTML = '<div class="card"><div class="vazio">' + esc(e.message) + '</div></div>'; return; }
+  if (!$('#abaCad')) return;
+  const cl = d.cliente || {}, cad = cl.cadastro || {}, sug = d.sugestao || {};
+  const atual = Object.assign({}, cad, { nome: cl.nome, cpf: cl.cpf, cnpj: cl.cnpj, email: cl.email, telefone: cl.telefone });
+  const sugeridos = {};
+  Object.keys(sug).forEach((k) => { if (!atual[k] && sug[k]) { atual[k] = sug[k]; sugeridos[k] = true; } });
+  if (!atual.cidade && sug.cidade_uf && !cad.endereco) { const [ci, uf] = String(sug.cidade_uf).split(/\s*[\/-]\s*/); atual.cidade = ci; if (uf && uf.length === 2) atual.uf = uf.toUpperCase(); sugeridos.cidade = true; sugeridos.uf = !!uf; }
+  if (!atual.banco && sug.credor) { atual.banco = sug.credor; sugeridos.banco = true; }
+  const fmtCpf = (v) => { const s = String(v || '').replace(/\D/g, ''); return s.length === 11 ? s.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : String(v || ''); };
+  if (atual.cpf) atual.cpf = fmtCpf(atual.cpf);
+  const feitos = CAD_ESSENCIAIS.filter((k) => String(atual[k] || '').trim()).length, pct = Math.round(100 * feitos / CAD_ESSENCIAIS.length);
+  const campo = ([k, rot, cls, tipo, ops]) => {
+    const v = atual[k] == null ? '' : String(atual[k]), s = sugeridos[k] ? ' sug' : '';
+    const ctl = tipo === 'sel' ? '<select class="inp' + s + '" name="' + k + '">' + (ops.includes(v) ? ops : ops.concat(v ? [v] : [])).map((o) => '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>'
+      : tipo === 'area' ? '<textarea class="inp' + s + '" name="' + k + '" rows="3">' + esc(v) + '</textarea>'
+      : '<input class="inp' + s + '" name="' + k + '" type="' + (tipo || 'text') + '" value="' + esc(v) + '"' + (k === 'cep' ? ' inputmode="numeric" maxlength="9"' : k === 'cpf' || k === 'conjuge_cpf' ? ' inputmode="numeric" maxlength="14"' : k === 'uf' ? ' maxlength="2"' : '') + '>';
+    return '<label class="cad-c ' + (cls || '') + '"><span>' + rot + (sugeridos[k] ? ' <em title="Preenchido com o que o cliente informou no contrato ou na conversa. Confira e salve.">sugerido</em>' : '') + '</span>' + ctl + '</label>';
+  };
+  const docs = d.documentos || [], pend = d.pendencias || [], procs = d.processos || [];
+  let h = '<div class="cad-grid"><form class="card cad-form" id="fCad" autocomplete="off">' +
+    '<div class="cad-topo"><div><h3>Cadastro do cliente</h3><div class="pq mut">' + (cl.cadastro_em ? 'Atualizado ' + esc(quando(cl.cadastro_em, true)) : 'Ainda não conferido') + (Object.keys(sugeridos).length ? ' · campos em amarelo vieram do contrato ou da conversa' : '') + '</div></div>' +
+    '<button class="btn pri sm" type="submit">' + ic('check', 's') + '<span class="so-desk"> Salvar</span></button><div class="cad-pct" title="' + feitos + ' de ' + CAD_ESSENCIAIS.length + ' dados essenciais"><b>' + pct + '%</b><span><i style="width:' + pct + '%"></i></span></div></div>' +
+    CAD_SECOES.map(([t, cs]) => '<fieldset><legend>' + t + '</legend><div class="cad-campos">' + cs.map(campo).join('') + '</div></fieldset>').join('') +
+    '<div class="cad-acoes"><button class="btn pri" type="submit">' + ic('check', 's') + ' Salvar cadastro</button></div></form>' +
+    '<div class="cad-lado"><div class="card"><div class="cab-mini">' + ic('doc', 's') + ' Documentos <span class="mut pp">' + docs.length + '</span><a class="btn sm fant" href="javascript:void 0" data-ir-docs style="margin-left:auto">Abrir aba</a></div><div class="lista">' +
+    (docs.length ? docs.slice(0, 12).map((x) => '<div class="item"><div class="mid"><div class="t">' + esc(x.tipo || 'Documento') + '</div><div class="d">' + esc(x.nome || '') + ' · ' + esc(quando(x.em, true)) + '</div></div>' + (x.tem_arquivo ? '<button class="btn sm" data-cad-ver="' + x.id + '">' + ic('olho', 's') + '</button>' : '<span class="pp mut">sem arquivo</span>') + '</div>').join('') : '<div class="vazio" style="padding:14px">Nenhum documento recebido.</div>') +
+    (pend.length ? '<div class="pq" style="padding:10px 14px 4px;font-weight:600">Faltam</div>' + pend.map((p) => '<div class="item"><div class="dot ' + (p.obrigatoria ? 'warn' : '') + '"></div><div class="mid"><div class="t">' + esc(p.tipo || '') + '</div><div class="d">' + esc(p.descricao || '') + '</div></div></div>').join('') : '') + '</div></div>' +
+    '<div class="card" style="margin-top:14px"><div class="cab-mini">' + ic('martelo', 's') + ' Processos <span class="mut pp">' + procs.length + '</span></div><div class="lista">' +
+    (procs.length ? procs.map((p) => '<a class="item" href="#/processo/' + p.id + '"><div class="mid"><div class="t">' + esc(p.numero || 'Sem número ainda') + '</div><div class="d">' + esc([p.tribunal, p.classe, p.status ? String(p.status).toLowerCase().replace(/_/g, ' ') : ''].filter(Boolean).join(' · ')) + '</div></div>' + ic('seta', 's') + '</a>').join('')
+      : '<div class="vazio" style="padding:14px">Nenhum processo cadastrado.' + (d.processo_informado ? '<br>Processo informado pelo cliente: <b>' + esc(d.processo_informado) + '</b>' : '') + '</div>') +
+    (procs.filter((p) => p.link).map((p) => '<a class="item" href="' + esc(p.link) + '" target="_blank" rel="noopener"><div class="mid"><div class="t">Abrir no tribunal</div><div class="d">' + esc(p.numero || '') + '</div></div>' + ic('link', 's') + '</a>').join('')) + '</div></div></div></div>';
+  box.innerHTML = h;
+  const f = $('#fCad');
+  $$('.inp.sug', f).forEach((i) => i.addEventListener('input', () => i.classList.remove('sug'), { once: true }));
+  const cep = $('[name=cep]', f);
+  cep.onblur = async () => {
+    const s = cep.value.replace(/\D/g, ''); if (s.length !== 8) return;
+    cep.value = s.replace(/(\d{5})(\d{3})/, '$1-$2');
+    try { const r = await (await fetch('https://viacep.com.br/ws/' + s + '/json/')).json(); if (r && !r.erro) { [['endereco', r.logradouro], ['bairro', r.bairro], ['cidade', r.localidade], ['uf', r.uf]].forEach(([k, v]) => { const i = $('[name=' + k + ']', f); if (v && i && !i.value) i.value = v; }); toast('Endereço preenchido pelo CEP. Confira o número.'); } } catch (e) {}
+  };
+  [['cpf'], ['conjuge_cpf']].forEach(([k]) => { const i = $('[name=' + k + ']', f); i.onblur = () => { i.value = fmtCpf(i.value); }; });
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    const dd = {}; $$('[name]', f).forEach((i) => { dd[i.name] = i.value.trim(); });
+    try { await agir(e.submitter || $('button[type=submit]', f), () => api('cadastro_salvar', { caso_id: c.id, dados: dd }), 'Cadastro salvo'); } catch (er) { return; }
+    delete S.cache['cad:' + c.id]; delete S.cache.cadastros; carregarCadastro(c, true);
+  };
+  $$('[data-cad-ver]', box).forEach((b) => b.onclick = async () => {
+    const w = window.open('about:blank', '_blank');
+    try { const r = await agir(b, () => api('doc_link', { id: b.dataset.cadVer, baixar: false })); if (r && r.url) w.location.href = r.url; else { w.close(); toast('O arquivo original deste documento não está guardado.', true); } } catch (er) { w.close(); }
+  });
+  const ir = $('[data-ir-docs]', box); if (ir) ir.onclick = () => { const b = $('#abas button[data-a="docs"]'); if (b) b.click(); };
+}
+// abrir o caso já numa aba (#/caso/ID?aba=cadastro)
+{
+  const baseCaso = VIEWS.caso;
+  VIEWS.caso = (id, forcar) => { const m = /[?&]aba=(\w+)/.exec(location.hash); if (m && ABAS[m[1]]) S.abaCaso = m[1]; return baseCaso(id, forcar); };
+}
+// lista de cadastros (clientes e quem já pagou a consulta)
+VIEWS.cadastros = async (_, forcar) => {
+  titulo('Cadastro de clientes', '<a class="btn fant sm" href="#/clientes">' + ic('voltar', 's') + '<span class="so-desk"> Clientes</span></a>');
+  if (!S.cache.cadastros) carregando(4);
+  const l = await dados('cadastros', 'cadastros', null, forcar);
+  const pct = (x) => Math.round(100 * ['tem_doc', 'tem_email', 'tem_end', 'tem_civil', 'tem_prof', 'tem_rg'].filter((k) => x[k]).length / 6);
+  const linha = (x) => { const p = pct(x); return '<a class="item" href="#/caso/' + x.id + '?aba=cadastro"><span class="av sm">' + esc(iniciais(x.nome)) + '</span><div class="mid"><div class="t">' + esc(x.nome) + '</div><div class="d">' + esc(ETAPA[x.etapa] || x.etapa) + ' · ' + x.docs + ' documento(s) · ' + x.processos + ' processo(s)' + (x.cadastro_em ? ' · conferido ' + esc(quando(x.cadastro_em, true)) : '') + '</div></div>' +
+    '<div class="cad-pct mini" title="Dados essenciais preenchidos"><b>' + p + '%</b><span><i style="width:' + p + '%"></i></span></div>' + ic('seta', 's') + '</a>'; };
+  const cli = (l || []).filter((x) => x.cliente), an = (l || []).filter((x) => !x.cliente && x.etapa !== 'ENCERRADO'), enc = (l || []).filter((x) => !x.cliente && x.etapa === 'ENCERRADO');
+  let h = '<div class="pq mut" style="margin:14px 2px 0">CPF, RG, estado civil, endereço e contato de cada cliente, com os documentos e processos do caso. Os dados que o cliente informou no contrato aparecem como sugestão para você conferir.</div>';
+  [['Clientes com contrato', cli], ['Em análise (consulta paga ou proposta)', an], ['Encerrados', enc]].forEach(([t, xs]) => { if (xs.length) h += '<div class="sec-tit">' + t + ' <span class="mut pp">' + xs.length + '</span></div><div class="card lista">' + xs.map(linha).join('') + '</div>'; });
+  if (!(l || []).length) h += '<div class="card" style="margin-top:14px"><div class="vazio">Nenhum cliente ainda.</div></div>';
+  $('#cont').innerHTML = h;
+};
+{
+  const baseCli = VIEWS.clientes;
+  VIEWS.clientes = async (a, f) => { await baseCli(a, f); if (/^#\/clientes/.test(location.hash) && !$('#bCads')) $('#topoAcoes').insertAdjacentHTML('afterbegin', '<a class="btn sm" id="bCads" href="#/cadastros">' + ic('pessoa', 's') + '<span class="so-desk"> Cadastro de clientes</span></a><a class="btn sm fant" href="#/casos">' + ic('casos', 's') + '<span class="so-desk"> Todos os casos</span></a>'); };
+}
+
+// ---------- fundo de cada aba: fotos do prédio, desfocadas (só no app interno) ----------
+const FUNDOS = { inicio: 'predio', whatsapp: 'recepcao', analise: 'biblioteca', clientes: 'saguao', cadastros: 'saguao', agenda: 'vista', aprovacoes: 'elevadores', processos: 'biblioteca', processo: 'biblioteca',
+  marketing: 'lounge', redes: 'lounge', conteudo: 'lounge', indicadores: 'lounge2', financeiro: 'balcao', despesas: 'balcao', caso: 'catracas', casos: 'catracas', diagnostico: 'biblioteca', mais: 'predio' };
+function trocarFundo() {
+  const k = (location.hash.replace(/^#\/?/, '').split(/[/?]/)[0]) || 'inicio';
+  const f = FUNDOS[k] || 'predio';
+  if (document.body.dataset.fundo !== f) document.body.dataset.fundo = f;
+}
+window.addEventListener('hashchange', trocarFundo);
+trocarFundo();
 (function boot() {
   try { const t = localStorage.getItem('fce_tema'); if (t) document.documentElement.dataset.tema = t; } catch (e) {}
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;
@@ -2786,7 +3053,7 @@ const DOC_ASS = { PROCURACAO: 'Procuração (ad judicia et extra)', HIPOSSUFICIE
 const ST_ASS = { GERAR: ['Preparando', ''], FALTAM_DADOS: ['Faltam dados do cliente', 'bad'], AGUARDANDO_JANELA: ['Pronto, aguardando o cliente responder', 'warn'], ENVIADO: ['Enviado, aguardando assinatura', 'warn'], ASSINADO: ['Assinado', 'ok'] };
 ABAS.processos = () => '<div id="abaProc"><div class="esq" style="height:120px"></div></div>';
 const _ligarAbaOriginal = ligarAba;
-ligarAba = function (k, c) { _ligarAbaOriginal(k, c); if (k === 'processos') carregarProcessosDoCaso(c); };
+ligarAba = function (k, c) { _ligarAbaOriginal(k, c); if (k === 'processos') carregarProcessosDoCaso(c); if (k === 'cadastro') carregarCadastro(c); };
 async function carregarProcessosDoCaso(c, forcar) {
   let d; try { d = await api('processos_do_caso', { caso_id: c.id }); } catch (e) { $('#abaProc').innerHTML = '<div class="card"><div class="vazio">' + esc(e.message) + '</div></div>'; return; }
   if (!$('#abaProc')) return;
