@@ -742,6 +742,45 @@ body[data-fundo=predio]{--fundo-img:url(fundos/predio.jpg)}body[data-fundo=sagua
 .nt-i{margin:0;font-size:13px;line-height:1.45;background:color-mix(in srgb,var(--nc) 8%,transparent);border-radius:8px;padding:6px 9px}
 .nt-sug{font-size:12px;font-weight:600;color:var(--gold);display:inline-flex;gap:5px;align-items:center}
 @media (max-width:760px){.nt-card{padding:14px}.nt-lista{grid-template-columns:1fr}}
+/* noticiário */
+.nx-faixa{display:flex;align-items:stretch;background:#B3121B;color:#fff;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(179,18,27,.25);margin-top:12px;height:40px}
+.nx-ult{flex:none;display:flex;align-items:center;padding:0 14px;background:#7E0A10;font-weight:800;font-size:12.5px;letter-spacing:1.2px}
+.nx-ult::before{content:"";width:8px;height:8px;border-radius:50%;background:#fff;margin-right:8px;animation:nxp 1.4s infinite}
+@keyframes nxp{50%{opacity:.25}}
+.nx-rolo{flex:1;overflow:hidden;position:relative;mask-image:linear-gradient(90deg,transparent,#000 30px,#000 calc(100% - 30px),transparent)}
+.nx-trilho{display:flex;align-items:center;gap:18px;height:100%;white-space:nowrap;width:max-content;animation:nxr 90s linear infinite;padding-left:20px}
+.nx-faixa:hover .nx-trilho{animation-play-state:paused}
+.nx-trilho a{color:#fff;font-size:14px;font-weight:500}.nx-trilho a:hover{text-decoration:underline}
+.nx-trilho a b{font-size:11px;letter-spacing:.6px;text-transform:uppercase;opacity:.8;margin-right:4px}.nx-trilho i{opacity:.6;font-style:normal}
+@keyframes nxr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.nx-trilho{animation:none}.nx-rolo{overflow-x:auto}.nx-ult::before{animation:none}}
+.nx-foto{position:relative;overflow:hidden;background:color-mix(in srgb,var(--nc) 25%,#1F2328);aspect-ratio:16/9}
+.nx-foto img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.nx-foto img[data-reserva],.nx-foto.reserva img{filter:saturate(.7) brightness(.85)}
+.nx-foto img[data-reserva]+.nx-selo,.nx-foto.reserva::after{content:""}
+.nx-selo{position:absolute;left:10px;bottom:10px;background:var(--nc);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:6px;padding:3px 8px}
+a:hover .nx-foto img{transform:scale(1.03)}
+.nx-topo{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:16px;margin-top:8px}
+.nx-manchete{background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:var(--sh3d,0 10px 30px rgba(0,0,0,.08))}
+.nx-manchete .nx-link{display:block;position:relative;color:#fff}
+.nx-foto.alta{aspect-ratio:16/8.5}
+.nx-sobre{position:absolute;left:0;right:0;bottom:0;padding:60px 22px 18px;background:linear-gradient(transparent,rgba(0,0,0,.82));display:grid;gap:6px}
+.nx-sobre h2{margin:0;font:700 26px/1.2 var(--serif);color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.nx-sobre .nt-tema{color:#fff;background:var(--nc);justify-self:start;border-radius:6px;padding:2px 8px}
+.nx-sobre .pp{color:rgba(255,255,255,.8)}
+.nx-man-txt{padding:14px 20px 18px;display:grid;gap:8px}
+.nx-lado{display:grid;gap:10px;align-content:start}
+.nx-mini{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;align-items:center;background:var(--surface);border-radius:14px;overflow:hidden;padding-right:12px;color:var(--txt);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.nx-mini .nx-foto{aspect-ratio:4/3;height:100%}.nx-mini>span{display:grid;gap:3px;padding:8px 0}.nx-mini b{font-size:13.5px;line-height:1.3}.nx-mini:hover b{color:var(--gold)}
+.nx-mini .nx-selo{display:none}
+.nx-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.nx-card{background:var(--surface);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.05);border-top:3px solid var(--nc)}
+.nx-txt{padding:12px 14px 14px;display:grid;gap:6px;align-content:start}
+.nx-t{font-weight:700;font-size:15px;line-height:1.35;color:var(--txt)}.nx-t:hover{color:var(--gold)}
+.nx-ideias{display:grid;gap:4px;font-size:12.5px;background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.nt-ini-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
+.nt-ini-grade .nx-card .nx-foto{aspect-ratio:16/8}
+@media (max-width:900px){.nx-topo{grid-template-columns:1fr}.nx-sobre h2{font-size:20px}.nx-mini{grid-template-columns:110px minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -2136,6 +2175,7 @@ VIEWS.mais = async () => {
     '<div class="card lista" style="margin-top:14px"><a class="item" href="#/indicadores"><div class="ic-circ ouro">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Indicadores</div><div class="d">Meta de faturamento, conversão, financeiro e gráficos</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/aprovacoes"><div class="ic-circ warn">' + ic('checks', 's') + '</div><div class="mid"><div class="t">Aprovações</div><div class="d">Decisões de caso, anúncios e posts</div></div><span class="bdg" data-bdg hidden></span>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/agenda"><div class="ic-circ info">' + ic('cal', 's') + '</div><div class="mid"><div class="t">Agenda</div><div class="d">Consultas e compromissos</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/noticias"><div class="ic-circ rd">' + ic('jornal', 's') + '</div><div class="mid"><div class="t">Notícias</div><div class="d">Bancário, imobiliário, agro, economia e tribunais</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/cadastros"><div class="ic-circ ouro">' + ic('pessoa', 's') + '</div><div class="mid"><div class="t">Cadastro de clientes</div><div class="d">CPF, RG, endereço e estado civil, com documentos e processos</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/redes"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Anúncios e posts para aprovar, Google Ads e calendário de conteúdo</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/casos"><div class="ic-circ nav">' + ic('casos', 's') + '</div><div class="mid"><div class="t">Todos os casos</div><div class="d">Lista e quadro por etapa, inclusive encerrados</div></div>' + ic('seta', 's') + '</a>' +
@@ -2675,38 +2715,76 @@ const COR_NT = { BANCARIO: '#4F7BC0', IMOBILIARIO: '#B38A45', AGRO: '#2E7D57', E
 S.ntTema = S.ntTema || ''; S.ntMais = false;
 function cartaoNoticias(l) {
   const lista = (l || []).filter((n) => !S.ntTema || n.tema === S.ntTema);
-  const mostra = S.ntMais ? lista.slice(0, 24) : lista.slice(0, 6);
-  const nome = Object.fromEntries(TEMAS_NT);
-  let h = '<div class="cab"><h2>' + ic('jornal', 's') + ' Notícias que afetam o escritório</h2><div class="dir"><a class="btn sm fant" href="#/conteudo">' + ic('cal', 's') + '<span class="so-desk"> Virar conteúdo</span></a></div></div>' +
-    '<div class="pills nt-pills" role="group" aria-label="Tema">' + TEMAS_NT.map(([k, t]) => '<button type="button" data-nt="' + k + '" class="' + (S.ntTema === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div><div class="nt-lista">';
-  if (!mostra.length) h += '<div class="vazio" style="padding:18px">' + ic('jornal') + '<div>Nenhuma notícia deste tema nos últimos dias. As buscas rodam às 6h10 e às 12h40.</div></div>';
-  mostra.forEach((n) => {
-    h += '<article class="nt" style="--nc:' + (COR_NT[n.tema] || '#7E858E') + '"><div class="nt-top"><span class="nt-tema">' + esc(nome[n.tema] || 'Geral') + '</span><span class="pp mut">' + esc(String(n.fonte || '')) + ' · ' + esc(quando(n.em, true)) + '</span>' + (Number(n.relevancia) >= 5 ? '<span class="nt-imp">importante</span>' : '') + '</div>' +
-      '<a class="nt-t" href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.titulo) + '</a>' +
-      (n.resumo ? '<p class="nt-r">' + esc(n.resumo) + '</p>' : '') +
-      (n.impacto ? '<p class="nt-i"><b>Para o escritório:</b> ' + esc(n.impacto) + '</p>' : '') +
-      (n.n_sug ? '<a class="nt-sug" href="#/conteudo">' + ic('mega', 's') + ' ' + n.n_sug + ' ideia(s) de conteúdo</a>' : '') + '</article>';
-  });
-  h += '</div>' + (lista.length > 6 ? '<div style="text-align:center;margin-top:10px"><button class="btn sm fant" type="button" data-ntmais>' + (S.ntMais ? 'Mostrar menos' : 'Ver mais ' + (Math.min(24, lista.length) - 6) + ' notícia(s)') + '</button></div>' : '') +
-    '<p class="pp mut" style="margin:10px 2px 0">Buscadas em jornais, portais econômicos e sites de tribunais às 6h10 e às 12h40. Resumos feitos por IA a partir do trecho publicado: abra a fonte antes de citar.</p>';
-  return h;
+  let h = '<div class="cab"><h2>' + ic('jornal', 's') + ' Notícias que afetam o escritório</h2><div class="dir"><a class="btn sm" href="#/noticias">Abrir noticiário ' + ic('seta', 's') + '</a></div></div>' +
+    faixaVermelha((l || []).slice().sort((a, b) => new Date(b.em) - new Date(a.em))) +
+    '<div class="pills nt-pills" role="group" aria-label="Tema">' + TEMAS_NT.map(([k, t]) => '<button type="button" data-nt="' + k + '" class="' + (S.ntTema === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>';
+  if (!lista.length) h += '<div class="vazio" style="padding:18px">' + ic('jornal') + '<div>Nenhuma notícia deste tema nos últimos dias. As buscas rodam às 6h10 e às 12h40.</div></div>';
+  else h += '<div class="nt-ini-grade">' + lista.slice(0, 6).map((n) => cardNt(n)).join('') + '</div>';
+  return h + '<p class="pp mut" style="margin:10px 2px 0">Resumos feitos por IA a partir do trecho publicado: abra a fonte antes de citar.</p>';
 }
 async function secaoNoticias(forcar) {
   const ref = $('#cont .fases3d'); if (!ref || $('#secNt')) return;
   const box = document.createElement('section'); box.id = 'secNt'; box.className = 'card t3d nt-card';
   box.innerHTML = '<div class="cab"><h2>' + ic('jornal', 's') + ' Notícias que afetam o escritório</h2></div><div class="esq" style="height:90px;margin-top:10px"></div>';
-  $('#cont').appendChild(box);
+  const ancora = () => $('#cont .msgs-card') || ($('#cont .fases3d') && $('#cont .fases3d').closest('section'));
+  const pos = ancora(); if (pos) pos.after(box); else $('#cont').appendChild(box);
   let l = [];
   try { l = await dados('noticias', 'noticias', null, forcar); } catch (e) { box.innerHTML = '<div class="vazio">Não foi possível carregar as notícias agora.</div>'; return; }
   const pintar = () => { if (!box.isConnected) return; box.innerHTML = cartaoNoticias(l);
     $$('[data-nt]', box).forEach((b) => b.onclick = () => { S.ntTema = b.dataset.nt; S.ntMais = false; pintar(); });
-    const m = $('[data-ntmais]', box); if (m) m.onclick = () => { S.ntMais = !S.ntMais; pintar(); }; };
+    const ms = $('#cont .msgs-card'); if (ms && ms.nextElementSibling !== box) ms.after(box); };
   pintar();
 }
 {
   const baseInicio = VIEWS.inicio;
   VIEWS.inicio = async (a, f) => { await baseInicio(a, f); if (/^(#\/?(inicio)?)?$/.test(location.hash.split('?')[0])) secaoNoticias(f); };
 }
+// ---------- Noticiário (#/noticias): faixa vermelha com as últimas, manchete com foto e grade por tema (12/11/2026) ----------
+const FOTO_TEMA = { BANCARIO: 'fundos/balcao.jpg', IMOBILIARIO: 'fundos/predio.jpg', AGRO: 'fundos/vista.jpg', ECONOMIA: 'fundos/lounge2.jpg', TRIBUNAIS: 'fundos/biblioteca.jpg' };
+function fotoNt(n, cls) {
+  const reserva = FOTO_TEMA[n.tema] || 'fundos/saguao.jpg';
+  return '<div class="nx-foto ' + (cls || '') + '" style="--nc:' + (COR_NT[n.tema] || '#7E858E') + '">' +
+    '<img loading="lazy" referrerpolicy="no-referrer" alt="" src="' + esc(n.imagem || reserva) + '" onerror="this.onerror=null;this.src=\'' + reserva + '\';this.parentNode.classList.add(\'reserva\')"' + (n.imagem ? '' : ' data-reserva') + '>' +
+    (n.imagem ? '' : '<span class="nx-selo">' + esc((Object.fromEntries(TEMAS_NT))[n.tema] || 'Notícia') + '</span>') + '</div>';
+}
+function faixaVermelha(l) {
+  const it = (l || []).slice(0, 14);
+  if (!it.length) return '';
+  const um = it.map((n) => '<a href="' + esc(n.url) + '" target="_blank" rel="noopener"><b>' + esc((Object.fromEntries(TEMAS_NT))[n.tema] || '') + '</b> ' + esc(n.titulo) + '</a>').join('<i>•</i>');
+  return '<div class="nx-faixa" role="region" aria-label="Últimas notícias"><span class="nx-ult">ÚLTIMAS</span><div class="nx-rolo"><div class="nx-trilho">' + um + '<i>•</i>' + um + '</div></div></div>';
+}
+function cardNt(n, grande) {
+  const nome = Object.fromEntries(TEMAS_NT);
+  return '<article class="nx-card' + (grande ? ' grande' : '') + '" style="--nc:' + (COR_NT[n.tema] || '#7E858E') + '"><a class="nx-link" href="' + esc(n.url) + '" target="_blank" rel="noopener">' + fotoNt(n) + '</a><div class="nx-txt">' +
+    '<div class="nt-top"><span class="nt-tema">' + esc(nome[n.tema] || 'Geral') + '</span><span class="pp mut">' + esc(n.fonte || '') + ' · ' + esc(quando(n.em, true)) + '</span>' + (Number(n.relevancia) >= 5 ? '<span class="nt-imp">importante</span>' : '') + '</div>' +
+    '<a class="nx-t" href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.titulo) + '</a>' + (n.resumo ? '<p class="nt-r">' + esc(n.resumo) + '</p>' : '') +
+    (n.impacto ? '<p class="nt-i"><b>Para o escritório:</b> ' + esc(n.impacto) + '</p>' : '') +
+    (grande && Array.isArray(n.sugestoes) && n.sugestoes.length ? '<div class="nx-ideias"><span class="dg-eye" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--mut)">Ideias de conteúdo</span>' + n.sugestoes.map((g) => '<div>' + esc((typeof CONT !== 'undefined' && CONT.formatos && CONT.formatos[g.formato]) || g.formato) + ' · ' + esc(g.ideia) + '</div>').join('') + '</div>' : '') +
+    (n.n_sug ? '<a class="nt-sug" href="#/conteudo">' + ic('mega', 's') + ' Levar para o calendário de conteúdo</a>' : '') + '</div></article>';
+}
+VIEWS.noticias = async (_, forcar) => {
+  titulo('Notícias', '<a class="btn sm fant" href="#/conteudo">' + ic('cal', 's') + '<span class="so-desk"> Calendário de conteúdo</span></a>');
+  if (!S.cache.noticias) carregando(4);
+  const l = await dados('noticias', 'noticias', null, forcar);
+  const filtro = (l || []).filter((n) => !S.nxTema || n.tema === S.nxTema);
+  const ord = filtro.slice().sort((a, b) => (b.dia > a.dia ? 1 : b.dia < a.dia ? -1 : 0) || (Number(b.relevancia) - Number(a.relevancia)) || (new Date(b.em) - new Date(a.em)));
+  const [m, ...resto] = ord;
+  const lado = resto.slice(0, 4), grade = resto.slice(4);
+  let h = faixaVermelha((l || []).slice().sort((a, b) => new Date(b.em) - new Date(a.em))) +
+    '<div class="pills nt-pills" role="group" aria-label="Tema" style="margin:16px 0 6px">' + TEMAS_NT.map(([k, t]) => '<button type="button" data-nx="' + k + '" class="' + ((S.nxTema || '') === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>';
+  if (!m) h += '<div class="card" style="margin-top:12px"><div class="vazio">' + ic('jornal') + '<div>Nenhuma notícia deste tema nos últimos dias.</div></div></div>';
+  else {
+    h += '<div class="nx-topo"><article class="nx-manchete" style="--nc:' + (COR_NT[m.tema] || '#7E858E') + '"><a href="' + esc(m.url) + '" target="_blank" rel="noopener" class="nx-link">' + fotoNt(m, 'alta') +
+      '<div class="nx-sobre"><span class="nt-tema">' + esc((Object.fromEntries(TEMAS_NT))[m.tema] || '') + '</span><h2>' + esc(m.titulo) + '</h2><span class="pp">' + esc(m.fonte || '') + ' · ' + esc(quando(m.em, true)) + '</span></div></a>' +
+      '<div class="nx-man-txt">' + (m.resumo ? '<p class="nt-r" style="font-size:14px">' + esc(m.resumo) + '</p>' : '') + (m.impacto ? '<p class="nt-i"><b>Para o escritório:</b> ' + esc(m.impacto) + '</p>' : '') + '</div></article>' +
+      '<div class="nx-lado">' + lado.map((n) => '<a class="nx-mini" href="' + esc(n.url) + '" target="_blank" rel="noopener" style="--nc:' + (COR_NT[n.tema] || '#7E858E') + '">' + fotoNt(n, 'mini') + '<span><span class="nt-tema">' + esc((Object.fromEntries(TEMAS_NT))[n.tema] || '') + '</span><b>' + esc(n.titulo) + '</b><span class="pp mut">' + esc(n.fonte || '') + ' · ' + esc(quando(n.em, true)) + '</span></span></a>').join('') + '</div></div>';
+    if (grade.length) h += '<div class="sec-tit">Mais notícias</div><div class="nx-grade">' + grade.map((n) => cardNt(n)).join('') + '</div>';
+  }
+  h += '<p class="pp mut" style="margin:16px 2px 0">Jornais, portais econômicos e sites de tribunais, buscados às 6h10 e às 12h40. Fotos e resumos vêm das próprias matérias; abra a fonte antes de citar. Uso interno.</p>';
+  $('#cont').innerHTML = h;
+  $$('[data-nx]').forEach((b) => b.onclick = () => { S.nxTema = b.dataset.nx; VIEWS.noticias(); });
+};
+FUNDOS.noticias = 'vista';
 (function boot() {
   try { const t = localStorage.getItem('fce_tema'); if (t) document.documentElement.dataset.tema = t; } catch (e) {}
   const g = document.createElement('script'); g.src = 'https://accounts.google.com/gsi/client'; g.async = true; g.defer = true;
