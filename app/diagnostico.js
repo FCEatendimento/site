@@ -151,6 +151,15 @@ const Q = [
   { id: "fin_mensal", e: "financeiro", t: "money", l: "Quanto cabe no orçamento por mês para resolver?", porque: "Base para o parcelamento dos honorários." },
   { id: "fin_fgts", e: "financeiro", t: "single", l: "Tem saldo de FGTS?", show: a => a.area === "af" && a.af_contrato === "sfh", opts: [o("sim","Sim"), o("nao","Não"), o("nsei","Não sabe")] },
   { id: "fin_outras", e: "financeiro", t: "single", l: "Tem outras dívidas atrasadas?", opts: [o("nao","Não"), o("sim","Sim, algumas"), o("muitas","Sim, várias")] },
+  { id: "fin_compromissos", e: "financeiro", t: "multi", l: "Que outros financiamentos, empréstimos e dívidas a família tem?", fala: "Além deste problema, vocês têm outros financiamentos ou empréstimos? Carro, moto, consignado, cartão, cheque especial, empréstimo da empresa?", porque: "Organiza a vida financeira do cliente, mostra se há superendividamento e revela outras frentes de atuação.", opts: [
+      o("veiculo","Carro ou moto financiado"), o("imovel2","Outro imóvel financiado"), o("garantia","Empréstimo com imóvel ou veículo em garantia"), o("consignado","Consignado (folha ou INSS)"), o("pessoal","Empréstimo pessoal ou de financeira"),
+      o("cartao","Cartão de crédito (rotativo ou parcelado)"), o("cheque","Cheque especial"), o("empresa","Dívidas da empresa ou aval"), o("consorcio","Consórcio"), o("crediario","Crediário ou carnê de loja"),
+      o("contas","Contas atrasadas (luz, água, condomínio, IPTU)"), o("particular","Dívida com particular ou agiota"), o("bets","Dívidas por apostas (bets)"), o("nenhuma","Nenhuma outra") ] },
+  { id: "fin_parcelas", e: "financeiro", t: "money", l: "Quanto paga por mês, somando todas as parcelas de dívidas?", show: a => Array.isArray(a.fin_compromissos) && a.fin_compromissos.some(x => x !== "nenhuma"), fala: "Somando tudo que sai por mês com parcelas, financiamentos e empréstimos, quanto dá?", porque: "Mostra quanto da renda já está comprometida." },
+  { id: "fin_total_dividas", e: "financeiro", t: "money", l: "Quanto deve no total, fora este caso (aproximado)?", show: a => Array.isArray(a.fin_compromissos) && a.fin_compromissos.some(x => x !== "nenhuma") },
+  { id: "fin_consig_margem", e: "financeiro", t: "single", l: "O consignado desconta mais de 35% do salário ou benefício?", show: a => Array.isArray(a.fin_compromissos) && a.fin_compromissos.includes("consignado"), porque: "Desconto acima da margem legal abre pedido de limitação.", opts: [o("sim","Sim"), o("nao","Não"), o("nsei","Não sabe")] },
+  { id: "fin_veic_atraso", e: "financeiro", t: "single", l: "O financiamento do carro ou da moto está em dia?", show: a => Array.isArray(a.fin_compromissos) && a.fin_compromissos.includes("veiculo"), opts: [o("dia","Em dia"), o("atraso","Atrasado"), o("notificado","Já recebeu notificação ou ação de busca e apreensão")] },
+  { id: "fin_negativado", e: "financeiro", t: "single", l: "Está com o nome negativado (Serasa, SPC)?", opts: [o("sim","Sim"), o("nao","Não"), o("nsei","Não sabe")] },
   { id: "fin_vender", e: "financeiro", t: "single", l: "Aceitaria vender o bem se for o melhor caminho?", show: a => isDev(a) || isVeic(a), opts: [o("nao","Não, quer manter"), o("talvez","Talvez"), o("sim","Sim")] },
   { id: "fin_forma", e: "financeiro", t: "single", l: "Como prefere pagar os honorários?", opts: [o("pix","Pix à vista"), o("boleto","Boleto parcelado"), o("cartao","Cartão de crédito")] },
 
@@ -436,6 +445,8 @@ function providencias(a) {
     if (a.pos_problema === "registro") add("Carta de arrematação, ITBI e registro na matrícula.");
     if (a.pos_problema === "dividas") add("Conferir o edital: débitos de IPTU anteriores se sub-rogam no preço (art. 130, parágrafo único, do CTN).");
   }
+  const VF = vidaFin(a); if (VF.superend) add("Avaliar repactuação das demais dívidas por superendividamento (CDC, arts. 104-A a 104-C).");
+  VF.servicos.filter((x) => !x.forte).slice(0, 4).forEach((x) => add("Outra frente a oferecer depois: " + x.t.charAt(0).toLowerCase() + x.t.slice(1) + "."));
   return P;
 }
 
@@ -547,8 +558,10 @@ function textoResumo() {
   const L = [];
   L.push("DIAGNÓSTICO FCE · " + new Date().toLocaleDateString("pt-BR"));
   L.push(resumoLinha(a)); L.push("Urgência: " + (bloqueado(a) ? "declinar" : u.txt));
+  const QL = qualificacao(a); if (QL) { L.push(""); L.push("CLIENTE"); L.push(QL); }
   L.push(""); L.push("FATOS");
   ETAPAS.forEach(e => Q.filter(q => q.e === e.id && visivel(q, a) && respondida(q, a)).forEach(q => L.push("- " + q.l + ": " + rotulo(q.id, a[q.id]))));
+  const VF = vidaFin(a); if (VF.linhas.length || VF.servicos.length) { L.push(""); L.push("VIDA FINANCEIRA E OUTRAS FRENTES"); VF.linhas.forEach(x => L.push("- " + x)); VF.servicos.forEach(x => L.push("- Possível serviço: " + x.t + " (" + x.d + ")")); }
   const pr = prazos(a); if (pr.length) { L.push(""); L.push("PRAZOS"); pr.forEach(p => L.push("- " + p.nome + ": " + dataBR(p.data))); }
   L.push(""); L.push("PROVIDÊNCIAS"); providencias(a).forEach(p => L.push("- " + (p.urg ? "[URGENTE] " : "") + p.t));
   L.push(""); L.push("ORIENTAÇÃO AO CLIENTE"); conselhos(a).forEach(c => L.push("- " + c));
@@ -567,7 +580,7 @@ function textoResumo() {
 function contextoCaso() {
   const a = A(); const H = honorarios(a); const J = emJogo(a); const u = urgencia(a);
   const fatos = Q.filter(q => visivel(q, a) && respondida(q, a)).map(q => "- " + q.l + ": " + rotulo(q.id, a[q.id])).join("\n");
-  return "DATA DE HOJE: " + new Date().toLocaleDateString("pt-BR") + "\n\nFATOS COLETADOS:\n" + (fatos || "(nenhum)") +
+  return "DATA DE HOJE: " + new Date().toLocaleDateString("pt-BR") + "\n\nFATOS COLETADOS:\n" + (fatos || "(nenhum)") + perfilCliIA(a) +
     "\n\nPRAZOS: " + (prazos(a).map(p => p.nome + " em " + dataBR(p.data)).join("; ") || "nenhum") + "\nURGÊNCIA: " + u.txt +
     "\n\nPROVIDÊNCIAS JÁ SUGERIDAS PELO ROTEIRO:\n" + providencias(a).map(p => "- " + p.t).join("\n") +
     (() => { const C = calcDevedor(a); return C && C.pat != null ? "\n\nCALCULADORA DO DEVEDOR: valor do imóvel " + brl(C.v) + "; saldo devedor " + brl(C.s) + (C.saldoEstimado ? " (estimado)" : "") + "; patrimônio em risco " + brl(C.pat) + "; sobra no 1º leilão " + brl(C.c1) + "; sobra no 2º leilão " + brl(C.c2) + (C.resto ? "; dívida que continua após o leilão " + brl(C.resto) : "") + (C.est ? "; juros já pagos (estimativa) " + brl(C.est.juros) : "") : ""; })() +
@@ -692,6 +705,7 @@ function deHelena(c) {
   const dt = (s) => { const m = String(s || '').match(/(\d{2})\/(\d{2})\/(\d{4})/); return m ? m[3] + '-' + m[2] + '-' + m[1] : null; };
   const lw = (s) => String(s || '').toLowerCase();
   if (c && c.nome && c.nome !== 'Sem nome') a.nome = c.nome;
+  preCli(a, c);
   const uf = String(h.cidade_uf || '').match(/\/\s*([A-Z]{2})\b/); if (uf) a.uf = ['RS', 'SC', 'PR', 'SP', 'MT', 'MS'].includes(uf[1]) ? uf[1] : 'outro';
   const relato = [c && (c.resumo_fatos || c.resumo), h.observacoes ? 'Observações da Helena: ' + h.observacoes : ''].filter(Boolean).join('\n\n'); if (relato) a.relato = relato.slice(0, 2000);
   const op = lw(h.tipo_operacao), fase = lw(h.fase);
@@ -707,7 +721,7 @@ function deHelena(c) {
     if (dt(h.data_segundo_leilao)) a.data_leilao2 = dt(h.data_segundo_leilao);
     const fi = lw(h.forma_intimacao); if (fi) a.af_intim_forma = /pessoal|m[aã]os/.test(fi) ? 'pessoal' : /porteiro|parente|vizinh|terceiro/.test(fi) ? 'terceiro' : /hora/.test(fi) ? 'horacerta' : /edital/.test(fi) ? 'edital' : /nao|não/.test(fi) ? 'nao' : undefined;
     if (/financ/.test(op)) a.af_contrato = 'sfh'; else if (/empr[eé]stimo|garantia/.test(op)) a.af_contrato = 'homeequity';
-    const pa = parseInt(String(h.parcelas_atrasadas || '').replace(/\D/g, ''), 10); if (isFinite(pa)) a.parcelas_atraso = pa;
+    const paS = String(h.parcelas_atrasadas || '').trim(); const paM = /[\/\-]/.test(paS) ? null : paS.match(/\d{1,3}/); const pa = paM ? parseInt(paM[0], 10) : NaN; if (isFinite(pa) && pa > 0 && pa <= 240) a.parcelas_atraso = pa;
     const vp = parseMoney(h.valor_parcela); if (vp) a.parcela = vp;
     const tn = lw(h.tentou_negociar); if (tn) a.af_negociou = /recus/.test(tn) ? 'recusou' : /n[aã]o/.test(tn) ? 'nao' : 'inviavel';
   }
@@ -734,7 +748,7 @@ async function abrir(arg, forcar) {
   if (r.diag) {
     const g = r.diag, ia = g.ia || {};
     Object.assign(nd, { id: g.id, A: g.respostas || {}, transcript: g.transcricao || '', ia: { analise: ia.analise, escuta: ia.escuta, defesas: ia.defesas || null, solucoes: ia.solucoes || null }, aiFilled: ia.aiFilled || {}, ajuste: ia.ajuste || {}, etapa: ia.etapa || 'situacao', salvoEm: '' , status: g.status });
-    nd.caso_id = g.caso_id || nd.caso_id;
+    nd.caso_id = g.caso_id || nd.caso_id; preCli(nd.A, nd.caso);
   } else if (nd.caso) {
     nd.A = deHelena(nd.caso); nd.helena = Object.keys(nd.A).filter((k) => k !== 'consulta_paga'); nd.etapa = 'situacao';
   }
@@ -822,14 +836,18 @@ function renderMain() {
     if (et.fala) h += '<div class="dg-roteiro"><span class="dg-eye">Diga ao cliente</span><p>“' + esc(et.fala) + '”</p></div>';
     if (bloqueado(a) && et.id !== 'abertura') h += '<div class="dg-al crit"><b>Caso a declinar.</b> O escritório não atua em causas contra o Município de Novo Hamburgo. Encerre com cordialidade e sem indicar colega.</div>';
     if (foraPerfil(a) && et.id !== 'abertura') h += '<div class="dg-al warn"><b>Fora do perfil.</b> Acolha, anote o resumo e indique um colega da área.</div>';
+    if (et.id === 'financeiro') { h += Q.filter((q) => q.e === et.id && visivel(q, a)).map(renderQuestion).join('') + renderFinVida(); main.innerHTML = cabecaEtapa(h, vis, idx); return; }
     if (et.id === 'impacto' && isDev(a) && !bloqueado(a)) h += renderCalc();
-    h += Q.filter((q) => q.e === et.id && visivel(q, a)).map(renderQuestion).join('');
+    h += Q.filter((q) => q.e === et.id && visivel(q, a)).map(renderQuestion).join('') + (et.id === 'abertura' ? renderCli() : '');
     if (et.id === 'caso' && a.area) { const u = urgencia(a); if (u.nivel === 'crit' || u.nivel === 'alta') h += '<div class="dg-al ' + (u.nivel === 'crit' ? 'crit' : 'warn') + '"><b>' + esc(u.txt) + '</b>' + (u.prazo ? '<span class="pq">Data: ' + dataBR(u.prazo.data) + '</span>' : '') + '</div>'; }
   }
+  main.innerHTML = cabecaEtapa(h, vis, idx);
+  if (et.id === 'defesas') autoDefesas();
+}
+function cabecaEtapa(h, vis, idx) {
   const prev = vis[idx - 1], next = vis[idx + 1];
   h += '<div class="dg-foot">' + (prev ? '<button class="btn" type="button" data-ir="' + prev.id + '">' + ic('voltar', 's') + ' ' + esc(prev.nome) + '</button>' : '<span></span>') + (next ? '<button class="btn pri" type="button" data-ir="' + next.id + '">' + esc(next.nome) + ' ' + ic('seta', 's') + '</button>' : '') + '</div>';
-  main.innerHTML = h;
-  if (et.id === 'defesas') autoDefesas();
+  return h;
 }
 function renderProposta() {
   const a = A(); const H = honorarios(a); const J = emJogo(a); const PL = plano(a, H);
@@ -914,7 +932,7 @@ document.addEventListener('click', (ev) => {
   if (t.id === 'btnSolCopiar') { copiar(textoSolucoes()); return; }
   if (t.matches('.dg-opt[data-q]')) {
     const id = t.dataset.q, q = QI[id]; const v = t.dataset.num ? Number(t.dataset.v) : t.dataset.v;
-    if (q.t === 'multi') { const cur = Array.isArray(A()[id]) ? A()[id].slice() : []; const i = cur.indexOf(v); if (i >= 0) cur.splice(i, 1); else { if (v === 'sozinho') cur.length = 0; else { const j = cur.indexOf('sozinho'); if (j >= 0) cur.splice(j, 1); } cur.push(v); } setResp(id, cur.length ? cur : null); }
+    if (q.t === 'multi') { const cur = Array.isArray(A()[id]) ? A()[id].slice() : []; const i = cur.indexOf(v); if (i >= 0) cur.splice(i, 1); else { if (v === 'sozinho' || v === 'nenhuma') cur.length = 0; else { ['sozinho', 'nenhuma'].forEach((x) => { const j = cur.indexOf(x); if (j >= 0) cur.splice(j, 1); }); } cur.push(v); } setResp(id, cur.length ? cur : null); }
     else setResp(id, A()[id] === v ? null : v);
     const y = window.scrollY; renderTudo(); window.scrollTo(0, y); return;
   }
@@ -975,7 +993,26 @@ async function pedirIA(tipo, prompt) {
   if (!j || !j.ok) throw new Error((j && j.erro) || 'A IA não respondeu agora.');
   return j.dados.texto;
 }
-const lerJSON = (t) => { const s = String(t || ''); const i = s.indexOf('{'), f = s.lastIndexOf('}'); if (i < 0 || f < i) throw new Error('A resposta veio fora do formato. Tente de novo.'); return JSON.parse(s.slice(i, f + 1)); };
+function reparaJSON(s) {
+  // resposta cortada pelo limite: fecha no último item completo e fecha as chaves abertas
+  const pilha = []; let str = false, esc2 = false, corte = -1, pilhaCorte = [];
+  for (let k = 0; k < s.length; k++) {
+    const ch = s[k];
+    if (str) { if (esc2) esc2 = false; else if (ch === '\\') esc2 = true; else if (ch === '"') str = false; continue; }
+    if (ch === '"') str = true;
+    else if (ch === '{' || ch === '[') pilha.push(ch === '{' ? '}' : ']');
+    else if (ch === '}' || ch === ']') { pilha.pop(); corte = k + 1; pilhaCorte = pilha.slice(); }
+    else if (ch === ',') { corte = k; pilhaCorte = pilha.slice(); }
+  }
+  if (corte < 0) return null;
+  try { return JSON.parse(s.slice(0, corte) + pilhaCorte.reverse().join('')); } catch (e) { return null; }
+}
+const lerJSON = (t) => {
+  const s = String(t || '').replace(/```(?:json)?/gi, ''); const i = s.indexOf('{'); if (i < 0) throw new Error('A resposta veio fora do formato. Tente de novo.');
+  const f = s.lastIndexOf('}'); if (f > i) { try { return JSON.parse(s.slice(i, f + 1)); } catch (e) {} }
+  const r = reparaJSON(s.slice(i)); if (r) return r;
+  throw new Error('A resposta da IA veio incompleta. Tente de novo.');
+};
 async function analisar(btn) {
   const st = q$('#iaStatus'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = ic('att', 's gira') + ' Analisando'; if (st) st.textContent = 'Leva de 20 a 60 segundos.';
   const prompt = 'Você é um advogado brasileiro sênior, especialista em defesa de devedores em leilão de imóveis (alienação fiduciária da Lei 9.514/97 e execução judicial), execuções fiscais, condomínio, busca e apreensão de veículos e assessoria a arrematantes. Está ajudando o Dr. Fábio DURANTE uma consulta com o cliente.\n\n' + contextoCaso() +
@@ -1009,6 +1046,195 @@ async function responderObjecao(btn) {
   catch (e) { out.innerHTML = '<p class="mut">' + esc(e.message || 'Não deu certo.') + '</p>'; }
   finally { if (document.body.contains(btn)) { btn.disabled = false; btn.innerHTML = orig; } }
 }
+
+// ---------- vida financeira e outras frentes ----------
+const SERV_FIN = {
+  veiculo: (a) => ({ t: a.fin_veic_atraso === 'notificado' ? 'Defesa na busca e apreensão do veículo' : 'Revisão do financiamento do veículo', d: a.fin_veic_atraso === 'notificado' ? 'urgente: prazo de 5 dias para pagar e 15 para contestar após a apreensão' : 'juros acima da média do Banco Central, seguros e tarifas embutidas' }),
+  imovel2: () => ({ t: 'Análise do segundo financiamento imobiliário', d: 'conferir atraso e risco de consolidação' }),
+  garantia: () => ({ t: 'Revisão do empréstimo com garantia', d: 'risco de perder o bem dado em garantia; conferir contrato e juros' }),
+  consignado: (a) => ({ t: 'Revisão ou limitação do consignado', d: a.fin_consig_margem === 'sim' ? 'desconto acima da margem: pedido de limitação' : 'conferir margem, cartão consignado (RMC) e descontos não contratados' }),
+  pessoal: () => ({ t: 'Revisional de empréstimo pessoal', d: 'comparar a taxa com a média do Banco Central' }),
+  cartao: () => ({ t: 'Revisão de cartão de crédito', d: 'juros do rotativo e parcelamentos sucessivos' }),
+  cheque: () => ({ t: 'Revisão do cheque especial', d: 'juros e capitalização' }),
+  empresa: () => ({ t: 'Defesa em dívidas da empresa e do avalista', d: 'execuções, aval, fiança e renegociação' }),
+  consorcio: () => ({ t: 'Análise do consórcio', d: 'devolução de valores ou defesa em caso de bem já contemplado' }),
+  contas: () => ({ t: 'Organização de contas e cobranças', d: 'condomínio e cobranças com risco de penhora; IPTU de Novo Hamburgo fica fora (o escritório não atua contra o Município)' }),
+  particular: () => ({ t: 'Análise da dívida com particular', d: 'juros acima do limite legal (Lei de Usura) e garantias assinadas' }),
+  bets: () => ({ t: 'Ação contra casas de apostas e proteção do patrimônio', d: 'restituição de perdas, autoexclusão e, se for o caso, curatela' })
+};
+function vidaFin(a) {
+  const C = Array.isArray(a.fin_compromissos) ? a.fin_compromissos.filter((x) => x !== 'nenhuma') : [];
+  const L = [], S = [];
+  const comp = a.fin_renda && a.fin_parcelas ? a.fin_parcelas / a.fin_renda * 100 : null;
+  if (C.length) L.push('Compromissos: ' + rotulo('fin_compromissos', C));
+  if (comp != null) L.push('Parcelas de dívidas: ' + brl(a.fin_parcelas) + ' por mês, ' + Math.round(comp) + '% da renda');
+  if (a.fin_total_dividas) L.push('Dívidas fora deste caso: ' + brl(a.fin_total_dividas));
+  if (a.fin_negativado === 'sim') L.push('Nome negativado');
+  const superend = C.length >= 3 || (comp != null && comp >= 40) || (a.fin_outras === 'muitas');
+  if (superend) S.push({ t: 'Repactuação de dívidas por superendividamento', d: 'plano único com todos os credores, preservando o mínimo existencial (CDC, arts. 104-A a 104-C)', forte: true });
+  C.forEach((k) => { const f = SERV_FIN[k]; if (f && !(k === 'veiculo' && a.area === 'veic')) S.push(f(a)); });
+  return { C, comp, superend, linhas: L, servicos: S };
+}
+function renderFinVida() {
+  const a = A(); const V = vidaFin(a);
+  if (!V.C.length && V.comp == null) return '';
+  const nivel = V.comp == null ? '' : V.comp >= 50 ? 'crit' : V.comp >= 30 ? 'warn' : 'info';
+  let h = '<section class="card dg-c dg-vida" aria-labelledby="dgVidaT"><h3 id="dgVidaT" style="margin:0">Vida financeira do cliente</h3>';
+  if (V.comp != null) h += '<div class="dg-al ' + nivel + '"><b>' + Math.round(V.comp) + '% da renda já vai para parcelas de dívidas</b><span class="pq">' + brl(a.fin_parcelas) + ' de ' + brl(a.fin_renda) + ' por mês' + (V.comp >= 30 ? '. Acima de 30% o orçamento costuma não fechar; leve isso em conta na forma de pagamento dos honorários.' : '.') + '</span></div>';
+  else if (V.C.length) h += '<p class="dg-hint" style="margin:0">Pergunte quanto sai por mês com essas parcelas e a renda da família para ver o quanto da renda está comprometido.</p>';
+  if (V.servicos.length) h += '<div style="display:grid;gap:6px"><span class="dg-eye">Outras frentes que o escritório pode cuidar</span><ul class="dg-vl">' + V.servicos.map((x) => '<li' + (x.forte ? ' class="forte"' : '') + '><b>' + esc(x.t) + '</b><span>' + esc(x.d) + '</span></li>').join('') + '</ul>' +
+    '<p class="dg-hint" style="margin:0">Apresente como organização da vida financeira, depois de tratar o problema principal. Cada frente precisa de análise dos contratos antes de qualquer proposta.</p></div>';
+  return h + '</section>';
+}
+(function cssVida() {
+  if (document.getElementById('dg-css-vida')) return;
+  const st = document.createElement('style'); st.id = 'dg-css-vida';
+  st.textContent = '.dg-vl{margin:0;padding:0;list-style:none;display:grid;gap:6px}.dg-vl li{display:grid;gap:1px;padding:8px 10px;border:1px solid var(--line-2);border-radius:10px;font-size:14px}.dg-vl li span{color:var(--mut);font-size:13px}.dg-vl li.forte{border-color:var(--gold);background:var(--surface-2)}';
+  document.head.appendChild(st);
+})();
+
+// ---------- identificação do cliente (abertura) ----------
+const EST_CIVIL = [['', 'Escolha'], ['solteiro', 'Solteiro(a)'], ['casado', 'Casado(a)'], ['uniao', 'União estável'], ['divorciado', 'Divorciado(a)'], ['separado', 'Separado(a) judicialmente'], ['viuvo', 'Viúvo(a)']];
+const REGIME = [['', 'Escolha'], ['parcial', 'Comunhão parcial'], ['universal', 'Comunhão universal'], ['separacao', 'Separação de bens'], ['participacao', 'Participação final nos aquestos'], ['nsei', 'Não sabe']];
+const UFS = [['', 'UF']].concat('AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR RS SC SE SP TO'.split(' ').map((x) => [x, x]));
+const SIMNAO = [['', 'Escolha'], ['sim', 'Sim'], ['nao', 'Não, fica em outro endereço']];
+const comConj = (c) => ['casado', 'uniao'].includes(c.civil);
+const CLI = [
+  { g: 'Documentos e dados pessoais', id: 'cpf', l: 'CPF', t: 'cpf' },
+  { id: 'rg', l: 'RG e órgão emissor', t: 'txt', ph: '0000000000 SSP/RS' },
+  { id: 'nasc', l: 'Data de nascimento', t: 'date' },
+  { id: 'nacionalidade', l: 'Nacionalidade', t: 'txt', ph: 'brasileira' },
+  { id: 'profissao', l: 'Profissão', t: 'txt' },
+  { id: 'civil', l: 'Estado civil', t: 'sel', o: EST_CIVIL },
+  { id: 'regime', l: 'Regime de bens', t: 'sel', o: REGIME, show: (c) => c.civil === 'casado' },
+  { id: 'conjuge', l: 'Nome do cônjuge ou companheiro(a)', t: 'txt', show: comConj },
+  { id: 'conjuge_cpf', l: 'CPF do cônjuge ou companheiro(a)', t: 'cpf', show: comConj },
+  { g: 'Contato', id: 'tel', l: 'WhatsApp ou telefone', t: 'tel' },
+  { id: 'email', l: 'E-mail', t: 'email' },
+  { g: 'Endereço residencial', id: 'cep', l: 'CEP', t: 'cep' },
+  { id: 'rua', l: 'Rua, avenida', t: 'txt', w: 2 },
+  { id: 'numero', l: 'Número', t: 'txt' },
+  { id: 'compl', l: 'Complemento', t: 'txt', ph: 'apto, bloco, casa' },
+  { id: 'bairro', l: 'Bairro', t: 'txt' },
+  { id: 'cidade', l: 'Cidade', t: 'txt' },
+  { id: 'uf', l: 'UF', t: 'sel', o: UFS },
+  { g: 'Imóvel ou bem em discussão', id: 'bem_local', l: 'Fica nesse mesmo endereço?', t: 'sel', o: SIMNAO },
+  { id: 'bem_end', l: 'Endereço completo do imóvel ou bem', t: 'txt', w: 2, ph: 'Rua, número, bairro, cidade/UF', show: (c) => c.bem_local === 'nao' },
+  { id: 'bem_matricula', l: 'Matrícula e cartório (se souber)', t: 'txt', ph: 'Matrícula 12.345 · RI de Novo Hamburgo' }
+];
+const cliDe = (a) => (a.cli && typeof a.cli === 'object' ? a.cli : {});
+const soDig = (v) => String(v || '').replace(/\D/g, '');
+function cpfValido(v) {
+  const d = soDig(v); if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+  for (let t = 9; t < 11; t++) { let soma = 0; for (let i = 0; i < t; i++) soma += +d[i] * (t + 1 - i); if (((soma * 10) % 11) % 10 !== +d[t]) return false; }
+  return true;
+}
+const fmtCPF = (v) => { const d = soDig(v).slice(0, 11); const p = [d.slice(0, 3), d.slice(3, 6), d.slice(6, 9)].filter(Boolean).join('.'); return d.length > 9 ? p + '-' + d.slice(9) : p; };
+const fmtCEP = (v) => { const d = soDig(v).slice(0, 8); return d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d; };
+const fmtTel = (v) => { let d = soDig(v); if (d.length > 11 && d.startsWith('55')) d = d.slice(2); d = d.slice(0, 11); if (d.length < 3) return d; const n = d.slice(2); return '(' + d.slice(0, 2) + ') ' + (n.length > 8 ? n.slice(0, 5) + '-' + n.slice(5) : n.length > 4 ? n.slice(0, 4) + '-' + n.slice(4) : n); };
+const FMT = { cpf: fmtCPF, cep: fmtCEP, tel: fmtTel };
+function idadeCli(c) { if (!/^\d{4}-\d{2}-\d{2}$/.test(c.nasc || '')) return null; const n = new Date(c.nasc + 'T12:00:00'), h = new Date(); let i = h.getFullYear() - n.getFullYear(); if (h.getMonth() < n.getMonth() || (h.getMonth() === n.getMonth() && h.getDate() < n.getDate())) i--; return i >= 0 && i < 120 ? i : null; }
+function preCli(a, c) {
+  if (!c) return; const k = a.cli && typeof a.cli === 'object' ? a.cli : (a.cli = {}); const h = c.helena || {};
+  if (!k.tel && c.telefone) k.tel = fmtTel(c.telefone);
+  if (!k.email && c.email) k.email = String(c.email);
+  const m = String(h.cidade_uf || c.cidade || '').match(/^\s*([^\/,–-]+?)\s*(?:[\/,–-]\s*([A-Za-z]{2}))?\s*$/);
+  if (m) { if (!k.cidade && m[1]) k.cidade = m[1].trim(); if (!k.uf && m[2]) k.uf = m[2].toUpperCase(); }
+  if (!Object.keys(k).length) delete a.cli;
+}
+function cliStatus(c) {
+  const vis = CLI.filter((f) => !f.show || f.show(c)); const ok = vis.filter((f) => String(c[f.id] || '').trim()).length;
+  const falta = ['cpf', 'rg', 'civil', 'profissao', 'cep', 'rua', 'numero', 'cidade'].filter((k) => !String(c[k] || '').trim()).map((k) => CLI.find((f) => f.id === k).l);
+  return { ok, total: vis.length, falta };
+}
+function campoCli(f, c) {
+  const v = c[f.id] || ''; const idc = 'cli-' + f.id; let ctrl;
+  if (f.t === 'sel') ctrl = '<select class="sel" id="' + idc + '" data-cli="' + f.id + '">' + f.o.map(([k, t]) => '<option value="' + k + '"' + (String(v) === k ? ' selected' : '') + '>' + esc(t) + '</option>').join('') + '</select>';
+  else if (f.t === 'date') ctrl = '<input type="date" class="inp" id="' + idc + '" data-cli="' + f.id + '" value="' + esc(v) + '">';
+  else ctrl = '<input class="inp" id="' + idc + '" data-cli="' + f.id + '" value="' + esc(v) + '"' + (f.t === 'cpf' ? ' inputmode="numeric" placeholder="000.000.000-00" maxlength="14"' : f.t === 'cep' ? ' inputmode="numeric" placeholder="00000-000" maxlength="9"' : f.t === 'tel' ? ' inputmode="tel" placeholder="(51) 90000-0000"' : f.t === 'email' ? ' type="email" inputmode="email" autocomplete="off" placeholder="nome@exemplo.com"' : f.ph ? ' placeholder="' + esc(f.ph) + '"' : '') + ' autocomplete="off">';
+  return '<label class="dc-f' + (f.w === 2 ? ' cli-w2' : '') + '" for="' + idc + '"><span>' + esc(f.l) + '</span>' + ctrl + '<small class="cli-av" id="cliav-' + f.id + '">' + avisoCli(f, v, c) + '</small></label>';
+}
+function avisoCli(f, v, c) {
+  if (f.t === 'cpf' && soDig(v).length === 11) return cpfValido(v) ? '<span class="cli-ok">CPF válido</span>' : '<span class="cli-er">CPF inválido, confira os números</span>';
+  if (f.t === 'cpf' && soDig(v).length) return 'Faltam ' + (11 - soDig(v).length) + ' dígitos';
+  if (f.t === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return '<span class="cli-er">Confira o e-mail</span>';
+  if (f.t === 'cep' && D && D._cepMsg) return esc(D._cepMsg);
+  if (f.id === 'nasc') { const i = idadeCli(c); if (i != null) return i + ' anos' + (i >= 80 ? ' · prioridade especial na tramitação' : i >= 60 ? ' · prioridade na tramitação (pessoa idosa)' : ''); }
+  return '';
+}
+function renderCli() {
+  const c = cliDe(A()); const st = cliStatus(c);
+  let h = '<section class="card dg-c dg-cli" id="dgCli" aria-labelledby="dgCliT"><div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><h3 id="dgCliT" style="margin:0">Identificação do cliente</h3><span class="pq mut" id="cliCont">' + st.ok + ' de ' + st.total + ' campos</span></div>' +
+    '<p class="dg-hint" style="margin:0">Dados para procuração, contrato e petição. Pode completar no fim da consulta; não são enviados à IA (ela recebe só cidade, idade, estado civil e profissão).</p>';
+  let grupo = null;
+  CLI.filter((f) => !f.show || f.show(c)).forEach((f) => {
+    if (f.g) { if (grupo) h += '</div></fieldset>'; grupo = f.g; h += '<fieldset class="cli-g"><legend>' + esc(f.g) + '</legend><div class="dc-campos">'; }
+    h += campoCli(f, c);
+  });
+  h += '</div></fieldset>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" type="button" id="btnQualif">Copiar qualificação</button><span class="pq mut" id="cliFalta">' + (st.falta.length ? 'Falta para a procuração: ' + esc(st.falta.join(', ')) : 'Pronto para a procuração.') + '</span></div></section>';
+  return h;
+}
+function qualificacao(a) {
+  const c = cliDe(a); if (!Object.keys(c).length) return '';
+  const civ = (EST_CIVIL.find(([k]) => k === c.civil) || [])[1];
+  const reg = c.civil === 'casado' && c.regime && c.regime !== 'nsei' ? 'pelo regime da ' + (REGIME.find(([k]) => k === c.regime) || [])[1].toLowerCase() : '';
+  const end = [c.rua, c.numero ? 'nº ' + c.numero : '', c.compl, c.bairro ? 'bairro ' + c.bairro : '', c.cidade ? c.cidade + (c.uf ? '/' + c.uf : '') : '', c.cep ? 'CEP ' + c.cep : ''].filter(Boolean).join(', ');
+  const p = [(a.nome || '[NOME]').toUpperCase(), c.nacionalidade || 'brasileiro(a)', civ ? civ.toLowerCase() + (reg ? ' ' + reg : '') : '', c.profissao,
+    c.rg ? 'portador(a) do RG nº ' + c.rg : '', c.cpf ? 'inscrito(a) no CPF sob o nº ' + c.cpf : '', end ? 'residente e domiciliado(a) na ' + end : '',
+    c.email ? 'e-mail ' + c.email : '', c.tel ? 'telefone ' + c.tel : ''].filter(Boolean).join(', ');
+  const conj = comConj(c) && c.conjuge ? ' Cônjuge ou companheiro(a): ' + c.conjuge + (c.conjuge_cpf ? ', CPF ' + c.conjuge_cpf : '') + '.' : '';
+  const bem = c.bem_local === 'sim' ? ' O imóvel ou bem em discussão fica no mesmo endereço.' : c.bem_end ? ' Imóvel ou bem em discussão: ' + c.bem_end + '.' : '';
+  return p + '.' + conj + bem + (c.bem_matricula ? ' ' + c.bem_matricula + '.' : '');
+}
+function perfilCliIA(a) {
+  const c = cliDe(a); const i = idadeCli(c); const civ = (EST_CIVIL.find(([k]) => k === c.civil) || [])[1];
+  const x = [c.cidade ? 'mora em ' + c.cidade + (c.uf ? '/' + c.uf : '') : '', i != null ? i + ' anos' : '', civ ? civ.toLowerCase() + (c.civil === 'casado' && c.regime ? ' (' + (REGIME.find(([k]) => k === c.regime) || [])[1].toLowerCase() + ')' : '') : '', c.profissao ? 'profissão: ' + c.profissao : '', c.bem_local === 'sim' ? 'o bem fica no endereço onde mora' : c.bem_local === 'nao' ? 'o bem fica em outro endereço' : ''].filter(Boolean);
+  return x.length ? '\n\nPERFIL DO CLIENTE: ' + x.join('; ') : '';
+}
+function atualizaCliInfo() { const c = cliDe(A()); const st = cliStatus(c); const n = q$('#cliCont'); if (n) n.textContent = st.ok + ' de ' + st.total + ' campos'; const f = q$('#cliFalta'); if (f) f.textContent = st.falta.length ? 'Falta para a procuração: ' + st.falta.join(', ') : 'Pronto para a procuração.'; }
+async function buscaCEP(cep) {
+  const d = soDig(cep); if (d.length !== 8 || !D) return; const meu = D; D._cepMsg = 'Buscando o endereço…'; const av = q$('#cliav-cep'); if (av) av.textContent = D._cepMsg;
+  try {
+    const r = await fetch('https://viacep.com.br/ws/' + d + '/json/'); const j = await r.json(); if (D !== meu) return;
+    if (j.erro) { D._cepMsg = 'CEP não encontrado, preencha à mão.'; }
+    else { const c = A().cli; const novo = { rua: j.logradouro, bairro: j.bairro, cidade: j.localidade, uf: j.uf }; Object.entries(novo).forEach(([k, v]) => { if (v) c[k] = v; }); D._cepMsg = 'Endereço preenchido pelo CEP. Confira e informe o número.'; marcarSujo(); }
+  } catch (e) { if (D === meu) D._cepMsg = 'Sem conexão com a busca de CEP, preencha à mão.'; }
+  const box = q$('#dgCli'); if (box && D === meu) { const y = window.scrollY; box.outerHTML = renderCli(); window.scrollTo(0, y); const n = q$('#cli-numero'); if (n && !A().cli.numero) n.focus(); }
+}
+document.addEventListener('input', (ev) => {
+  const el = ev.target; if (!D || !el.dataset || !el.dataset.cli || el.tagName === 'SELECT') return;
+  const f = CLI.find((x) => x.id === el.dataset.cli); if (!f) return; const a = A(); if (!a.cli || typeof a.cli !== 'object') a.cli = {};
+  if (FMT[f.t]) { const nv = FMT[f.t](el.value); if (nv !== el.value) el.value = nv; }
+  if (el.value.trim()) a.cli[f.id] = el.value.trim(); else delete a.cli[f.id];
+  if (f.t === 'cep') D._cepMsg = '';
+  const av = q$('#cliav-' + f.id); if (av) av.innerHTML = avisoCli(f, a.cli[f.id] || '', a.cli);
+  atualizaCliInfo(); marcarSujo();
+  if (f.t === 'cep' && soDig(el.value).length === 8) buscaCEP(el.value);
+});
+document.addEventListener('change', (ev) => {
+  const el = ev.target; if (!D || !el.dataset || !el.dataset.cli) return;
+  const f = CLI.find((x) => x.id === el.dataset.cli); if (!f || (f.t !== 'sel' && f.t !== 'date')) return; const a = A(); if (!a.cli || typeof a.cli !== 'object') a.cli = {};
+  if (el.value) a.cli[f.id] = el.value; else delete a.cli[f.id];
+  if (f.id === 'civil' && !comConj(a.cli)) { delete a.cli.conjuge; delete a.cli.conjuge_cpf; } if (f.id === 'civil' && a.cli.civil !== 'casado') delete a.cli.regime;
+  if (f.id === 'bem_local' && a.cli.bem_local === 'sim') { delete a.cli.bem_end; if (!a.uf && a.cli.uf) a.uf = ['RS', 'SC', 'PR', 'SP', 'MT', 'MS'].includes(a.cli.uf) ? a.cli.uf : 'outro'; }
+  marcarSujo();
+  if (['civil', 'bem_local'].includes(f.id)) { const box = q$('#dgCli'); if (box) { const y = window.scrollY; box.outerHTML = renderCli(); window.scrollTo(0, y); const nx = q$('#cli-' + f.id); if (nx) nx.focus(); } }
+  else { const av = q$('#cliav-' + f.id); if (av) av.innerHTML = avisoCli(f, a.cli[f.id] || '', a.cli); atualizaCliInfo(); }
+});
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest && ev.target.closest('#btnQualif'); if (!b || !D) return;
+  const t = qualificacao(A()); if (!t) { toast('Preencha os dados do cliente primeiro.'); return; }
+  try { await navigator.clipboard.writeText(t); toast('Qualificação copiada.'); } catch (e) { toast('Não consegui copiar. Use o resumo do atendimento.'); }
+});
+(function cssCli() {
+  if (document.getElementById('dg-css-cli')) return;
+  const st = document.createElement('style'); st.id = 'dg-css-cli';
+  st.textContent = '.cli-g{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}.cli-g legend{padding:0;margin-bottom:8px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);font-weight:700}' +
+    '.dg-cli .dc-campos{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}.cli-w2{grid-column:span 2}@media (max-width:520px){.cli-w2{grid-column:auto}}' +
+    '.cli-av{font-weight:500;min-height:0;font-size:12px}.cli-av:empty{display:none}.cli-ok{color:var(--ok,#2F6B45)}.cli-er{color:var(--bad)}.dg-cli .dc-f .inp,.dg-cli .dc-f .sel{width:100%}';
+  document.head.appendChild(st);
+})();
 
 // ---------- calculadora do devedor: tela ----------
 function campoCalc(id, rot, tipo, extra, padrao) {
@@ -1114,7 +1340,7 @@ async function gerarDefesas() {
     '4) "completo": true somente quando não restar pergunta útil para o cliente (o que falta depende de documentos ou de análise técnica); nesse caso "perguntas" pode vir vazio.\n' +
     '5) "observacao": uma frase sobre o ponto mais importante descoberto até agora (ou vazio).\n' +
     'Responda SOMENTE com JSON: {"mapa":[{"defesa":"","status":"","motivo":""}],"perguntas":[{"texto":"","defesa":"","porque":"","opcoes":[]}],"documentos":[],"completo":false,"observacao":""}\n' +
-    'Regras: no máximo 12 itens no mapa; não invente fatos; cite lei ou súmula só com segurança; nunca sugira prometer resultado.';
+    'Regras: no máximo 10 itens no mapa, em ordem de importância; "motivo" com até 20 palavras; JSON puro, sem crases nem markdown; não invente fatos; cite lei ou súmula só com segurança; nunca sugira prometer resultado.';
   try {
     const r = lerJSON(await pedirIA('perguntas', prompt));
     if (D !== meu) return;
@@ -1169,7 +1395,7 @@ async function gerarSolucoes() {
     (DF.documentos && DF.documentos.length ? '\n\nDOCUMENTOS AINDA A CONFERIR:\n' + DF.documentos.map((d) => '- ' + d).join('\n') : '') +
     '\n\nTAREFA: liste as soluções jurídicas e práticas viáveis para este cliente, da mais recomendada para a menos, considerando prazos, provas disponíveis, custo e o objetivo do cliente. Inclua, quando couber: medidas urgentes (tutela de urgência, suspensão de leilão ou de busca e apreensão), defesas no processo, ações próprias, negociação ou acordo (purgação da mora, renegociação, venda antes do leilão, acordo com o credor), proteção lícita do patrimônio e o plano B se a defesa principal falhar.\n' +
     'Responda SOMENTE com JSON:\n{"resumo":"2 a 3 frases","recomendada":{"titulo":"","porque":""},"solucoes":[{"titulo":"","tipo":"judicial | extrajudicial | negociação | administrativa","objetivo":"o que resolve para o cliente","fundamento":"lei, artigo ou súmula, só com segurança","forca":"forte | média | fraca","urgencia":"prazo ou quando agir","precisa":["provas ou documentos necessários"],"riscos":["..."],"tempo_custo":"estimativa qualitativa de tempo e custos (custas, perícia, caução)"}],"plano":[{"passo":"","quando":""}],"cliente":"explicação de 4 a 6 frases para o Dr. Fábio dizer ao cliente, em linguagem simples, sem prometer resultado","alertas":["prazos e cuidados críticos"]}\n' +
-    'Regras: no máximo 6 soluções e 7 passos; "forca" é a força jurídica da tese diante dos fatos, não promessa de resultado; não invente fatos; se faltar informação decisiva, diga em alertas.';
+    'Regras: no máximo 6 soluções e 7 passos; frases curtas; JSON puro, sem crases nem markdown; "forca" é a força jurídica da tese diante dos fatos, não promessa de resultado; não invente fatos; se faltar informação decisiva, diga em alertas.';
   try {
     const r = lerJSON(await pedirIA('solucoes', prompt));
     if (D !== meu) return;
