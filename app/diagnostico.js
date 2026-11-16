@@ -72,6 +72,8 @@ const Q = [
       o("arrematado","Imóvel já leiloado ou arrematado"),
       o("reintegracao","Já existe ação de desocupação ou reintegração") ] },
   { id: "af_data_intim", e: "caso", t: "date", l: "Data em que recebeu a intimação", show: a => a.area === "af" && a.af_fase === "intimado", porque: "O prazo para purgar a mora é de 15 dias." },
+  { id: "af_prazo_purga", e: "caso", t: "date", l: "Prazo final para pagar o boleto (purgar a mora)", show: a => a.area === "af" && a.af_fase === "intimado", porque: "Se não pagar até essa data, o banco pede a consolidação da propriedade." },
+  { id: "af_valor_purga", e: "caso", t: "money", l: "Valor do boleto para purgar a mora", show: a => a.area === "af" && a.af_fase === "intimado" },
   { id: "data_leilao1", e: "caso", t: "date", l: "Data do 1º leilão", show: a => (a.area === "af" && ["leilao"].includes(a.af_fase)) || (a.area === "exec" && a.ex_fase === "leilao") || (a.area === "cond" && a.cond_fase === "leilao") || (a.area === "fiscal" && a.fis_fase === "leilao") },
   { id: "data_leilao2", e: "caso", t: "date", l: "Data do 2º leilão", show: a => a.area === "af" && a.af_fase === "leilao" },
   { id: "af_data_citacao", e: "caso", t: "date", l: "Data da citação na ação de reintegração", show: a => a.area === "af" && a.af_fase === "reintegracao" },
@@ -179,7 +181,7 @@ function prazos(a) {
   const out = []; // {nome, data, dias}
   const push = (nome, iso) => { if (iso) out.push({ nome, data: iso, dias: diasAte(iso) }); };
   if (a.area === "af") {
-    if (a.af_fase === "intimado" && a.af_data_intim) push("Fim do prazo para purgar a mora (15 dias)", addDias(a.af_data_intim, 15));
+    if (a.af_fase === "intimado" && (a.af_prazo_purga || a.af_data_intim)) push(a.af_prazo_purga ? "Prazo final para pagar o boleto (purgar a mora)" : "Fim do prazo para purgar a mora (15 dias)", a.af_prazo_purga || addDias(a.af_data_intim, 15));
     if (a.af_fase === "leilao") { push("1º leilão", a.data_leilao1); push("2º leilão (limite do direito de preferência)", a.data_leilao2); }
     if (a.af_fase === "reintegracao" && a.af_data_citacao) push("Contestação (aprox. 15 dias úteis)", addDias(a.af_data_citacao, 21));
   }
@@ -231,15 +233,26 @@ function calcDevedor(a) {
   if (!v) return { falta: 'valor', est };
   const s = a.saldo_devedor != null ? a.saldo_devedor : (est ? est.saldo : null);
   if (s == null) return { falta: 'saldo', v, est };
-  const desp = Math.round(v * 0.05);
+  // Despesas cobradas do devedor no acerto (Lei 9.514/97, art. 27, § 3º, II, e § 2º-B): custas de intimação e consolidação, ITBI, comissão do leiloeiro, IPTU e condomínio.
+  let D2;
+  if (af) {
+    const itbiP = Number(a.calc_itbi != null ? a.calc_itbi : 3) || 0, leilP = Number(a.calc_leiloeiro != null ? a.calc_leiloeiro : 5) || 0;
+    const cartEst = a.calc_cartorio == null, cart = cartEst ? Math.max(2000, Math.round(v * 0.005)) : a.calc_cartorio;
+    const itbi = Math.round(v * itbiP / 100), enc = a.calc_encargos || 0;
+    D2 = { cart, cartEst, itbi, itbiP, leilP, leil1: Math.round(v * leilP / 100), leil2: Math.round(v * 0.5 * leilP / 100), enc };
+    D2.base = cart + itbi + enc; D2.d1 = D2.base + D2.leil1; D2.d2 = D2.base + D2.leil2;
+  } else { const d = Math.round(v * 0.05); D2 = { d1: d, d2: d, base: d }; }
+  const desp = D2.d2;
   const tipo = a.calc_tipo || (a.af_contrato === 'homeequity' ? 'outro' : 'residencial');
   const resid = af && tipo === 'residencial';
-  const pat = Math.max(0, v - s), c1 = Math.max(0, v - s - desp), c2 = Math.max(0, 0.5 * v - s - desp);
-  // Lei 9.514/97, art. 27 (Lei 14.711/2023): fora do financiamento residencial a dívida não se extingue; na execução judicial o saldo também continua.
-  const resto = resid ? 0 : Math.max(0, Math.round(s + desp - 0.5 * v));
-  const ocupMes = af ? Math.round(v * 0.01) : 0, meses = af ? (Number(a.calc_ocup_meses) || 0) : 0;
+  const pat = Math.max(0, v - s), c1 = Math.max(0, v - s - D2.d1), c2 = Math.max(0, 0.5 * v - s - D2.d2);
+  // Lei 9.514/97, art. 27, § 5º-A (Lei 14.711/2023): fora do financiamento residencial a dívida não se extingue; na execução judicial o saldo também continua.
+  const resto = resid ? 0 : Math.max(0, Math.round(s + D2.d2 - 0.5 * v));
+  const perda2 = Math.round(pat - c2);
+  const ocupMes = af ? Math.round(v * 0.01) : 0, meses = af ? Number(a.calc_ocup_meses != null ? a.calc_ocup_meses : 6) || 0 : 0;
   const atraso = a.parcela && a.parcelas_atraso ? a.parcela * a.parcelas_atraso : null;
-  return { af, v, s, saldoEstimado: a.saldo_devedor == null, desp, tipo, resid, pat, c1, c2, resto, ocupMes, meses, ocup: ocupMes * meses, atraso, est };
+  const recompra = af ? Math.round(s + D2.base) : null;
+  return { af, v, s, saldoEstimado: a.saldo_devedor == null, desp, D2, tipo, resid, pat, c1, c2, perda2, resto, ocupMes, meses, ocup: ocupMes * meses, atraso, recompra, est };
 }
 
 function emJogo(a) {
@@ -247,7 +260,9 @@ function emJogo(a) {
   if (isDev(a)) {
     const C = calcDevedor(a);
     const vm = a.valor_mercado, sd = a.saldo_devedor != null ? a.saldo_devedor : (C && C.s != null ? C.s : null);
-    if (vm != null) {
+    if (C && C.perda2 != null && C.v) {
+      L.push({ k: C.c2 > 0 ? "Perda no 2º leilão: metade do valor do imóvel + despesas" : "Patrimônio do cliente no imóvel, perdido no leilão", v: C.perda2 }); total += C.perda2;
+    } else if (vm != null) {
       const patr = Math.max(0, vm - (sd || 0));
       L.push({ k: "Patrimônio do cliente no imóvel (valor − dívida)", v: patr }); total += patr;
     }
@@ -559,6 +574,7 @@ function textoResumo() {
   L.push("DIAGNÓSTICO FCE · " + new Date().toLocaleDateString("pt-BR"));
   L.push(resumoLinha(a)); L.push("Urgência: " + (bloqueado(a) ? "declinar" : u.txt));
   const QL = qualificacao(a); if (QL) { L.push(""); L.push("CLIENTE"); L.push(QL); }
+  const DE = textoDiagEf(a); if (DE) { L.push(""); L.push("DIAGNÓSTICO DA SITUAÇÃO"); L.push(DE); }
   L.push(""); L.push("FATOS");
   ETAPAS.forEach(e => Q.filter(q => q.e === e.id && visivel(q, a) && respondida(q, a)).forEach(q => L.push("- " + q.l + ": " + rotulo(q.id, a[q.id]))));
   const VF = vidaFin(a); if (VF.linhas.length || VF.servicos.length) { L.push(""); L.push("VIDA FINANCEIRA E OUTRAS FRENTES"); VF.linhas.forEach(x => L.push("- " + x)); VF.servicos.forEach(x => L.push("- Possível serviço: " + x.t + " (" + x.d + ")")); }
@@ -580,7 +596,7 @@ function textoResumo() {
 function contextoCaso() {
   const a = A(); const H = honorarios(a); const J = emJogo(a); const u = urgencia(a);
   const fatos = Q.filter(q => visivel(q, a) && respondida(q, a)).map(q => "- " + q.l + ": " + rotulo(q.id, a[q.id])).join("\n");
-  return "DATA DE HOJE: " + new Date().toLocaleDateString("pt-BR") + "\n\nFATOS COLETADOS:\n" + (fatos || "(nenhum)") + perfilCliIA(a) +
+  return "DATA DE HOJE: " + new Date().toLocaleDateString("pt-BR") + "\n\nFATOS COLETADOS:\n" + (fatos || "(nenhum)") + perfilCliIA(a) + (a.diag_obs ? "\n\nDIAGNÓSTICO DO DR. FÁBIO: " + String(a.diag_obs).slice(0, 1500) : "") +
     "\n\nPRAZOS: " + (prazos(a).map(p => p.nome + " em " + dataBR(p.data)).join("; ") || "nenhum") + "\nURGÊNCIA: " + u.txt +
     "\n\nPROVIDÊNCIAS JÁ SUGERIDAS PELO ROTEIRO:\n" + providencias(a).map(p => "- " + p.t).join("\n") +
     (() => { const C = calcDevedor(a); return C && C.pat != null ? "\n\nCALCULADORA DO DEVEDOR: valor do imóvel " + brl(C.v) + "; saldo devedor " + brl(C.s) + (C.saldoEstimado ? " (estimado)" : "") + "; patrimônio em risco " + brl(C.pat) + "; sobra no 1º leilão " + brl(C.c1) + "; sobra no 2º leilão " + brl(C.c2) + (C.resto ? "; dívida que continua após o leilão " + brl(C.resto) : "") + (C.est ? "; juros já pagos (estimativa) " + brl(C.est.juros) : "") : ""; })() +
@@ -837,6 +853,7 @@ function renderMain() {
     if (bloqueado(a) && et.id !== 'abertura') h += '<div class="dg-al crit"><b>Caso a declinar.</b> O escritório não atua em causas contra o Município de Novo Hamburgo. Encerre com cordialidade e sem indicar colega.</div>';
     if (foraPerfil(a) && et.id !== 'abertura') h += '<div class="dg-al warn"><b>Fora do perfil.</b> Acolha, anote o resumo e indique um colega da área.</div>';
     if (et.id === 'financeiro') { h += Q.filter((q) => q.e === et.id && visivel(q, a)).map(renderQuestion).join('') + renderFinVida(); main.innerHTML = cabecaEtapa(h, vis, idx); return; }
+    if (et.id === 'impacto' && a.area && !bloqueado(a) && !foraPerfil(a)) h += renderDiagEf();
     if (et.id === 'impacto' && isDev(a) && !bloqueado(a)) h += renderCalc();
     h += Q.filter((q) => q.e === et.id && visivel(q, a)).map(renderQuestion).join('') + (et.id === 'abertura' ? renderCli() : '');
     if (et.id === 'caso' && a.area) { const u = urgencia(a); if (u.nivel === 'crit' || u.nivel === 'alta') h += '<div class="dg-al ' + (u.nivel === 'crit' ? 'crit' : 'warn') + '"><b>' + esc(u.txt) + '</b>' + (u.prazo ? '<span class="pq">Data: ' + dataBR(u.prazo.data) + '</span>' : '') + '</div>'; }
@@ -1047,6 +1064,91 @@ async function responderObjecao(btn) {
   finally { if (document.body.contains(btn)) { btn.disabled = false; btn.innerHTML = orig; } }
 }
 
+// ---------- diagnóstico da situação (o que acontece, em ordem, com os números) ----------
+const quandoTxt = (iso) => { const d = diasAte(iso); if (d == null) return dataBR(iso); return dataBR(iso) + (d === 0 ? ' (hoje)' : d === 1 ? ' (amanhã)' : d > 1 ? ' (em ' + d + ' dias)' : d === -1 ? ' (ontem)' : ' (há ' + (-d) + ' dias)'); };
+function diagEf(a) {
+  const C = calcDevedor(a) || {}; const okC = C && C.v && C.s != null;
+  const hoje = [], passos = [], acoes = []; const P = (t, lei, cls) => passos.push({ t, lei: lei || '', cls: cls || '' });
+  if (a.area === 'af') {
+    const ordem = ['atraso', 'intimado', 'consolidado', 'leilao', 'arrematado', 'reintegracao']; const f = Math.max(0, ordem.indexOf(a.af_fase || 'atraso'));
+    const prazo = a.af_prazo_purga || (a.af_data_intim ? addDias(a.af_data_intim, 15) : null);
+    if (f === 0) hoje.push('O cliente está com parcelas atrasadas' + (a.parcelas_atraso ? ' (' + a.parcelas_atraso + ')' : '') + ' e ainda não recebeu a intimação do cartório.');
+    if (f === 1) hoje.push('O cliente foi intimado pelo cartório para pagar as parcelas atrasadas' + (prazo ? ' até ' + quandoTxt(prazo) : ' em 15 dias') + (a.af_valor_purga ? ', em um boleto de ' + brl(a.af_valor_purga) : '') + '.');
+    if (f === 2) hoje.push('O prazo para pagar passou e a propriedade já foi consolidada em nome do banco.');
+    if (f === 3) hoje.push('A propriedade está em nome do banco e o leilão está marcado' + (a.data_leilao1 ? ': 1º leilão em ' + quandoTxt(a.data_leilao1) : '') + (a.data_leilao2 ? '; 2º leilão em ' + quandoTxt(a.data_leilao2) : '') + '.');
+    if (f === 4) hoje.push('O imóvel já foi leiloado ou arrematado.');
+    if (f === 5) hoje.push('Já existe ação de reintegração ou desocupação contra o cliente.');
+    if (f <= 0) P('O banco pede ao cartório a intimação do cliente para pagar as parcelas atrasadas em 15 dias.', 'Lei 9.514/97, art. 26, § 1º');
+    if (f <= 1) P('Se não pagar' + (f === 1 && prazo ? ' até ' + dataBR(prazo) : ' no prazo') + ', o cartório averba a consolidação: o imóvel passa para o nome do banco. O banco recolhe o ITBI' + (okC && C.D2 ? ' (cerca de ' + brl(C.D2.itbi) + ')' : '') + ' e as custas' + (okC && C.D2 ? ' (cerca de ' + brl(C.D2.cart) + ')' : '') + ', que serão cobrados do cliente no acerto final.', 'art. 26, § 7º; art. 27, § 3º, II', f === 1 ? 'urg' : '');
+    if (f <= 2) P('A partir da consolidação corre a taxa de ocupação de 1% do valor do imóvel por mês' + (okC ? ' (' + brl(C.ocupMes) + '/mês)' : '') + ', até o cliente sair.', 'art. 37-A');
+    if (f <= 3) {
+      P('O banco faz o 1º leilão em até 60 dias da consolidação. O lance mínimo é o valor do imóvel' + (okC ? ' (' + brl(C.v) + ')' : '') + '. Se vender, o cliente recebe só o que sobrar depois da dívida e das despesas' + (okC ? ': ' + brl(C.c1) : '') + '.', 'art. 27, caput e § 1º');
+      P('Sem lance, vem o 2º leilão, que aceita lance de metade do valor de avaliação' + (okC ? ' (' + brl(C.v * 0.5) + ')' : '') + '. É uma perda de 50% do valor do imóvel, além das despesas: comissão do leiloeiro' + (okC && C.D2 ? ' de ' + C.D2.leilP + '%' : ' de 5% a 10%') + ', ITBI, custas de cartório' + (a.calc_encargos ? ', IPTU e condomínio' : '') + '.' + (okC ? ' Sobraria ao cliente ' + brl(C.c2) + '.' : ''), 'art. 27, §§ 2º e 3º');
+      P('Até a data do 2º leilão o cliente ainda pode recomprar o imóvel, pagando a dívida, as despesas e o ITBI' + (okC && C.recompra ? ' (cerca de ' + brl(C.recompra) + ')' : '') + '.', 'art. 27, § 2º-B', 'bom');
+      if (okC) P(C.resid ? 'Se ninguém der lance no 2º leilão, o banco fica com o imóvel e, no financiamento residencial, a dívida se extingue, mas o cliente perde tudo o que já investiu.' : 'Como o contrato não é de financiamento residencial, se o leilão não cobrir a dívida o cliente perde o imóvel e continua devendo' + (C.resto ? ' cerca de ' + brl(C.resto) : ' a diferença') + ', que o banco pode executar.', C.resid ? 'art. 26-A, § 4º' : 'art. 27, § 5º-A');
+    }
+    if (f <= 5) P('Depois do leilão, o arrematante ou o banco pede a reintegração de posse, com liminar para desocupar em 60 dias.', 'art. 30', f >= 4 ? 'urg' : '');
+    P('Ações depois da arrematação: discussões sobre o contrato ou sobre o procedimento de cobrança e leilão não impedem a reintegração de posse e se resolvem em perdas e danos. A exceção é a falta de intimação (notificação) do devedor: esse vício pode ser discutido para invalidar a consolidação e o leilão.', 'art. 30, parágrafo único');
+    if (okC) { acoes.push((f >= 4 ? 'Perda estimada se a arrematação foi pela metade do valor: ' : 'Perda estimada se o imóvel for arrematado no 2º leilão: ') + brl(C.perda2) + (C.resto ? ' + dívida que continua de ' + brl(C.resto) : '') + (C.ocup ? ' + taxa de ocupação de ' + brl(C.ocup) + ' (' + C.meses + ' meses)' : '') + '.'); }
+  } else if (a.area === 'exec') {
+    hoje.push('Execução judicial' + (a.ex_fase ? ': ' + rotulo('ex_fase', a.ex_fase).toLowerCase() : '') + '.');
+    P('Penhora e avaliação do imóvel por oficial de justiça ou perito.', 'CPC, arts. 831 e 870');
+    P('Leilão judicial: no 1º, lance pela avaliação; no 2º, aceita lance a partir de 50% da avaliação, salvo outro mínimo fixado pelo juiz.', 'CPC, art. 891, parágrafo único', 'urg');
+    P('Se o valor arrecadado não cobrir a dívida, a execução continua sobre outros bens.', 'CPC, art. 831');
+    if (a.ex_bem_familia === 'sim') P('Ponto de defesa: imóvel único de moradia da família pode ser impenhorável (bem de família).', 'Lei 8.009/90', 'bom');
+  } else if (a.area === 'veic') {
+    hoje.push('Busca e apreensão do veículo' + (a.v_fase ? ': ' + rotulo('v_fase', a.v_fase).toLowerCase() : '') + '.');
+    P('Liminar de busca e apreensão e entrega do veículo ao banco.', 'Decreto-Lei 911/69, art. 3º');
+    P('Em 5 dias da apreensão, o cliente pode pagar a dívida (parcelas vencidas e vincendas) para ter o veículo de volta; depois disso, o banco fica com a propriedade e pode vender.', 'art. 3º, §§ 1º e 2º', 'urg');
+    P('Prazo de 15 dias para contestar a ação.', 'art. 3º, § 3º');
+    P('O banco vende o veículo e, se a venda não cobrir a dívida, cobra a diferença do cliente.', 'art. 2º');
+  } else {
+    hoje.push(resumoLinha(a));
+  }
+  return { hoje, passos, acoes };
+}
+function textoDiagEf(a) {
+  if (!a.area || bloqueado(a) || foraPerfil(a)) return a.diag_obs ? String(a.diag_obs) : '';
+  const X = diagEf(a); const L = [];
+  if (X.hoje.length) L.push('Situação hoje: ' + X.hoje.join(' '));
+  if (X.passos.length) { L.push('O que acontece a seguir:'); X.passos.forEach((p, i) => L.push((i + 1) + '. ' + p.t + (p.lei ? ' (' + p.lei + ')' : ''))); }
+  X.acoes.forEach((t) => L.push(t));
+  if (a.diag_obs) { L.push('Diagnóstico do advogado: ' + a.diag_obs); }
+  return L.join('\n');
+}
+function renderDiagEf() {
+  const a = A(); const X = diagEf(a);
+  let h = '<section class="card dg-c dg-sit" id="dgDiagEf" aria-labelledby="dgDiagEfT"><div style="display:grid;gap:3px"><span class="dg-eye" style="color:var(--gold)">Diagnóstico da situação</span><h3 id="dgDiagEfT" style="margin:0">O que está acontecendo e o que vem depois</h3></div>';
+  h += '<div id="dgDiagAuto" style="display:grid;gap:10px">' + diagAutoHTML(X) + '</div>';
+  return h + diagObsHTML(a);
+}
+function diagAutoHTML(X) {
+  let h = '';
+  if (X.hoje.length) h += '<p class="de-hoje">' + esc(X.hoje.join(' ')) + '</p>';
+  if (X.passos.length) h += '<ol class="de-passos">' + X.passos.map((p) => '<li class="' + p.cls + '"><span>' + esc(p.t) + '</span>' + (p.lei ? '<small>' + esc(p.lei) + '</small>' : '') + '</li>').join('') + '</ol>';
+  if (X.acoes.length) h += X.acoes.map((t) => '<div class="dg-al crit"><b>' + esc(t) + '</b></div>').join('');
+  return h;
+}
+function diagObsHTML(a) {
+  return '<label class="dc-f" for="diagObs"><span>Diagnóstico do Dr. Fábio (o que só a consulta revelou)</span><textarea class="inp" id="diagObs" rows="4" placeholder="Ex.: boleto de purgação vence amanhã; cliente consegue pagar R$ 8 mil até sexta; intimação recebida pelo porteiro, sem assinatura do cliente.">' + esc(a.diag_obs || '') + '</textarea></label>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="btnDiagCopiar">Copiar diagnóstico</button></div>' +
+    '<p class="dg-hint" style="margin:0">Texto montado com as respostas e a calculadora; atualiza sozinho. Explica riscos, não promete resultado.</p></section>';
+}
+document.addEventListener('input', (ev) => { if (D && ev.target && ev.target.id === 'diagObs') { const a = A(); if (ev.target.value.trim()) a.diag_obs = ev.target.value; else delete a.diag_obs; marcarSujo(); } });
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest && ev.target.closest('#btnDiagCopiar'); if (!b || !D) return;
+  const t = textoDiagEf(A()); if (!t) { toast('Preencha a situação do cliente primeiro.'); return; }
+  try { await navigator.clipboard.writeText(t); toast('Diagnóstico copiado.'); } catch (e) { toast('Não consegui copiar. Use o resumo do atendimento.'); }
+});
+(function cssDiagEf() {
+  if (document.getElementById('dg-css-de')) return;
+  const st = document.createElement('style'); st.id = 'dg-css-de';
+  st.textContent = '.dg-sit{border-color:color-mix(in srgb,var(--line-2) 40%,var(--gold))}.de-hoje{margin:0;font:17px/1.45 var(--serif)}' +
+    '.de-passos{margin:0;padding-left:22px;display:grid;gap:8px}.de-passos li{font-size:14.5px;line-height:1.45}.de-passos li span{display:block}.de-passos li small{color:var(--mut);font-size:12px}' +
+    '.de-passos li.urg::marker{color:var(--bad);font-weight:700}.de-passos li.urg span{font-weight:600}.de-passos li.bom::marker{color:var(--ok);font-weight:700}';
+  document.head.appendChild(st);
+})();
+
 // ---------- vida financeira e outras frentes ----------
 const SERV_FIN = {
   veiculo: (a) => ({ t: a.fin_veic_atraso === 'notificado' ? 'Defesa na busca e apreensão do veículo' : 'Revisão do financiamento do veículo', d: a.fin_veic_atraso === 'notificado' ? 'urgente: prazo de 5 dias para pagar e 15 para contestar após a apreensão' : 'juros acima da média do Banco Central, seguros e tarifas embutidas' }),
@@ -1241,7 +1343,7 @@ function campoCalc(id, rot, tipo, extra, padrao) {
   const a = A(); const v = a[id];
   if (tipo === 'money') return '<label class="dc-f"><span>' + rot + '</span><div class="money"><input class="inp" data-q="' + id + '" data-dc="1" inputmode="decimal" placeholder="0" value="' + esc(fmtMoneyInput(v)) + '"></div></label>';
   if (tipo === 'number') return '<label class="dc-f"><span>' + rot + '</span><input class="inp" data-q="' + id + '" data-dc="1" inputmode="numeric" value="' + esc(v ?? '') + '"></label>';
-  if (tipo === 'cmoney') return '<label class="dc-f"><span>' + rot + '</span><div class="money"><input class="inp" data-calc="' + id + '" data-tp="money" inputmode="decimal" placeholder="0" value="' + esc(fmtMoneyInput(v)) + '"></div></label>';
+  if (tipo === 'cmoney') return '<label class="dc-f"><span>' + rot + '</span><div class="money"><input class="inp" data-calc="' + id + '" data-tp="money" inputmode="decimal" placeholder="' + esc(extra || '0') + '" value="' + esc(fmtMoneyInput(v)) + '"></div></label>';
   if (tipo === 'cnum') return '<label class="dc-f"><span>' + rot + '</span><input class="inp" data-calc="' + id + '" data-tp="num" inputmode="numeric" placeholder="' + esc(extra || '') + '" value="' + esc(v ?? '') + '"></label>';
   if (tipo === 'csel') return '<label class="dc-f"><span>' + rot + '</span><select class="sel" data-calc="' + id + '" data-tp="sel">' + extra.map(([k, t]) => '<option value="' + k + '"' + (String(v ?? padrao ?? '') === String(k) ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></label>';
   return '';
@@ -1253,7 +1355,12 @@ function renderCalc() {
     '<div class="dc-campos">' + campoCalc('valor_mercado', a.area === 'exec' && a.ex_avaliacao ? 'Valor de mercado (a avaliação judicial é usada nos leilões)' : 'Valor do imóvel hoje', 'money') + campoCalc('saldo_devedor', 'Saldo devedor', 'money') +
     (af ? campoCalc('parcela', 'Parcela mensal', 'money') + campoCalc('parcelas_atraso', 'Parcelas atrasadas', 'number') +
       campoCalc('calc_tipo', 'Tipo de contrato', 'csel', [['residencial', 'Financiamento residencial'], ['outro', 'Não residencial (garantia de empréstimo, comercial)']], tipoPad) +
-      campoCalc('calc_ocup_meses', 'Meses até desocupar (taxa de ocupação)', 'csel', [['0', 'Não incluir'], ['6', '6 meses'], ['12', '12 meses'], ['24', '24 meses']]) : '') + '</div>';
+      campoCalc('calc_ocup_meses', 'Meses até desocupar (taxa de ocupação de 1% ao mês)', 'csel', [['0', 'Não incluir'], ['3', '3 meses'], ['6', '6 meses'], ['12', '12 meses'], ['24', '24 meses']], '6') : '') + '</div>';
+  if (af) h += '<div style="display:grid;gap:6px"><span class="dg-eye">Despesas cobradas do cliente no acerto</span><div class="dc-campos">' +
+    campoCalc('calc_itbi', 'ITBI da consolidação', 'csel', [['2', '2%'], ['2.5', '2,5%'], ['3', '3%'], ['4', '4%']], '3') +
+    campoCalc('calc_leiloeiro', 'Comissão do leiloeiro', 'csel', [['5', '5%'], ['6', '6%'], ['8', '8%'], ['10', '10%']], '5') +
+    campoCalc('calc_cartorio', 'Custas de intimação e consolidação', 'cmoney', 'estimativa automática') +
+    campoCalc('calc_encargos', 'IPTU e condomínio em atraso', 'cmoney') + '</div><p class="dg-hint" style="margin:0">Confira a alíquota do ITBI do município e as custas no cartório. Sem custas informadas, usamos 0,5% do valor (mínimo R$ 2.000).</p></div>';
   if (af) h += '<details class="dc-det"' + (a.calc_preco ? ' open' : '') + '><summary>Estimar juros pagos e saldo pelo contrato (opcional)</summary><div class="dc-campos" style="padding-bottom:12px">' +
     campoCalc('calc_preco', 'Valor do imóvel na compra', 'cmoney') + campoCalc('calc_entrada', 'Entrada', 'cmoney') + campoCalc('calc_mes', 'Mês do contrato (1 a 12)', 'cnum', 'ex.: 5') + campoCalc('calc_ano', 'Ano do contrato', 'cnum', 'ex.: 2019') +
     campoCalc('calc_prazo', 'Prazo (anos)', 'cnum', 'ex.: 30') + campoCalc('calc_sistema', 'Sistema', 'csel', [['SAC', 'SAC'], ['PRICE', 'Price']]) + '</div></details>';
@@ -1269,12 +1376,19 @@ function calcOut() {
   let h = '<div class="dc-res"><div class="dc-prej"><span class="dg-eye">Prejuízo se o imóvel for a leilão</span><div class="dg-big" style="color:var(--bad)">' + brl(J.total) + '</div>' +
     J.linhas.filter((l) => !l.info).map((l) => '<div class="dg-l"><span>' + esc(l.k) + '</span><span class="num">' + brl(l.v) + '</span></div>').join('') + '</div>';
   h += '<div class="dc-barra" aria-hidden="true"><div class="b-div" style="width:' + pD + '%">' + (pD > 18 ? brl(C.s) : '') + '</div><div class="b-desp" style="width:' + pE + '%"></div><div class="b-pat" style="width:' + pP + '%">' + (pP > 18 ? brl(C.pat) : '') + '</div></div>' +
-    '<div class="dc-leg pp mut"><span><i class="b-div"></i>Dívida' + (C.saldoEstimado ? ' (estimada)' : '') + '</span><span><i class="b-desp"></i>Despesas do leilão (~5%)</span><span><i class="b-pat"></i>Patrimônio do cliente</span></div>';
+    '<div class="dc-leg pp mut"><span><i class="b-div"></i>Dívida' + (C.saldoEstimado ? ' (estimada)' : '') + '</span><span><i class="b-desp"></i>' + (C.af ? 'Despesas (ITBI, cartório, leiloeiro)' : 'Despesas do leilão (~5%)') + '</span><span><i class="b-pat"></i>Patrimônio do cliente</span></div>';
   h += '<div class="dc-cen">' +
     '<div class="dc-c"><small>' + (C.af ? '1º leilão' : '1º leilão (pela avaliação)') + '</small><b>' + brl(C.c1) + '</b><span>volta ao cliente se o imóvel for vendido pelo valor de mercado</span></div>' +
     '<div class="dc-c"><small>2º leilão</small><b>' + brl(C.c2) + '</b><span>volta ao cliente se o lance for pela metade do valor</span></div>' +
     '<div class="dc-c ruim"><small>' + (C.af ? 'Banco fica com o imóvel' : 'Leilão sem sobra') + '</small><b>' + (C.resto ? '− ' + brl(C.resto) : 'R$ 0') + '</b><span>' + (C.resto ? 'perde o imóvel e ainda continua devendo' : 'perde o imóvel e o patrimônio construído') + '</span></div></div>';
+  if (C.af) { const D2 = C.D2;
+    h += '<details class="dc-det"><summary>Despesas cobradas do cliente: ' + brl(D2.d2) + ' no 2º leilão</summary><div style="display:grid;gap:4px;padding-bottom:10px">' +
+      [['Custas de intimação e consolidação' + (D2.cartEst ? ' (estimativa)' : ''), D2.cart], ['ITBI da consolidação (' + String(D2.itbiP).replace('.', ',') + '%)', D2.itbi], ['Comissão do leiloeiro (' + D2.leilP + '%) no 1º leilão', D2.leil1], ['Comissão do leiloeiro (' + D2.leilP + '%) no 2º leilão', D2.leil2], ['IPTU e condomínio em atraso', D2.enc]]
+        .filter(([, x]) => x).map(([k, x]) => '<div class="dg-l"><span>' + esc(k) + '</span><span class="num">' + brl(x) + '</span></div>').join('') +
+      '<div class="dg-l"><span>Taxa de ocupação (1% do valor ao mês, art. 37-A)</span><span class="num">' + brl(C.ocupMes) + '/mês</span></div>' +
+      '<p class="dg-hint" style="margin:0">Lei 9.514/97, art. 27, § 3º, II: as despesas de intimação, consolidação e leilão, inclusive a comissão do leiloeiro, saem do valor que voltaria ao cliente.</p></div></details>'; }
   const ex = [];
+  if (C.af && C.recompra) ex.push('Para recomprar o imóvel até o 2º leilão (direito de preferência, art. 27, § 2º-B): cerca de <b>' + brl(C.recompra) + '</b> (dívida + despesas + ITBI).');
   if (C.af) ex.push('Taxa de ocupação depois da consolidação: <b>' + brl(C.ocupMes) + '/mês</b> (6 meses: ' + brl(C.ocupMes * 6) + '; 12 meses: ' + brl(C.ocupMes * 12) + ').');
   if (C.atraso) ex.push('Parcelas em atraso somam cerca de <b>' + brl(C.atraso) + '</b>.');
   if (C.est) ex.push('Estimativa do contrato (' + C.est.aa.toFixed(2).replace('.', ',') + '% a.a., média do Banco Central em ' + a.calc_ano + '): já pagou cerca de <b>' + brl(C.est.pago) + '</b>, dos quais <b>' + brl(C.est.juros) + '</b> foram juros; saldo estimado de ' + brl(C.est.saldo) + '.');
@@ -1287,7 +1401,7 @@ function calcOut() {
   }
   return h + '</div>';
 }
-function atualizaCalc() { const o = q$('#dgCalcOut'); if (o) o.innerHTML = calcOut(); renderTop(); }
+function atualizaCalc() { const o = q$('#dgCalcOut'); if (o) o.innerHTML = calcOut(); const d = q$('#dgDiagAuto'); if (d && D) d.innerHTML = diagAutoHTML(diagEf(A())); renderTop(); }
 (function cssCalc() {
   if (document.getElementById('dg-css-calc')) return;
   const st = document.createElement('style'); st.id = 'dg-css-calc';
