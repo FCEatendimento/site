@@ -1747,8 +1747,8 @@ const ABAS = {
     }
     if (!c.conversa_id) return h;
     h += '<div class="card resp-box"><div class="resp-st ' + (humano ? 'warn' : 'ok') + '">' + ic(humano ? 'pessoa' : 'chat', 's') + '<span>' +
-      (humano ? '<b>Você está atendendo.</b> A Helena está pausada nesta conversa.' : '<b>A Helena está atendendo.</b> Para conduzir sem aparecer, use <b>Orientar a Helena</b>: o cliente não vê. Se você escrever no campo abaixo, a mensagem vai para o cliente e você assume a conversa.') + '</span>' +
-      '<span style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">' + (humano ? '<button class="btn sm pri" id="bDevolver">' + ic('voltar', 's') + ' Devolver para a Helena</button>' : '<button class="btn sm pri" id="bOrientar">' + ic('estrela', 's') + ' Orientar a Helena</button>') + '<button class="btn sm fant" id="bLicoes">Lições</button></span></div>' +
+      (humano ? '<b>Você está atendendo.</b> A Helena está pausada nesta conversa.' : '<b>A Helena está atendendo.</b> Para conduzir sem aparecer, use <b>Orientar a Helena</b>: o cliente não vê. Para atender você mesmo, toque em <b>Assumir a conversa</b> (a Helena para na hora, sem avisar o cliente) ou escreva no campo abaixo.') + '</span>' +
+      '<span style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">' + (humano ? '<button class="btn sm pri" id="bDevolver">' + ic('voltar', 's') + ' Devolver para a Helena</button>' : '<button class="btn sm pri" id="bAssumir">' + ic('pessoa', 's') + ' Assumir a conversa</button><button class="btn sm" id="bOrientar">' + ic('estrela', 's') + ' Orientar a Helena</button>') + '<button class="btn sm fant" id="bLicoes">Lições</button></span></div>' +
       (janela ? '<textarea class="inp" id="msgTxt" rows="3" placeholder="Escreva para o cliente. A mensagem sai pelo WhatsApp do escritório."></textarea>' +
         '<div class="resp-rod"><span class="pp mut">Janela do WhatsApp aberta até ' + esc(fmtD(new Date(ultIn + 24 * 3600e3), { weekday: 'short', hour: '2-digit', minute: '2-digit' })) + '</span><button class="btn pri" id="bEnviarMsg">' + ic('zap', 's') + ' Enviar</button></div>'
         : '<p class="pq mut" style="margin:10px 2px 2px">' + ic('alerta', 's') + ' O WhatsApp só permite mensagem livre até 24 horas depois da última mensagem do cliente, e essa janela está fechada. Quando o cliente escrever de novo, o campo para responder aparece aqui' + (humano ? '; ou devolva a conversa para a Helena.' : '.') + '</p>') +
@@ -1850,6 +1850,13 @@ function ligarAba(k, c) {
         }
       }
       await agir(be, () => api('responder', { id: c.id, texto: t }), 'Mensagem enviada ao cliente');
+      S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
+    };
+    const bas = $('#bAssumir');
+    if (bas) bas.onclick = async () => {
+      if (!(await confirmar('Assumir a conversa', 'A Helena para de responder este cliente agora, e o cliente não recebe nenhum aviso. A conversa fica com você até você tocar em “Devolver para a Helena”.' + (ultIn && Date.now() - new Date(ultIn).getTime() < 24 * 3600e3 ? '' : ' A janela de 24 horas do WhatsApp está fechada: você só consegue escrever quando o cliente mandar mensagem de novo.'), 'Assumir'))) return;
+      let r; try { r = await agir(bas, () => api('assumir', { id: c.id })); } catch (e) { return; }
+      toast((r && r.mensagem) || 'Você assumiu a conversa. A Helena está pausada com este cliente.');
       S.abaCaso = 'conversa'; S.cache = {}; VIEWS.caso(c.id, true);
     };
     const bo = $('#bOrientar');
