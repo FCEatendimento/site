@@ -1073,7 +1073,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['atendimentos', 'Atendimentos', 'zap'], ['cadastros', 'Cadastros', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['marketing', 'Marketing', 'mega'], ['indicadores', 'Indicadores', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['diagnostico', 'Diagnóstico', 'lista'], ['cursos', 'Cursos', 'estrela']
+  ['inicio', 'Início', 'home'], ['atendimentos', 'Atendimentos', 'zap'], ['cadastros', 'Cadastros', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['marketing', 'Marketing', 'mega'], ['indicadores', 'Indicadores', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['diagnostico', 'Diagnóstico', 'lista'], ['teses', 'Teses', 'balanca'], ['cursos', 'Cursos', 'estrela']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -1100,8 +1100,10 @@ async function rota(forcar) {
   if (!S.token) return telaLogin();
   const h = location.hash.replace(/^#\/?/, '') || 'inicio';
   const [nome, arg] = h.split('?')[0].split('/');
+  // aba de um módulo que ainda está carregando (diagnostico.js, teses.js): espera a página terminar de carregar
+  if (!VIEWS[nome] && nome && document.readyState !== 'complete') { window.addEventListener('load', () => { if (rotaAtual !== (location.hash.replace(/^#\/?/, '') || 'inicio')) rota(forcar); }, { once: true }); return; }
   const k = VIEWS[nome] ? nome : 'inicio';
-  const MAIS_NAV = [], MAIS_TAB = ['casos', 'diagnostico', 'cursos', 'noticias'].concat(['aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
+  const MAIS_NAV = [], MAIS_TAB = ['casos', 'diagnostico', 'teses', 'cursos', 'noticias'].concat(['aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
   const GRUPO = { despesas: 'financeiro', redes: 'marketing', conteudo: 'marketing', processo: 'processos', whatsapp: 'atendimentos', analise: 'atendimentos', clientes: 'atendimentos' };
   $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || GRUPO[k] === a.dataset.k || (a.dataset.k === 'mais' && (a.closest('.tabbar') ? MAIS_TAB : MAIS_NAV).includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
@@ -2257,6 +2259,7 @@ VIEWS.mais = async () => {
     '<a class="item" href="#/redes"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Anúncios e posts para aprovar, Google Ads e calendário de conteúdo</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/casos"><div class="ic-circ nav">' + ic('casos', 's') + '</div><div class="mid"><div class="t">Todos os casos</div><div class="d">Lista e quadro por etapa, inclusive encerrados</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/teses"><div class="ic-circ ouro">' + ic('balanca', 's') + '</div><div class="mid"><div class="t">Teses</div><div class="d">Defesas, ações e estratégias por situação do devedor</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/diagnostico"><div class="ic-circ ouro">' + ic('balanca', 's') + '</div><div class="mid"><div class="t">Diagnóstico</div><div class="d">Roteiro da consulta: perguntas, providências, honorário e objeções</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/financeiro"><div class="ic-circ ok">' + ic('din', 's') + '</div><div class="mid"><div class="t">Financeiro</div><div class="d">Recebimentos, contratos, honorários e despesas</div></div>' + ic('seta', 's') + '</a>' +
     '<div class="card lista" style="margin-top:14px"><button class="item" id="mTema" style="width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer"><div class="ic-circ">' + ic('lua', 's') + '</div><div class="mid"><div class="t">Tema claro ou escuro</div></div></button>' +
@@ -2801,7 +2804,7 @@ VIEWS.cadastros = async (_, forcar) => {
 }
 
 // ---------- fundo de cada aba: fotos do prédio, desfocadas (só no app interno) ----------
-const FUNDOS = { inicio: 'predio', atendimentos: 'recepcao', whatsapp: 'recepcao', analise: 'biblioteca', clientes: 'saguao', cadastros: 'saguao', agenda: 'vista', aprovacoes: 'elevadores', processos: 'biblioteca', processo: 'biblioteca',
+const FUNDOS = { inicio: 'predio', teses: 'biblioteca', atendimentos: 'recepcao', whatsapp: 'recepcao', analise: 'biblioteca', clientes: 'saguao', cadastros: 'saguao', agenda: 'vista', aprovacoes: 'elevadores', processos: 'biblioteca', processo: 'biblioteca',
   marketing: 'lounge', redes: 'lounge', conteudo: 'lounge', indicadores: 'lounge2', financeiro: 'balcao', despesas: 'balcao', caso: 'catracas', casos: 'catracas', diagnostico: 'biblioteca', mais: 'predio' };
 function trocarFundo() {
   const k = (location.hash.replace(/^#\/?/, '').split(/[/?]/)[0]) || 'inicio';
@@ -3475,6 +3478,7 @@ async function calendarioPrazos(el, forcar) {
 }
 </script>
 <script src="diagnostico.js?v=6"></script>
+<script src="teses.js?v=1"></script>
 <script>
 /* Efeito 3D: inclinação leve dos indicadores ao passar o mouse */
 (function(){if(matchMedia('(prefers-reduced-motion: reduce)').matches||!matchMedia('(hover:hover)').matches)return;
