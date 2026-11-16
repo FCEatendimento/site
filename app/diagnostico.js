@@ -769,6 +769,7 @@ async function abrir(arg, forcar) {
     nd.A = deHelena(nd.caso); nd.helena = Object.keys(nd.A).filter((k) => k !== 'consulta_paga'); nd.etapa = 'situacao';
   }
   D = nd;
+  if (nd.caso_id) setTimeout(() => puxarCadastro(nd), 0);
 }
 
 // ---------- salvar ----------
@@ -1149,6 +1150,47 @@ document.addEventListener('click', async (ev) => {
   document.head.appendChild(st);
 })();
 
+// ---------- ligação com o cadastro do cliente (aba Cadastros) ----------
+const CIV_CAD = { solteiro: 'Solteiro(a)', casado: 'Casado(a)', uniao: 'União estável', divorciado: 'Divorciado(a)', separado: 'Separado(a)', viuvo: 'Viúvo(a)' };
+const REG_CAD = { parcial: 'Comunhão parcial', universal: 'Comunhão universal', separacao: 'Separação total', participacao: 'Participação final nos aquestos' };
+const MAP_CAD = [['cpf', 'cpf'], ['rg', 'rg'], ['nasc', 'nascimento'], ['nacionalidade', 'nacionalidade'], ['profissao', 'profissao'], ['conjuge', 'conjuge_nome'], ['conjuge_cpf', 'conjuge_cpf'], ['tel', 'telefone'], ['email', 'email'], ['cep', 'cep'], ['rua', 'endereco'], ['numero', 'numero'], ['compl', 'complemento'], ['bairro', 'bairro'], ['cidade', 'cidade'], ['uf', 'uf']];
+const invMap = (o, v) => (Object.entries(o).find(([, t]) => t === v) || [])[0];
+async function puxarCadastro(meu) {
+  if (!meu || !meu.caso_id) return;
+  let d; try { d = await api('cadastro', { caso_id: meu.caso_id }); } catch (e) { return; }
+  if (D !== meu || !d || !d.cliente) return;
+  const cl = d.cliente, cad = cl.cadastro || {}, a = meu.A; const c = a.cli && typeof a.cli === 'object' ? a.cli : (a.cli = {});
+  const src = Object.assign({}, cad, { cpf: cl.cpf, email: cl.email, telefone: cl.telefone }); let mudou = false;
+  MAP_CAD.forEach(([k, kc]) => { const v = src[kc]; if (v && !c[k]) { c[k] = k === 'cpf' || k === 'conjuge_cpf' ? fmtCPF(v) : k === 'tel' ? fmtTel(v) : k === 'cep' ? fmtCEP(v) : String(v); mudou = true; } });
+  if (cad.orgao_rg && c.rg && !c.rg.includes(cad.orgao_rg)) { c.rg += ' ' + cad.orgao_rg; }
+  if (!c.civil && invMap(CIV_CAD, cad.estado_civil)) { c.civil = invMap(CIV_CAD, cad.estado_civil); mudou = true; }
+  if (!c.regime && invMap(REG_CAD, cad.regime_bens)) { c.regime = invMap(REG_CAD, cad.regime_bens); mudou = true; }
+  if (!a.nome && cl.nome) { a.nome = cl.nome; mudou = true; }
+  meu._cadBase = d;
+  if (mudou && D.etapa === 'abertura') { const box = q$('#dgCli'); if (box && !(document.activeElement && box.contains(document.activeElement))) box.outerHTML = renderCli(); }
+}
+async function salvarNoCadastro(btn) {
+  if (!D || !D.caso_id) return; const meu = D, a = A(), c = cliDe(a);
+  if (c.cpf && !cpfValido(c.cpf)) { toast('Confira o CPF antes de salvar no cadastro.', true); return; }
+  const orig = btn.innerHTML; btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    const d = await api('cadastro', { caso_id: D.caso_id }); const cl = (d && d.cliente) || {};
+    const dd = Object.assign({}, cl.cadastro || {}, { nome: cl.nome || '', cpf: cl.cpf || '', cnpj: cl.cnpj || '', email: cl.email || '', telefone: cl.telefone || '' });
+    if (a.nome) dd.nome = a.nome;
+    MAP_CAD.forEach(([k, kc]) => { if (c[k]) dd[kc] = String(c[k]); });
+    if (c.civil && CIV_CAD[c.civil]) dd.estado_civil = CIV_CAD[c.civil];
+    if (c.regime && REG_CAD[c.regime]) dd.regime_bens = REG_CAD[c.regime];
+    const bem = c.bem_local === 'nao' && c.bem_end ? 'Imóvel em discussão: ' + c.bem_end : ''; const mat = c.bem_matricula ? 'Matrícula: ' + c.bem_matricula : '';
+    [bem, mat].filter(Boolean).forEach((t) => { if (!String(dd.obs || '').includes(t)) dd.obs = (dd.obs ? dd.obs + '\n' : '') + t; });
+    if (!dd.nome) throw new Error('Informe o nome do cliente.');
+    await api('cadastro_salvar', { caso_id: D.caso_id, dados: dd });
+    try { delete S.cache['cad:' + D.caso_id]; delete S.cache.cadastros; } catch (e) {}
+    toast('Cadastro do cliente atualizado.');
+  } catch (e) { toast(e.message || 'Não deu para salvar no cadastro.', true); }
+  finally { if (document.body.contains(btn)) { btn.disabled = false; btn.innerHTML = orig; } }
+}
+document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('#btnCliCad'); if (b && D) salvarNoCadastro(b); });
+
 // ---------- vida financeira e outras frentes ----------
 const SERV_FIN = {
   veiculo: (a) => ({ t: a.fin_veic_atraso === 'notificado' ? 'Defesa na busca e apreensão do veículo' : 'Revisão do financiamento do veículo', d: a.fin_veic_atraso === 'notificado' ? 'urgente: prazo de 5 dias para pagar e 15 para contestar após a apreensão' : 'juros acima da média do Banco Central, seguros e tarifas embutidas' }),
@@ -1267,14 +1309,14 @@ function avisoCli(f, v, c) {
 function renderCli() {
   const c = cliDe(A()); const st = cliStatus(c);
   let h = '<section class="card dg-c dg-cli" id="dgCli" aria-labelledby="dgCliT"><div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><h3 id="dgCliT" style="margin:0">Identificação do cliente</h3><span class="pq mut" id="cliCont">' + st.ok + ' de ' + st.total + ' campos</span></div>' +
-    '<p class="dg-hint" style="margin:0">Dados para procuração, contrato e petição. Pode completar no fim da consulta; não são enviados à IA (ela recebe só cidade, idade, estado civil e profissão).</p>';
+    '<p class="dg-hint" style="margin:0">Dados para procuração, contrato e petição. Pode completar no fim da consulta; não são enviados à IA (ela recebe só cidade, idade, estado civil e profissão).' + (D && D.caso_id ? ' O que já está no cadastro do cliente aparece aqui; use “Salvar no cadastro” para levar o que mudou.' : '') + '</p>';
   let grupo = null;
   CLI.filter((f) => !f.show || f.show(c)).forEach((f) => {
     if (f.g) { if (grupo) h += '</div></fieldset>'; grupo = f.g; h += '<fieldset class="cli-g"><legend>' + esc(f.g) + '</legend><div class="dc-campos">'; }
     h += campoCli(f, c);
   });
   h += '</div></fieldset>';
-  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" type="button" id="btnQualif">Copiar qualificação</button><span class="pq mut" id="cliFalta">' + (st.falta.length ? 'Falta para a procuração: ' + esc(st.falta.join(', ')) : 'Pronto para a procuração.') + '</span></div></section>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" type="button" id="btnQualif">Copiar qualificação</button>' + (D && D.caso_id ? '<button class="btn sm pri" type="button" id="btnCliCad">Salvar no cadastro do cliente</button>' : '') + '<span class="pq mut" id="cliFalta">' + (st.falta.length ? 'Falta para a procuração: ' + esc(st.falta.join(', ')) : 'Pronto para a procuração.') + '</span></div></section>';
   return h;
 }
 function qualificacao(a) {
