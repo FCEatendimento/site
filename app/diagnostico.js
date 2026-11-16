@@ -32,9 +32,11 @@ const ETAPAS = [
   { id: "abertura", nome: "Abertura", fala: "Obrigado pela confiança. Nos próximos minutos eu vou entender a sua situação com calma, te explicar o que pode acontecer e quais caminhos existem. No final, você sai daqui sabendo exatamente o que fazer. Posso te fazer algumas perguntas?" },
   { id: "situacao", nome: "Situação", fala: "Me conta com as suas palavras: o que está acontecendo e o que te fez procurar a gente agora?" },
   { id: "caso", nome: "Diagnóstico", fala: "Agora eu preciso de alguns detalhes técnicos. São eles que mostram onde estão as falhas do procedimento e o que ainda dá para fazer." },
+  { id: "defesas", nome: "Defesas (IA)", fala: "Agora eu vou te fazer algumas perguntas mais específicas. Cada detalhe pode abrir uma defesa diferente, então vale a pena pensar com calma antes de responder." },
   { id: "impacto", nome: "Impacto", fala: "Vamos pensar juntos no que acontece se nada for feito. Não é para assustar, é para a gente decidir com os pés no chão." },
   { id: "financeiro", nome: "Finanças", fala: "Para eu montar um plano que caiba na sua realidade, preciso entender um pouco da sua situação financeira. Fica só entre nós." },
   { id: "decisao", nome: "Decisão", fala: "Antes de eu te mostrar o caminho, duas perguntas rápidas sobre como você costuma tomar esse tipo de decisão." },
+  { id: "solucoes", nome: "Soluções", fala: "" },
   { id: "proposta", nome: "Proposta", fala: "" }
 ];
 
@@ -197,14 +199,51 @@ function urgencia(a) {
   return { nivel: "neutro", txt: "Sem prazo informado", curto: "Sem prazo", prazo: null };
 }
 
+// ---------- calculadora do devedor (mesma lógica da calculadora do site) ----------
+// Taxa média anual do financiamento imobiliário (Banco Central, SGS 20774, % a.a.)
+const TAXA_HAB = { 2011: 10.39, 2012: 8.49, 2013: 8.12, 2014: 9.37, 2015: 10.11, 2016: 10.86, 2017: 9.10, 2018: 8.02, 2019: 7.74, 2020: 7.17, 2021: 7.16, 2022: 9.87, 2023: 10.41, 2024: 9.43, 2025: 10.57, 2026: 11.17 };
+const taxaHab = (y) => TAXA_HAB[y] || (y < 2011 ? TAXA_HAB[2011] : TAXA_HAB[2026]);
+function simFin(F, n, aa, sis, pagas) {
+  const i = Math.pow(1 + aa / 100, 1 / 12) - 1; let saldo = F, jur = 0, amo = 0, pago = 0; const Am = F / n, P = i > 0 ? F * i / (1 - Math.pow(1 + i, -n)) : F / n;
+  for (let k = 1; k <= n; k++) { const j = saldo * i, am = sis === 'PRICE' ? P - j : Am; if (k <= pagas) { jur += j; amo += am; pago += j + am; } saldo -= am; }
+  return { juros: jur, amort: amo, pago, saldo: Math.max(0, F - amo) };
+}
+function calcDevedor(a) {
+  if (!isDev(a)) return null;
+  const af = a.area === 'af';
+  const v = a.area === 'exec' && a.ex_avaliacao ? a.ex_avaliacao : a.valor_mercado;
+  let est = null;
+  if (af && a.calc_preco && a.calc_ano && a.calc_prazo) {
+    const hoje = new Date(), mes = a.calc_mes || 1, F = Math.max(0, a.calc_preco - (a.calc_entrada || 0)), n = a.calc_prazo * 12;
+    const dec = (hoje.getFullYear() - a.calc_ano) * 12 + (hoje.getMonth() + 1 - mes);
+    if (F > 0 && dec > 0) { const pagas = Math.max(0, Math.min(n, dec - (a.parcelas_atraso || 0))), aa = taxaHab(a.calc_ano), r = simFin(F, n, aa, a.calc_sistema || 'SAC', pagas);
+      est = { F, n, pagas, aa, juros: Math.round(r.juros), amort: Math.round(r.amort), pago: Math.round((a.calc_entrada || 0) + r.pago), saldo: Math.round(r.saldo) }; }
+  }
+  if (!v) return { falta: 'valor', est };
+  const s = a.saldo_devedor != null ? a.saldo_devedor : (est ? est.saldo : null);
+  if (s == null) return { falta: 'saldo', v, est };
+  const desp = Math.round(v * 0.05);
+  const tipo = a.calc_tipo || (a.af_contrato === 'homeequity' ? 'outro' : 'residencial');
+  const resid = af && tipo === 'residencial';
+  const pat = Math.max(0, v - s), c1 = Math.max(0, v - s - desp), c2 = Math.max(0, 0.5 * v - s - desp);
+  // Lei 9.514/97, art. 27 (Lei 14.711/2023): fora do financiamento residencial a dívida não se extingue; na execução judicial o saldo também continua.
+  const resto = resid ? 0 : Math.max(0, Math.round(s + desp - 0.5 * v));
+  const ocupMes = af ? Math.round(v * 0.01) : 0, meses = af ? (Number(a.calc_ocup_meses) || 0) : 0;
+  const atraso = a.parcela && a.parcelas_atraso ? a.parcela * a.parcelas_atraso : null;
+  return { af, v, s, saldoEstimado: a.saldo_devedor == null, desp, tipo, resid, pat, c1, c2, resto, ocupMes, meses, ocup: ocupMes * meses, atraso, est };
+}
+
 function emJogo(a) {
   const L = []; let total = 0;
   if (isDev(a)) {
-    const vm = a.valor_mercado, sd = a.saldo_devedor;
+    const C = calcDevedor(a);
+    const vm = a.valor_mercado, sd = a.saldo_devedor != null ? a.saldo_devedor : (C && C.s != null ? C.s : null);
     if (vm != null) {
       const patr = Math.max(0, vm - (sd || 0));
       L.push({ k: "Patrimônio do cliente no imóvel (valor − dívida)", v: patr }); total += patr;
     }
+    if (C && C.resto) { L.push({ k: C.af ? "Dívida que continua depois do leilão (contrato não residencial)" : "Dívida que continua depois do leilão", v: C.resto }); total += C.resto; }
+    if (C && C.ocup) { L.push({ k: "Taxa de ocupação até desocupar (" + C.meses + " meses)", v: C.ocup }); total += C.ocup; }
     if (a.imp_aluguel) { const al = a.imp_aluguel * 24; L.push({ k: "Aluguel por 2 anos se perder o imóvel", v: al }); total += al; }
     if (a.imp_mudanca) { L.push({ k: "Mudança e custos de saída", v: a.imp_mudanca }); total += a.imp_mudanca; }
     if (a.imp_renda_aluguel) { const r = a.imp_renda_aluguel * 24; L.push({ k: "Renda de aluguel perdida em 2 anos", v: r }); total += r; }
@@ -520,6 +559,8 @@ function textoResumo() {
     if (PL) L.push("- Pagamento: " + PL.txt);
     H.exito.forEach(e => L.push("- " + e.k + (e.v != null ? ": " + brl(e.v) : "")));
   }
+  const DF = D.ia.defesas; if (DF && DF.mapa && DF.mapa.length) { L.push(""); L.push("DEFESAS INVESTIGADAS"); DF.mapa.filter(m => m.status !== "descartada").forEach(m => L.push("- " + m.defesa + " (" + (ST_DEF[m.status] || [m.status])[0].toLowerCase() + ")" + (m.motivo ? ": " + m.motivo : ""))); }
+  const SO = D.ia.solucoes; if (SO && Array.isArray(SO.solucoes) && SO.solucoes.length) { L.push(""); L.push("PROVÁVEIS SOLUÇÕES"); if (SO.recomendada && SO.recomendada.titulo) L.push("Recomendada: " + SO.recomendada.titulo); SO.solucoes.forEach((x, i) => L.push((i + 1) + ". " + x.titulo + (x.forca ? " (força " + x.forca + ")" : ""))); }
   if (D.ia.analise && D.ia.analise.resumo) { L.push(""); L.push("LEITURA DA IA"); L.push(D.ia.analise.resumo); (D.ia.analise.teses || []).forEach(t => L.push("- " + (typeof t === "string" ? t : t.tese + (t.fundamento ? " — " + t.fundamento : "")))); }
   return L.join("\n");
 }
@@ -529,6 +570,7 @@ function contextoCaso() {
   return "DATA DE HOJE: " + new Date().toLocaleDateString("pt-BR") + "\n\nFATOS COLETADOS:\n" + (fatos || "(nenhum)") +
     "\n\nPRAZOS: " + (prazos(a).map(p => p.nome + " em " + dataBR(p.data)).join("; ") || "nenhum") + "\nURGÊNCIA: " + u.txt +
     "\n\nPROVIDÊNCIAS JÁ SUGERIDAS PELO ROTEIRO:\n" + providencias(a).map(p => "- " + p.t).join("\n") +
+    (() => { const C = calcDevedor(a); return C && C.pat != null ? "\n\nCALCULADORA DO DEVEDOR: valor do imóvel " + brl(C.v) + "; saldo devedor " + brl(C.s) + (C.saldoEstimado ? " (estimado)" : "") + "; patrimônio em risco " + brl(C.pat) + "; sobra no 1º leilão " + brl(C.c1) + "; sobra no 2º leilão " + brl(C.c2) + (C.resto ? "; dívida que continua após o leilão " + brl(C.resto) : "") + (C.est ? "; juros já pagos (estimativa) " + brl(C.est.juros) : "") : ""; })() +
     "\n\nEM JOGO PARA O CLIENTE: " + brl(J.total) + "\nHONORÁRIO SUGERIDO: " + brl(H.fixo) + " (" + (H.produto || "") + ")";
 }
 function esquemaPerguntas() {
@@ -691,7 +733,7 @@ async function abrir(arg, forcar) {
   const nd = novoD(); nd.chave = chave; nd.caso = r.caso || null; nd.caso_id = (r.caso && r.caso.id) || caso_id || null;
   if (r.diag) {
     const g = r.diag, ia = g.ia || {};
-    Object.assign(nd, { id: g.id, A: g.respostas || {}, transcript: g.transcricao || '', ia: { analise: ia.analise, escuta: ia.escuta }, aiFilled: ia.aiFilled || {}, ajuste: ia.ajuste || {}, etapa: ia.etapa || 'situacao', salvoEm: '' , status: g.status });
+    Object.assign(nd, { id: g.id, A: g.respostas || {}, transcript: g.transcricao || '', ia: { analise: ia.analise, escuta: ia.escuta, defesas: ia.defesas || null, solucoes: ia.solucoes || null }, aiFilled: ia.aiFilled || {}, ajuste: ia.ajuste || {}, etapa: ia.etapa || 'situacao', salvoEm: '' , status: g.status });
     nd.caso_id = g.caso_id || nd.caso_id;
   } else if (nd.caso) {
     nd.A = deHelena(nd.caso); nd.helena = Object.keys(nd.A).filter((k) => k !== 'consulta_paga'); nd.etapa = 'situacao';
@@ -709,7 +751,7 @@ async function salvarAgora() {
   const a = A(); const H = honorarios(a); const J = emJogo(a);
   try {
     const r = await api('diag_salvar', { id: D.id || '', caso_id: D.caso_id || '', nome: a.nome || (D.caso && D.caso.nome) || '', area: a.area || '', respostas: a, transcricao: D.transcript || '',
-      ia: { analise: D.ia.analise || null, escuta: D.ia.escuta || null, aiFilled: D.aiFilled, ajuste: D.ajuste, etapa: D.etapa }, total_em_jogo: J.total, honorario: H.fixo, status: D.status || 'RASCUNHO' });
+      ia: { analise: D.ia.analise || null, escuta: D.ia.escuta || null, defesas: D.ia.defesas || null, solucoes: D.ia.solucoes || null, aiFilled: D.aiFilled, ajuste: D.ajuste, etapa: D.etapa }, total_em_jogo: J.total, honorario: H.fixo, status: D.status || 'RASCUNHO' });
     if (r && r.id) { if (!D.id) { D.id = r.id; if (D.chave === 'novo') { D.chave = r.id; history.replaceState(null, '', '#/diagnostico/' + r.id); rotaAtual = 'diagnostico/' + r.id; } } D.salvoEm = r.salvo_em || ''; mostraSalvo('Salvo às ' + D.salvoEm); delete S.cache.diaglista; }
   } catch (e) { D.sujo = true; mostraSalvo('Não salvou: ' + (e.message || 'erro')); }
   finally { salvando = false; if (D && D.sujo) { clearTimeout(tSalvar); tSalvar = setTimeout(salvarAgora, 3000); } }
@@ -718,9 +760,10 @@ window.addEventListener('beforeunload', () => { if (D && D.sujo) salvarAgora(); 
 window.addEventListener('hashchange', () => { if (D && D.sujo && !/^#\/diagnostico/.test(location.hash)) salvarAgora(); });
 
 // ---------- render do editor ----------
-function etapasVisiveis() { const a = A(); return ETAPAS.filter((e) => e.id === 'proposta' || Q.some((q) => q.e === e.id && visivel(q, a))); }
-function contagem(eid) { const a = A(); const qs = Q.filter((q) => q.e === eid && visivel(q, a)); return { feitas: qs.filter((q) => respondida(q, a)).length, total: qs.length }; }
-function tituloEtapa(id) { return ({ abertura: 'Abertura e conexão', situacao: 'O que está acontecendo', caso: 'Diagnóstico técnico', impacto: 'Consequências e motivação', financeiro: 'Realidade financeira', decisao: 'Como ele decide', proposta: 'Proposta, objeções e fechamento' })[id]; }
+function etapaIA(id, a) { return (id === 'defesas' || id === 'solucoes') && !!a.area && !bloqueado(a) && !foraPerfil(a); }
+function etapasVisiveis() { const a = A(); return ETAPAS.filter((e) => e.id === 'proposta' || etapaIA(e.id, a) || Q.some((q) => q.e === e.id && visivel(q, a))); }
+function contagem(eid) { if (eid === 'defesas') { const P = (D.ia.defesas && D.ia.defesas.perguntas) || []; return { feitas: P.filter((p) => respDQ(p)).length, total: P.length }; } const a = A(); const qs = Q.filter((q) => q.e === eid && visivel(q, a)); return { feitas: qs.filter((q) => respondida(q, a)).length, total: qs.length }; }
+function tituloEtapa(id) { return ({ abertura: 'Abertura e conexão', situacao: 'O que está acontecendo', caso: 'Diagnóstico técnico', impacto: 'Consequências e motivação', financeiro: 'Realidade financeira', decisao: 'Como ele decide', defesas: 'Investigação das defesas', solucoes: 'Prováveis soluções para o caso', proposta: 'Proposta, objeções e fechamento' })[id]; }
 
 function telaEditor() {
   const a = A();
@@ -741,7 +784,7 @@ function renderTop() {
 }
 function renderEtapas() {
   const el = q$('#dgEtapas'); if (!el) return; const vis = etapasVisiveis();
-  el.innerHTML = vis.map((e, i) => { const c = e.id === 'proposta' ? null : contagem(e.id); const feita = c && c.total && c.feitas === c.total;
+  el.innerHTML = vis.map((e, i) => { const c = e.id === 'proposta' || e.id === 'solucoes' ? null : contagem(e.id); const feita = c && c.total && c.feitas === c.total;
     return '<button type="button" data-etapa="' + e.id + '" class="' + (D.etapa === e.id ? 'on ' : '') + (feita ? 'feita' : '') + '"><span class="n">' + (i + 1) + '</span>' + esc(e.nome) + (c && c.total ? '<span class="c">' + c.feitas + '/' + c.total + '</span>' : '') + '</button>'; }).join('');
 }
 function renderQuestion(q) {
@@ -773,16 +816,20 @@ function renderMain() {
   const idx = vis.findIndex((e) => e.id === D.etapa); const et = vis[idx];
   let h = '<div style="display:grid;gap:4px"><span class="dg-eye">Etapa ' + (idx + 1) + ' de ' + vis.length + '</span><h2>' + esc(tituloEtapa(et.id)) + '</h2></div>';
   if (et.id === 'proposta') h += renderProposta();
+  else if (et.id === 'defesas') h += renderDefesas();
+  else if (et.id === 'solucoes') h += renderSolucoes();
   else {
     if (et.fala) h += '<div class="dg-roteiro"><span class="dg-eye">Diga ao cliente</span><p>“' + esc(et.fala) + '”</p></div>';
     if (bloqueado(a) && et.id !== 'abertura') h += '<div class="dg-al crit"><b>Caso a declinar.</b> O escritório não atua em causas contra o Município de Novo Hamburgo. Encerre com cordialidade e sem indicar colega.</div>';
     if (foraPerfil(a) && et.id !== 'abertura') h += '<div class="dg-al warn"><b>Fora do perfil.</b> Acolha, anote o resumo e indique um colega da área.</div>';
+    if (et.id === 'impacto' && isDev(a) && !bloqueado(a)) h += renderCalc();
     h += Q.filter((q) => q.e === et.id && visivel(q, a)).map(renderQuestion).join('');
     if (et.id === 'caso' && a.area) { const u = urgencia(a); if (u.nivel === 'crit' || u.nivel === 'alta') h += '<div class="dg-al ' + (u.nivel === 'crit' ? 'crit' : 'warn') + '"><b>' + esc(u.txt) + '</b>' + (u.prazo ? '<span class="pq">Data: ' + dataBR(u.prazo.data) + '</span>' : '') + '</div>'; }
   }
   const prev = vis[idx - 1], next = vis[idx + 1];
   h += '<div class="dg-foot">' + (prev ? '<button class="btn" type="button" data-ir="' + prev.id + '">' + ic('voltar', 's') + ' ' + esc(prev.nome) + '</button>' : '<span></span>') + (next ? '<button class="btn pri" type="button" data-ir="' + next.id + '">' + esc(next.nome) + ' ' + ic('seta', 's') + '</button>' : '') + '</div>';
   main.innerHTML = h;
+  if (et.id === 'defesas') autoDefesas();
 }
 function renderProposta() {
   const a = A(); const H = honorarios(a); const J = emJogo(a); const PL = plano(a, H);
@@ -820,6 +867,8 @@ function painelDiag() {
   const u = urgencia(a), J = emJogo(a), H = honorarios(a), PL = plano(a, H), P = providencias(a), C = conselhos(a), pr = prazos(a);
   let h = '<div class="card dg-b"><span class="dg-chip ' + (bloqueado(a) ? 'bloq' : u.nivel) + '" style="justify-self:start">' + esc(bloqueado(a) ? 'DECLINAR' : u.curto) + '</span><p class="dg-r1">' + esc(resumoLinha(a)) + '</p>' + pr.map((p) => '<div class="dg-l"><span>' + esc(p.nome) + '</span><span class="num">' + dataBR(p.data) + '</span></div>').join('') + '</div>';
   h += blocoProximas(a);
+  const DFp = ((D.ia.defesas && D.ia.defesas.perguntas) || []).filter((p) => !respDQ(p));
+  if (DFp.length && D.etapa !== 'defesas') h += '<div class="card dg-b"><h3>Defesas: perguntas em aberto</h3><div class="dg-sug">' + DFp.slice(0, 3).map((p) => '<button type="button" data-ir="defesas">' + esc(p.texto) + '</button>').join('') + '</div></div>';
   if (P.length) h += '<div class="card dg-b"><h3>Providências</h3><ul>' + P.map((p) => '<li class="' + (p.urg ? 'urg' : '') + '">' + esc(p.t) + '</li>').join('') + '</ul></div>';
   if (C.length) h += '<div class="card dg-b"><h3>O que dizer ao cliente</h3><ul>' + C.map((c) => '<li>' + esc(c) + '</li>').join('') + '</ul></div>';
   if (!bloqueado(a) && !foraPerfil(a)) h += '<div class="card dg-b"><h3>Em jogo e honorário</h3>' + J.linhas.filter((l) => !l.info).map((l) => '<div class="dg-l"><span>' + esc(l.k) + '</span><span class="num">' + brl(l.v) + '</span></div>').join('') +
@@ -855,7 +904,15 @@ function setResp(id, v) { const a = A(); if (v === '' || v == null) delete a[id]
 document.addEventListener('click', (ev) => {
   if (!D || !q$('#dg') || !ev.target.closest('#dg')) return;
   const t = ev.target.closest('button'); if (!t) return;
-  if (t.matches('.dg-opt')) {
+  if (t.dataset.dop || t.dataset.dns) { const p = acharDQ(t.dataset.dop || t.dataset.dns); if (!p) return;
+    if (t.dataset.dns) { p.nao_sabe = !p.nao_sabe; if (p.nao_sabe) p.resp = ''; } else { p.resp = p.resp === t.dataset.v ? '' : t.dataset.v; if (p.resp) p.nao_sabe = false; }
+    marcarSujo(); const y = window.scrollY; renderTudo(); window.scrollTo(0, y); checarRodada(); return; }
+  if (t.id === 'btnDefGerar') { gerarDefesas(); return; }
+  if (t.id === 'btnSolGerar') { gerarSolucoes(); return; }
+  if (t.id === 'btnSolNota') { agir(t, () => api('nota', { id: D.caso_id, texto: textoSolucoes().slice(0, 3990) }), 'Soluções guardadas nas notas do caso.').then(() => { delete S.cache['caso:' + D.caso_id]; }).catch(() => {}); return; }
+  if (t.id === 'btnSolCliente') { copiar((D.ia.solucoes && D.ia.solucoes.cliente) || ''); return; }
+  if (t.id === 'btnSolCopiar') { copiar(textoSolucoes()); return; }
+  if (t.matches('.dg-opt[data-q]')) {
     const id = t.dataset.q, q = QI[id]; const v = t.dataset.num ? Number(t.dataset.v) : t.dataset.v;
     if (q.t === 'multi') { const cur = Array.isArray(A()[id]) ? A()[id].slice() : []; const i = cur.indexOf(v); if (i >= 0) cur.splice(i, 1); else { if (v === 'sozinho') cur.length = 0; else { const j = cur.indexOf('sozinho'); if (j >= 0) cur.splice(j, 1); } cur.push(v); } setResp(id, cur.length ? cur : null); }
     else setResp(id, A()[id] === v ? null : v);
@@ -879,11 +936,17 @@ document.addEventListener('input', (ev) => {
   if (!D || !ev.target.closest || !ev.target.closest('#dg')) return;
   const el = ev.target;
   if (el.id === 'dgTrans') { D.transcript = el.value; marcarSujo(); return; }
+  if (el.dataset && el.dataset.dc && el.dataset.q) { const q = QI[el.dataset.q]; const n = q.t === 'money' ? parseMoney(el.value) : parseInt(String(el.value).replace(/\D/g, ''), 10); const a = A(); if (n == null || !isFinite(n)) delete a[q.id]; else a[q.id] = n; delete D.aiFilled[q.id]; marcarSujo(); atualizaCalc(); return; }
+  if (el.dataset && el.dataset.calc && el.dataset.tp !== 'sel') { const a = A(), k = el.dataset.calc; const n = el.dataset.tp === 'money' ? parseMoney(el.value) : parseInt(String(el.value).replace(/\D/g, ''), 10); if (n == null || !isFinite(n)) delete a[k]; else a[k] = n; marcarSujo(); atualizaCalc(); return; }
+  if (el.dataset && el.dataset.dq) { const p = acharDQ(el.dataset.dq); if (p) { p.det = el.value.trim() ? el.value : ''; marcarSujo(); const c = document.getElementById('dq-' + p.id); if (c) c.classList.toggle('resp', !!respDQ(p)); renderEtapas(); } return; }
   if (el.dataset && el.dataset.q) { const q = QI[el.dataset.q]; if (q.t === 'text' || q.t === 'textarea') { setResp(q.id, el.value.trim() ? el.value : null); renderTop(); renderEtapas(); renderPainel(); const c = document.getElementById('dgq-' + q.id); if (c) c.classList.toggle('resp', respondida(q, A())); } }
 });
 document.addEventListener('change', (ev) => {
   if (!D || !ev.target.closest || !ev.target.closest('#dg')) return;
   const el = ev.target;
+  if (el.dataset && el.dataset.dq) { checarRodada(); return; }
+  if (el.dataset && el.dataset.calc) { const a = A(), k = el.dataset.calc; if (el.dataset.tp === 'sel') { if (el.value === '') delete a[k]; else a[k] = el.value; marcarSujo(); } atualizaCalc(); renderEtapas(); renderPainel(); return; }
+  if (el.dataset && el.dataset.dc) { atualizaCalc(); renderEtapas(); renderPainel(); return; }
   if (el.dataset && el.dataset.q) {
     const q = QI[el.dataset.q];
     if (q.t === 'money') setResp(q.id, parseMoney(el.value));
@@ -946,6 +1009,221 @@ async function responderObjecao(btn) {
   catch (e) { out.innerHTML = '<p class="mut">' + esc(e.message || 'Não deu certo.') + '</p>'; }
   finally { if (document.body.contains(btn)) { btn.disabled = false; btn.innerHTML = orig; } }
 }
+
+// ---------- calculadora do devedor: tela ----------
+function campoCalc(id, rot, tipo, extra, padrao) {
+  const a = A(); const v = a[id];
+  if (tipo === 'money') return '<label class="dc-f"><span>' + rot + '</span><div class="money"><input class="inp" data-q="' + id + '" data-dc="1" inputmode="decimal" placeholder="0" value="' + esc(fmtMoneyInput(v)) + '"></div></label>';
+  if (tipo === 'number') return '<label class="dc-f"><span>' + rot + '</span><input class="inp" data-q="' + id + '" data-dc="1" inputmode="numeric" value="' + esc(v ?? '') + '"></label>';
+  if (tipo === 'cmoney') return '<label class="dc-f"><span>' + rot + '</span><div class="money"><input class="inp" data-calc="' + id + '" data-tp="money" inputmode="decimal" placeholder="0" value="' + esc(fmtMoneyInput(v)) + '"></div></label>';
+  if (tipo === 'cnum') return '<label class="dc-f"><span>' + rot + '</span><input class="inp" data-calc="' + id + '" data-tp="num" inputmode="numeric" placeholder="' + esc(extra || '') + '" value="' + esc(v ?? '') + '"></label>';
+  if (tipo === 'csel') return '<label class="dc-f"><span>' + rot + '</span><select class="sel" data-calc="' + id + '" data-tp="sel">' + extra.map(([k, t]) => '<option value="' + k + '"' + (String(v ?? padrao ?? '') === String(k) ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></label>';
+  return '';
+}
+function renderCalc() {
+  const a = A(), af = a.area === 'af';
+  const tipoPad = a.calc_tipo || (a.af_contrato === 'homeequity' ? 'outro' : 'residencial');
+  let h = '<div class="card dg-c dg-calc" id="dgCalc"><div style="display:grid;gap:3px"><span class="dg-eye" style="color:var(--gold)">Calculadora do devedor</span><h3>O que o cliente perde se o imóvel for a leilão</h3><p class="mut pq" style="margin:0">Os números mudam na hora. Use o prejuízo para mostrar ao cliente o que está em jogo e ancorar o honorário.</p></div>' +
+    '<div class="dc-campos">' + campoCalc('valor_mercado', a.area === 'exec' && a.ex_avaliacao ? 'Valor de mercado (a avaliação judicial é usada nos leilões)' : 'Valor do imóvel hoje', 'money') + campoCalc('saldo_devedor', 'Saldo devedor', 'money') +
+    (af ? campoCalc('parcela', 'Parcela mensal', 'money') + campoCalc('parcelas_atraso', 'Parcelas atrasadas', 'number') +
+      campoCalc('calc_tipo', 'Tipo de contrato', 'csel', [['residencial', 'Financiamento residencial'], ['outro', 'Não residencial (garantia de empréstimo, comercial)']], tipoPad) +
+      campoCalc('calc_ocup_meses', 'Meses até desocupar (taxa de ocupação)', 'csel', [['0', 'Não incluir'], ['6', '6 meses'], ['12', '12 meses'], ['24', '24 meses']]) : '') + '</div>';
+  if (af) h += '<details class="dc-det"' + (a.calc_preco ? ' open' : '') + '><summary>Estimar juros pagos e saldo pelo contrato (opcional)</summary><div class="dc-campos" style="padding-bottom:12px">' +
+    campoCalc('calc_preco', 'Valor do imóvel na compra', 'cmoney') + campoCalc('calc_entrada', 'Entrada', 'cmoney') + campoCalc('calc_mes', 'Mês do contrato (1 a 12)', 'cnum', 'ex.: 5') + campoCalc('calc_ano', 'Ano do contrato', 'cnum', 'ex.: 2019') +
+    campoCalc('calc_prazo', 'Prazo (anos)', 'cnum', 'ex.: 30') + campoCalc('calc_sistema', 'Sistema', 'csel', [['SAC', 'SAC'], ['PRICE', 'Price']]) + '</div></details>';
+  h += '<div id="dgCalcOut">' + calcOut() + '</div></div>';
+  return h;
+}
+function calcOut() {
+  const a = A(), C = calcDevedor(a);
+  if (!C || C.falta === 'valor') return '<div class="dg-al info"><b>Informe o valor do imóvel hoje</b><span>e o saldo devedor (ou preencha os dados do contrato para estimar o saldo).</span></div>';
+  if (C.falta === 'saldo') return '<div class="dg-al info"><b>Falta o saldo devedor.</b><span>Pergunte ao cliente ou preencha os dados do contrato para estimar.</span></div>';
+  const J = emJogo(a), H = honorarios(a);
+  const tot = Math.max(C.v, C.s + C.desp), pD = Math.min(100, C.s / tot * 100), pE = Math.min(100 - pD, C.desp / tot * 100), pP = Math.max(0, 100 - pD - pE);
+  let h = '<div class="dc-res"><div class="dc-prej"><span class="dg-eye">Prejuízo se o imóvel for a leilão</span><div class="dg-big" style="color:var(--bad)">' + brl(J.total) + '</div>' +
+    J.linhas.filter((l) => !l.info).map((l) => '<div class="dg-l"><span>' + esc(l.k) + '</span><span class="num">' + brl(l.v) + '</span></div>').join('') + '</div>';
+  h += '<div class="dc-barra" aria-hidden="true"><div class="b-div" style="width:' + pD + '%">' + (pD > 18 ? brl(C.s) : '') + '</div><div class="b-desp" style="width:' + pE + '%"></div><div class="b-pat" style="width:' + pP + '%">' + (pP > 18 ? brl(C.pat) : '') + '</div></div>' +
+    '<div class="dc-leg pp mut"><span><i class="b-div"></i>Dívida' + (C.saldoEstimado ? ' (estimada)' : '') + '</span><span><i class="b-desp"></i>Despesas do leilão (~5%)</span><span><i class="b-pat"></i>Patrimônio do cliente</span></div>';
+  h += '<div class="dc-cen">' +
+    '<div class="dc-c"><small>' + (C.af ? '1º leilão' : '1º leilão (pela avaliação)') + '</small><b>' + brl(C.c1) + '</b><span>volta ao cliente se o imóvel for vendido pelo valor de mercado</span></div>' +
+    '<div class="dc-c"><small>2º leilão</small><b>' + brl(C.c2) + '</b><span>volta ao cliente se o lance for pela metade do valor</span></div>' +
+    '<div class="dc-c ruim"><small>' + (C.af ? 'Banco fica com o imóvel' : 'Leilão sem sobra') + '</small><b>' + (C.resto ? '− ' + brl(C.resto) : 'R$ 0') + '</b><span>' + (C.resto ? 'perde o imóvel e ainda continua devendo' : 'perde o imóvel e o patrimônio construído') + '</span></div></div>';
+  const ex = [];
+  if (C.af) ex.push('Taxa de ocupação depois da consolidação: <b>' + brl(C.ocupMes) + '/mês</b> (6 meses: ' + brl(C.ocupMes * 6) + '; 12 meses: ' + brl(C.ocupMes * 12) + ').');
+  if (C.atraso) ex.push('Parcelas em atraso somam cerca de <b>' + brl(C.atraso) + '</b>.');
+  if (C.est) ex.push('Estimativa do contrato (' + C.est.aa.toFixed(2).replace('.', ',') + '% a.a., média do Banco Central em ' + a.calc_ano + '): já pagou cerca de <b>' + brl(C.est.pago) + '</b>, dos quais <b>' + brl(C.est.juros) + '</b> foram juros; saldo estimado de ' + brl(C.est.saldo) + '.');
+  if (ex.length) h += '<div class="pq" style="display:grid;gap:4px">' + ex.map((t) => '<div>' + t + '</div>').join('') + '</div>';
+  if (H.fixo && J.total) {
+    const p = H.fixo / J.total * 100, x = J.total / H.fixo;
+    const fala = 'Hoje você corre o risco de perder cerca de ' + brl(J.total) + '. O nosso trabalho para defender esse patrimônio custa ' + brl(H.fixo) + ', ou seja, ' + pct(p) + ' do que está em jogo. Para cada real investido na defesa, ' + (x >= 2 ? 'são cerca de R$ ' + Math.round(x).toLocaleString('pt-BR') + ' do seu patrimônio em risco.' : 'há um valor maior do seu patrimônio em risco.');
+    h += '<div class="dc-anc"><span class="dg-eye" style="color:var(--gold)">Ancoragem do honorário</span><div class="dg-l"><span>Honorário sugerido</span><span class="num">' + brl(H.fixo) + '</span></div><div class="dg-l"><span>Proporção do prejuízo</span><span class="num">' + pct(p) + '</span></div>' +
+      '<div class="dg-script" style="font-size:15px">' + esc(fala) + '</div><div><button class="btn sm" type="button" data-copiar-txt="' + esc(fala) + '">Copiar fala</button></div><p class="dg-hint" style="margin:0">Mostre o risco, nunca prometa resultado. Valores estimados com base no que o cliente informou.</p></div>';
+  }
+  return h + '</div>';
+}
+function atualizaCalc() { const o = q$('#dgCalcOut'); if (o) o.innerHTML = calcOut(); renderTop(); }
+(function cssCalc() {
+  if (document.getElementById('dg-css-calc')) return;
+  const st = document.createElement('style'); st.id = 'dg-css-calc';
+  st.textContent = '.dg-calc{border-color:color-mix(in srgb,var(--line-2) 40%,var(--gold))}.dc-campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.dc-f{display:grid;gap:4px;font-size:12.5px;color:var(--mut);font-weight:600}.dc-f .money{max-width:none}' +
+    '.dc-det{border:1px solid var(--line-2);border-radius:10px;padding:0 12px}.dc-det summary{cursor:pointer;padding:10px 0;font-weight:600;font-size:14px}' +
+    '.dc-res{display:grid;gap:12px}.dc-prej{display:grid;gap:4px}.dc-barra{display:flex;height:30px;border-radius:8px;overflow:hidden;font-size:12px;font-weight:700;color:#fff}.dc-barra>div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden}' +
+    '.b-div{background:#8C2F2F}.b-desp{background:#B9A57A}.b-pat{background:#2F6B45}.dc-leg{display:flex;gap:14px;flex-wrap:wrap}.dc-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}' +
+    '.dc-cen{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.dc-c{border:1px solid var(--line-2);border-radius:12px;padding:10px 12px;display:grid;gap:2px}.dc-c small{color:var(--mut);font-weight:600}.dc-c b{font-size:20px;font-variant-numeric:tabular-nums}.dc-c span{font-size:12.5px;color:var(--mut)}.dc-c.ruim b{color:var(--bad)}' +
+    '.dc-anc{border-left:3px solid var(--gold);background:var(--surface-2);border-radius:0 12px 12px 0;padding:12px 14px;display:grid;gap:6px}';
+  document.head.appendChild(st);
+})();
+// ---------- Defesas (IA): perguntas em rodadas e mapa das defesas; Soluções ----------
+const ST_DEF = { forte: ['Forte', 'normal'], possivel: ['Possível', 'alta'], investigar: ['A investigar', 'neutro'], descartada: ['Descartada', 'neutro'] };
+const ESPEC = 'Você é um advogado brasileiro sênior em defesa de devedores: alienação fiduciária de imóveis (Lei 9.514/97, com as mudanças da Lei 14.711/2023), execução judicial e penhora, cobrança de condomínio, busca e apreensão de veículos (Decreto-Lei 911/69), fiança, aval e garantias, contratos bancários (juros, capitalização, seguros, tarifas) e superendividamento (CDC, arts. 54-A e 104-A), além de assessoria a arrematantes.';
+let defCarregando = false, solCarregando = false, tRodada = null;
+function acharDQ(id) { const P = (D.ia.defesas && D.ia.defesas.perguntas) || []; return P.find((p) => p.id === id); }
+function respDQ(p) { if (!p) return ''; if (p.nao_sabe) return 'o cliente não sabe' + (p.det ? ' (' + String(p.det).trim() + ')' : ''); return [p.resp, String(p.det || '').trim()].filter(Boolean).join(' — '); }
+function defesasTexto() {
+  const DF = D.ia.defesas; let t = '';
+  if (DF && DF.perguntas && DF.perguntas.length) t += '\n\nPERGUNTAS DE DEFESA JÁ FEITAS (pergunta → resposta do cliente):\n' + DF.perguntas.map((p) => '- ' + p.texto + ' → ' + (respDQ(p) || '(ainda sem resposta)')).join('\n');
+  if (DF && DF.mapa && DF.mapa.length) t += '\n\nMAPA DE DEFESAS ATUAL:\n' + DF.mapa.map((m) => '- ' + m.defesa + ': ' + m.status + (m.motivo ? ' (' + m.motivo + ')' : '')).join('\n');
+  const tr = String(D.transcript || '').trim(); if (tr.length > 30) t += '\n\nTRECHO DA CONVERSA (mais recente no fim):\n' + tr.slice(-4000);
+  return t;
+}
+function statusDef(t) { D._defStatus = t; const el = q$('#defStatus'); if (el) el.textContent = t; }
+function rerenderDef() {
+  const ae = document.activeElement;
+  if (ae && ae.closest && ae.closest('#dgMain') && /TEXTAREA|INPUT/.test(ae.tagName)) { D._pendRender = true; renderEtapas(); renderPainel(); return; }
+  D._pendRender = false; const y = window.scrollY; renderTudo(); window.scrollTo(0, y);
+}
+document.addEventListener('focusout', () => { if (D && D._pendRender) setTimeout(() => { const ae = document.activeElement; if (!(ae && ae.closest && ae.closest('#dgMain') && /TEXTAREA|INPUT/.test(ae.tagName))) rerenderDef(); }, 50); });
+function autoDefesas() {
+  const a = A(), DF = D.ia.defesas;
+  if (!defCarregando && a.area && (!DF || !DF.perguntas || !DF.perguntas.length) && !(DF && DF.erro)) gerarDefesas();
+}
+function checarRodada() {
+  const DF = D.ia.defesas; if (!DF || DF.completo || defCarregando) return;
+  if (DF.perguntas.length && DF.perguntas.every((p) => respDQ(p))) { clearTimeout(tRodada); statusDef('Todas respondidas. A IA vai sugerir as próximas perguntas…'); tRodada = setTimeout(() => gerarDefesas(), 900); }
+}
+async function gerarDefesas() {
+  if (defCarregando || !D) return; const a = A(); if (!a.area) return;
+  const DF = D.ia.defesas || (D.ia.defesas = { perguntas: [], mapa: [], documentos: [], completo: false, rodadas: 0 });
+  const meu = D; defCarregando = true; delete DF.erro;
+  statusDef('A IA está lendo as respostas e procurando defesas. Leva de 15 a 40 segundos.'); rerenderDef();
+  const prompt = ESPEC + ' Está ajudando o Dr. Fábio DURANTE a consulta, em tempo real.\n\n' + contextoCaso() + defesasTexto() +
+    '\n\nTAREFA: mapear TODAS as defesas e saídas jurídicas possíveis para este cliente e escolher as próximas perguntas que mais ajudam a confirmar ou descartar cada uma.\n' +
+    '1) "mapa": as defesas, teses e saídas plausíveis para a situação (processuais, materiais, contratuais, de negociação e de proteção do patrimônio), cada uma com "status": "forte" (indícios claros nas respostas), "possivel" (há indício, falta confirmar), "investigar" (ainda sem informação) ou "descartada" (as respostas afastam), e "motivo" em 1 frase citando a resposta que sustenta o status.\n' +
+    '2) "perguntas": até 4 NOVAS perguntas para o Dr. Fábio fazer agora, em linguagem simples (como se fala com o cliente), priorizando as defesas "investigar" e "possivel" de maior impacto e as que dependem de prazo. Não repita nem reformule perguntas já feitas ou respondidas acima. Para cada uma: "texto", "defesa" (nome curto da defesa que ela testa), "porque" (1 frase: o que a resposta muda) e "opcoes" (2 a 5 respostas curtas prováveis, ou [] se a resposta for aberta).\n' +
+    '3) "documentos": documentos a pedir ao cliente para comprovar as defesas.\n' +
+    '4) "completo": true somente quando não restar pergunta útil para o cliente (o que falta depende de documentos ou de análise técnica); nesse caso "perguntas" pode vir vazio.\n' +
+    '5) "observacao": uma frase sobre o ponto mais importante descoberto até agora (ou vazio).\n' +
+    'Responda SOMENTE com JSON: {"mapa":[{"defesa":"","status":"","motivo":""}],"perguntas":[{"texto":"","defesa":"","porque":"","opcoes":[]}],"documentos":[],"completo":false,"observacao":""}\n' +
+    'Regras: no máximo 12 itens no mapa; não invente fatos; cite lei ou súmula só com segurança; nunca sugira prometer resultado.';
+  try {
+    const r = lerJSON(await pedirIA('perguntas', prompt));
+    if (D !== meu) return;
+    const ja = new Set(DF.perguntas.map((p) => p.texto.trim().toLowerCase()));
+    const rod = (DF.rodadas || 0) + 1;
+    const novas = (Array.isArray(r.perguntas) ? r.perguntas : []).filter((p) => p && p.texto && !ja.has(String(p.texto).trim().toLowerCase())).slice(0, 4)
+      .map((p, i) => ({ id: 'd' + Date.now().toString(36) + i, texto: String(p.texto).slice(0, 300), defesa: String(p.defesa || '').slice(0, 80), porque: String(p.porque || '').slice(0, 300),
+        opcoes: Array.isArray(p.opcoes) ? p.opcoes.map((x) => String(x).slice(0, 80)).filter(Boolean).slice(0, 5) : [], rodada: rod, resp: '', det: '', nao_sabe: false }));
+    DF.perguntas = DF.perguntas.concat(novas);
+    if (Array.isArray(r.mapa) && r.mapa.length) DF.mapa = r.mapa.filter((m) => m && m.defesa).slice(0, 14).map((m) => ({ defesa: String(m.defesa).slice(0, 120), status: ST_DEF[m.status] ? m.status : 'investigar', motivo: String(m.motivo || '').slice(0, 300) }));
+    if (Array.isArray(r.documentos)) DF.documentos = r.documentos.map(String).filter(Boolean).slice(0, 10);
+    DF.completo = !!r.completo || !novas.length; DF.observacao = String(r.observacao || ''); DF.rodadas = rod; DF.em = new Date().toISOString();
+    statusDef(novas.length ? novas.length + ' pergunta(s) nova(s) na rodada ' + rod + '.' : 'Não há mais perguntas úteis para o cliente.');
+    marcarSujo();
+  } catch (e) { DF.erro = e.message || 'Não deu certo.'; statusDef(DF.erro); }
+  finally { defCarregando = false; if (D === meu && D.etapa === 'defesas') rerenderDef(); else if (D === meu) { renderEtapas(); renderPainel(); } }
+}
+function blocoMapa(M) {
+  const ordem = ['forte', 'possivel', 'investigar', 'descartada'];
+  const L = M.slice().sort((x, y) => ordem.indexOf(x.status) - ordem.indexOf(y.status));
+  const n = (s) => M.filter((m) => m.status === s).length;
+  return '<details class="card dg-c dg-mapa" open><summary>Mapa das defesas <span class="mut pq" style="font-weight:500">' + [['forte', 'fortes'], ['possivel', 'possíveis'], ['investigar', 'a investigar']].filter(([k]) => n(k)).map(([k, t]) => n(k) + ' ' + t).join(' · ') + '</span></summary><div class="resp">' +
+    L.map((m) => '<div class="dg-def' + (m.status === 'descartada' ? ' desc' : '') + '"><span class="dg-chip ' + ST_DEF[m.status][1] + '">' + ST_DEF[m.status][0] + '</span><div><b>' + esc(m.defesa) + '</b>' + (m.motivo ? '<div class="mut pq">' + esc(m.motivo) + '</div>' : '') + '</div></div>').join('') + '</div></details>';
+}
+function cardDQ(p) {
+  const ok = respDQ(p), op = p.opcoes || [];
+  return '<div class="card dg-q' + (ok ? ' resp' : '') + '" id="dq-' + p.id + '"><div class="lab">' + esc(p.texto) + (p.defesa ? ' <span class="dg-chip ai">' + esc(p.defesa) + '</span>' : '') + '</div>' +
+    (p.porque ? '<p class="porque">' + esc(p.porque) + '</p>' : '') +
+    '<div class="dg-opts">' + op.map((v) => '<button type="button" class="dg-opt' + (p.resp === v ? ' on' : '') + '" data-dop="' + p.id + '" data-v="' + esc(v) + '">' + esc(v) + '</button>').join('') +
+    '<button type="button" class="dg-opt' + (p.nao_sabe ? ' on' : '') + '" data-dns="' + p.id + '">Não sabe</button></div>' +
+    '<textarea class="inp" rows="2" data-dq="' + p.id + '" placeholder="' + (op.length ? 'Detalhes do que o cliente disse (opcional)' : 'O que o cliente respondeu') + '">' + esc(p.det || '') + '</textarea></div>';
+}
+function renderDefesas() {
+  const a = A(), DF = D.ia.defesas || { perguntas: [], mapa: [] }, et = ETAPAS.find((e) => e.id === 'defesas');
+  let h = '<div class="dg-roteiro"><span class="dg-eye">Diga ao cliente</span><p>“' + esc(et.fala) + '”</p></div>';
+  h += '<div class="card dg-c"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><div style="flex:1;min-width:220px;display:grid;gap:4px"><h3>Perguntas sugeridas pela IA</h3><p class="mut pq" style="margin:0">A cada rodada respondida, a IA relê tudo, atualiza o mapa das defesas e sugere as próximas perguntas. Toque numa opção ou escreva o que o cliente disse.</p></div>' +
+    '<button class="btn" type="button" id="btnDefGerar"' + (defCarregando ? ' disabled' : '') + '>' + ic(defCarregando ? 'att' : 'estrela', 's' + (defCarregando ? ' gira' : '')) + (DF.perguntas.length ? ' Mais perguntas' : ' Gerar perguntas') + '</button></div>' +
+    '<div class="mut pq" id="defStatus">' + esc(D._defStatus || '') + '</div>' + (DF.observacao ? '<div class="dg-al info"><b>Ponto de atenção</b><span>' + esc(DF.observacao) + '</span></div>' : '') + '</div>';
+  if (DF.mapa && DF.mapa.length) h += blocoMapa(DF.mapa);
+  let rod = 0;
+  DF.perguntas.forEach((p) => { if (p.rodada !== rod) { rod = p.rodada; h += '<span class="dg-eye" style="margin-top:4px">Rodada ' + rod + '</span>'; } h += cardDQ(p); });
+  if (!DF.perguntas.length && !defCarregando) h += '<div class="card dg-c"><p class="mut" style="margin:0">' + (a.area ? 'Toque em “Gerar perguntas”. A IA usa o que já foi respondido nas etapas anteriores.' : 'Escolha a situação do cliente na etapa 2.') + '</p></div>';
+  if (DF.completo && DF.perguntas.length) h += '<div class="dg-al info"><b>As defesas possíveis já foram investigadas com o cliente.</b><span>O que falta depende de documentos ou de análise técnica. Siga para as prováveis soluções.</span><div><button class="btn pri sm" type="button" data-ir="solucoes">Ver prováveis soluções ' + ic('seta', 's') + '</button></div></div>';
+  if (DF.documentos && DF.documentos.length) h += '<div class="card dg-c"><h3>Documentos para comprovar as defesas</h3><ul class="pq" style="margin:0;padding-left:18px;display:grid;gap:4px">' + DF.documentos.map((d) => '<li>' + esc(d) + '</li>').join('') + '</ul></div>';
+  return h;
+}
+async function gerarSolucoes() {
+  if (solCarregando || !D) return; const a = A(); if (!a.area) return;
+  const meu = D; solCarregando = true; D._solStatus = 'A IA está montando as prováveis soluções. Leva de 30 a 90 segundos.'; const y0 = window.scrollY; renderMain(); window.scrollTo(0, y0);
+  const DF = D.ia.defesas || {};
+  const prompt = ESPEC + ' O Dr. Fábio terminou as perguntas da consulta e precisa das PROVÁVEIS SOLUÇÕES para o caso, para explicar ao cliente e montar a proposta.\n\n' + contextoCaso() + defesasTexto() +
+    (DF.documentos && DF.documentos.length ? '\n\nDOCUMENTOS AINDA A CONFERIR:\n' + DF.documentos.map((d) => '- ' + d).join('\n') : '') +
+    '\n\nTAREFA: liste as soluções jurídicas e práticas viáveis para este cliente, da mais recomendada para a menos, considerando prazos, provas disponíveis, custo e o objetivo do cliente. Inclua, quando couber: medidas urgentes (tutela de urgência, suspensão de leilão ou de busca e apreensão), defesas no processo, ações próprias, negociação ou acordo (purgação da mora, renegociação, venda antes do leilão, acordo com o credor), proteção lícita do patrimônio e o plano B se a defesa principal falhar.\n' +
+    'Responda SOMENTE com JSON:\n{"resumo":"2 a 3 frases","recomendada":{"titulo":"","porque":""},"solucoes":[{"titulo":"","tipo":"judicial | extrajudicial | negociação | administrativa","objetivo":"o que resolve para o cliente","fundamento":"lei, artigo ou súmula, só com segurança","forca":"forte | média | fraca","urgencia":"prazo ou quando agir","precisa":["provas ou documentos necessários"],"riscos":["..."],"tempo_custo":"estimativa qualitativa de tempo e custos (custas, perícia, caução)"}],"plano":[{"passo":"","quando":""}],"cliente":"explicação de 4 a 6 frases para o Dr. Fábio dizer ao cliente, em linguagem simples, sem prometer resultado","alertas":["prazos e cuidados críticos"]}\n' +
+    'Regras: no máximo 6 soluções e 7 passos; "forca" é a força jurídica da tese diante dos fatos, não promessa de resultado; não invente fatos; se faltar informação decisiva, diga em alertas.';
+  try {
+    const r = lerJSON(await pedirIA('solucoes', prompt));
+    if (D !== meu) return;
+    D.ia.solucoes = { resumo: String(r.resumo || ''), recomendada: r.recomendada && r.recomendada.titulo ? { titulo: String(r.recomendada.titulo), porque: String(r.recomendada.porque || '') } : null,
+      solucoes: (Array.isArray(r.solucoes) ? r.solucoes : []).filter((x) => x && x.titulo).slice(0, 6).map((x) => ({ titulo: String(x.titulo), tipo: String(x.tipo || ''), objetivo: String(x.objetivo || ''), fundamento: String(x.fundamento || ''), forca: String(x.forca || ''), urgencia: String(x.urgencia || ''),
+        precisa: Array.isArray(x.precisa) ? x.precisa.map(String).slice(0, 6) : [], riscos: Array.isArray(x.riscos) ? x.riscos.map(String).slice(0, 5) : [], tempo_custo: String(x.tempo_custo || '') })),
+      plano: (Array.isArray(r.plano) ? r.plano : []).filter((x) => x && x.passo).slice(0, 7).map((x) => ({ passo: String(x.passo), quando: String(x.quando || '') })),
+      cliente: String(r.cliente || ''), alertas: Array.isArray(r.alertas) ? r.alertas.map(String).slice(0, 6) : [], em: new Date().toISOString(), base: (DF.perguntas || []).length };
+    D._solStatus = 'Soluções geradas às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.';
+    marcarSujo();
+  } catch (e) { if (D === meu) D._solStatus = e.message || 'Não deu certo.'; }
+  finally { solCarregando = false; if (D === meu && D.etapa === 'solucoes') { const y = window.scrollY; renderTudo(); window.scrollTo(0, y); } }
+}
+const FORCA = { forte: 'normal', 'média': 'alta', media: 'alta', fraca: 'neutro' };
+function renderSolucoes() {
+  const DF = D.ia.defesas || {}, SO = D.ia.solucoes; const P = DF.perguntas || [];
+  const pend = P.filter((p) => !respDQ(p)).length;
+  let h = '';
+  if (!P.length) h += '<div class="dg-al warn"><b>As perguntas de defesa ainda não foram feitas.</b><span>As soluções ficam mais precisas depois da etapa “Defesas (IA)”.</span><div><button class="btn sm" type="button" data-ir="defesas">Ir para as defesas</button></div></div>';
+  else if (pend || !DF.completo) h += '<div class="dg-al info"><b>' + (pend ? pend + ' pergunta(s) de defesa sem resposta.' : 'A IA ainda tem perguntas de defesa a sugerir.') + '</b><span>Você pode gerar as soluções agora; elas consideram só o que já foi respondido.</span></div>';
+  h += '<div class="card dg-c"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><div style="flex:1;min-width:220px;display:grid;gap:4px"><h3>Prováveis soluções</h3><p class="mut pq" style="margin:0">A IA cruza todas as respostas, o mapa das defesas e os prazos e devolve os caminhos possíveis, o recomendado e o plano de ação.</p></div>' +
+    '<button class="btn ' + (SO ? '' : 'pri') + '" type="button" id="btnSolGerar"' + (solCarregando ? ' disabled' : '') + '>' + ic(solCarregando ? 'att' : 'estrela', 's' + (solCarregando ? ' gira' : '')) + (SO ? ' Atualizar soluções' : ' Gerar prováveis soluções') + '</button></div><div class="mut pq">' + esc(D._solStatus || (SO && SO.base !== P.length ? 'Há respostas novas desde a última geração: atualize.' : '')) + '</div></div>';
+  if (!SO) return h;
+  if (SO.resumo) h += '<div class="card dg-c"><span class="dg-eye">Leitura do caso</span><p style="margin:0;font:16px/1.5 var(--serif)">' + esc(SO.resumo) + '</p></div>';
+  if (SO.recomendada) h += '<div class="card dg-c dg-reco"><span class="dg-eye" style="color:var(--gold)">Caminho recomendado</span><h3>' + esc(SO.recomendada.titulo) + '</h3>' + (SO.recomendada.porque ? '<p class="pq" style="margin:0">' + esc(SO.recomendada.porque) + '</p>' : '') + '</div>';
+  SO.solucoes.forEach((x, i) => {
+    const li = (t, arr) => arr && arr.length ? '<div class="pq"><b>' + t + '</b><ul style="margin:4px 0 0;padding-left:18px">' + arr.map((v) => '<li>' + esc(v) + '</li>').join('') + '</ul></div>' : '';
+    const ln = (t, v) => v ? '<div class="pq"><b>' + t + ':</b> ' + esc(v) + '</div>' : '';
+    h += '<details class="card dg-c dg-sol"' + (i < 2 ? ' open' : '') + '><summary><span>' + (i + 1) + '. ' + esc(x.titulo) + '</span><span style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">' + (x.tipo ? '<span class="dg-chip neutro">' + esc(x.tipo) + '</span>' : '') + (x.forca ? '<span class="dg-chip ' + (FORCA[x.forca.toLowerCase()] || 'neutro') + '">força ' + esc(x.forca) + '</span>' : '') + '</span></summary><div class="resp" style="display:grid;gap:6px">' +
+      ln('O que resolve', x.objetivo) + ln('Fundamento', x.fundamento) + ln('Quando agir', x.urgencia) + li('O que precisa', x.precisa) + li('Riscos', x.riscos) + ln('Tempo e custos', x.tempo_custo) + '</div></details>';
+  });
+  if (SO.plano.length) h += '<div class="card dg-c"><h3>Plano de ação</h3><ol class="pq" style="margin:0;padding-left:20px;display:grid;gap:5px">' + SO.plano.map((p) => '<li>' + esc(p.passo) + (p.quando ? ' <span class="mut">· ' + esc(p.quando) + '</span>' : '') + '</li>').join('') + '</ol></div>';
+  if (SO.alertas.length) h += '<div class="dg-al warn"><b>Alertas</b>' + SO.alertas.map((t) => '<span>' + esc(t) + '</span>').join('') + '</div>';
+  if (SO.cliente) h += '<div class="card dg-c"><h3>Como explicar ao cliente</h3><div class="dg-script">' + esc(SO.cliente) + '</div><div><button class="btn sm" type="button" id="btnSolCliente">Copiar texto</button></div></div>';
+  h += '<div class="card dg-c"><p class="dg-hint" style="margin:0">Sugestões geradas por IA para apoiar o seu raciocínio. Confira fundamentos e prazos antes de orientar o cliente; a força indicada não é promessa de resultado.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="btnSolCopiar">Copiar soluções</button>' + (D.caso_id ? '<button class="btn" type="button" id="btnSolNota">' + ic('caneta', 's') + ' Guardar nas notas do caso</button>' : '') + '<button class="btn pri" type="button" data-ir="proposta">Ir para a proposta ' + ic('seta', 's') + '</button></div></div>';
+  return h;
+}
+function textoSolucoes() {
+  const SO = D.ia.solucoes, a = A(); if (!SO) return '';
+  const L = ['PROVÁVEIS SOLUÇÕES · ' + (a.nome || 'cliente') + ' · ' + new Date().toLocaleDateString('pt-BR')];
+  if (SO.resumo) L.push('', SO.resumo);
+  if (SO.recomendada) L.push('', 'Caminho recomendado: ' + SO.recomendada.titulo + (SO.recomendada.porque ? ' — ' + SO.recomendada.porque : ''));
+  SO.solucoes.forEach((x, i) => { L.push('', (i + 1) + '. ' + x.titulo + (x.tipo ? ' (' + x.tipo + ')' : '') + (x.forca ? ' · força ' + x.forca : '')); if (x.objetivo) L.push('   O que resolve: ' + x.objetivo); if (x.fundamento) L.push('   Fundamento: ' + x.fundamento); if (x.urgencia) L.push('   Quando agir: ' + x.urgencia); if (x.precisa.length) L.push('   Precisa: ' + x.precisa.join('; ')); if (x.riscos.length) L.push('   Riscos: ' + x.riscos.join('; ')); });
+  if (SO.plano.length) { L.push('', 'PLANO DE AÇÃO'); SO.plano.forEach((p, i) => L.push((i + 1) + '. ' + p.passo + (p.quando ? ' (' + p.quando + ')' : ''))); }
+  if (SO.alertas.length) { L.push('', 'ALERTAS'); SO.alertas.forEach((t) => L.push('- ' + t)); }
+  return L.join('\n');
+}
+(function cssDef() {
+  if (document.getElementById('dg-css-def')) return;
+  const st = document.createElement('style'); st.id = 'dg-css-def';
+  st.textContent = '.dg-def{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:6px 0;border-top:1px solid var(--line)}.dg-def:first-child{border-top:0}.dg-def.desc b{text-decoration:line-through;color:var(--mut)}' +
+    '.dg-mapa summary,.dg-sol summary{flex-wrap:wrap;align-items:center}.dg-sol summary span:first-child{font-weight:600}.dg-reco{border-color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}';
+  document.head.appendChild(st);
+})();
 
 // ---------- microfone (Chrome no computador ou Android) ----------
 let rec = null, gravando = false;
