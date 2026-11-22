@@ -2813,9 +2813,9 @@ function trocarFundo() {
 }
 window.addEventListener('hashchange', trocarFundo);
 trocarFundo();
-// ---------- Notícias do dia no Início (imobiliário, bancário, agro, economia e tribunais) (12/11/2026) ----------
-const TEMAS_NT = [['', 'Todas'], ['BANCARIO', 'Bancário'], ['IMOBILIARIO', 'Imobiliário'], ['AGRO', 'Agro e rural'], ['ECONOMIA', 'Economia'], ['TRIBUNAIS', 'Tribunais']];
-const COR_NT = { BANCARIO: '#4F7BC0', IMOBILIARIO: '#B38A45', AGRO: '#2E7D57', ECONOMIA: '#7E62B5', TRIBUNAIS: '#B5470F' };
+// ---------- Notícias do dia no Início (imobiliário, bancário, agro, economia, Banco Central e tribunais) (12/11/2026) ----------
+const TEMAS_NT = [['', 'Todas'], ['BANCARIO', 'Bancário'], ['IMOBILIARIO', 'Imobiliário'], ['AGRO', 'Agro e rural'], ['ECONOMIA', 'Economia'], ['BACEN', 'Banco Central'], ['TRIBUNAIS', 'Tribunais']];
+const COR_NT = { BANCARIO: '#4F7BC0', IMOBILIARIO: '#B38A45', AGRO: '#2E7D57', ECONOMIA: '#7E62B5', BACEN: '#1F6E8C', TRIBUNAIS: '#B5470F' };
 S.ntTema = S.ntTema || ''; S.ntMais = false;
 function linhaNt(n) {
   const nome = Object.fromEntries(TEMAS_NT);
@@ -2854,7 +2854,7 @@ async function secaoNoticias(forcar) {
   VIEWS.inicio = async (a, f) => { await baseInicio(a, f); if (/^(#\/?(inicio)?)?$/.test(location.hash.split('?')[0])) secaoNoticias(f); };
 }
 // ---------- Noticiário (#/noticias): faixa vermelha com as últimas, manchete com foto e grade por tema (12/11/2026) ----------
-const FOTO_TEMA = { BANCARIO: 'fundos/balcao.jpg', IMOBILIARIO: 'fundos/predio.jpg', AGRO: 'fundos/vista.jpg', ECONOMIA: 'fundos/lounge2.jpg', TRIBUNAIS: 'fundos/biblioteca.jpg' };
+const FOTO_TEMA = { BANCARIO: 'fundos/balcao.jpg', IMOBILIARIO: 'fundos/predio.jpg', AGRO: 'fundos/vista.jpg', ECONOMIA: 'fundos/lounge2.jpg', BACEN: 'fundos/saguao.jpg', TRIBUNAIS: 'fundos/biblioteca.jpg' };
 function fotoNt(n, cls) {
   const reserva = FOTO_TEMA[n.tema] || 'fundos/saguao.jpg';
   return '<div class="nx-foto ' + (cls || '') + '" style="--nc:' + (COR_NT[n.tema] || '#7E858E') + '">' +
@@ -2894,7 +2894,7 @@ VIEWS.noticias = async (_, forcar) => {
       '<div class="nx-lado">' + lado.map((n) => '<a class="nx-mini" href="' + esc(n.url) + '" target="_blank" rel="noopener" style="--nc:' + (COR_NT[n.tema] || '#7E858E') + '">' + fotoNt(n, 'mini') + '<span><span class="nt-tema">' + esc((Object.fromEntries(TEMAS_NT))[n.tema] || '') + '</span><b>' + esc(n.titulo) + '</b><span class="pp mut">' + esc(n.fonte || '') + ' · ' + esc(quando(n.em, true)) + '</span></span></a>').join('') + '</div></div>';
     if (grade.length) h += '<div class="sec-tit">Mais notícias</div><div class="nx-grade">' + grade.map((n) => cardNt(n)).join('') + '</div>';
   }
-  h += '<p class="pp mut" style="margin:16px 2px 0">Jornais, portais econômicos e sites de tribunais, buscados às 6h10 e às 12h40. Fotos e resumos vêm das próprias matérias; abra a fonte antes de citar. Uso interno.</p>';
+  h += '<p class="pp mut" style="margin:16px 2px 0">Jornais, portais econômicos, sites de tribunais e publicações oficiais do Banco Central (notas à imprensa, Copom, Focus, estatísticas monetárias e de crédito), buscados às 6h10 e às 12h40. Fotos e resumos vêm das próprias matérias; abra a fonte antes de citar. Uso interno.</p>';
   $('#cont').innerHTML = h;
   $$('[data-nx]').forEach((b) => b.onclick = () => { S.nxTema = b.dataset.nx; VIEWS.noticias(); });
 };
