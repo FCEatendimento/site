@@ -1,0 +1,395 @@
+// Aba "Atendimento bancário" (#/bancario), 22/11/2026: formulário de atendimento do cliente com dívida bancária, montado a partir do
+// curso Advocacia Bancária Milionária (Dossiê Jurídico-Contábil, O Malote, Caderno de Modelos de Malotes, Pronampe, Imersão comercial,
+// Qualificação do Lead). Gera: lista de documentos do cliente, plano do malote, próximos passos do método e relatório .docx.
+// Salva por caso na tabela app_atend_bancario (ações ab_lista, ab_abrir, ab_salvar da App API). Material de trabalho interno.
+(function () {
+const css = document.createElement('style');
+css.textContent = `
+.ab{margin-top:12px;display:grid;gap:12px}
+.ab-c{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.ab-c h3{margin:0 0 4px;font-family:var(--serif);font-size:18px}.ab-c .sub{margin:0 0 12px;color:var(--mut);font-size:13px}
+.ab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px 14px}
+.ab-f{display:flex;flex-direction:column;gap:5px;font-size:13px}.ab-f>span{color:var(--mut);font-weight:600}
+.ab-q{padding:12px 0;border-top:1px dashed var(--line)}.ab-q:first-of-type{border-top:0}
+.ab-q .t{font-weight:600;font-size:14px;margin-bottom:3px}.ab-q .p{font-size:12px;color:var(--mut);margin-bottom:7px}
+.ab-q textarea.inp{min-height:64px;max-width:none}.ab-q input.inp,.ab-q .sel{max-width:420px}
+.ab-sn{display:inline-flex;gap:4px}.ab-sn button{border:1px solid var(--line-2);background:var(--surface);border-radius:9px;padding:6px 14px;font-weight:600;cursor:pointer;color:var(--txt)}
+.ab-sn button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.ab-div{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;background:color-mix(in srgb,var(--txt) 2%,transparent)}
+.ab-div .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700}
+.ab-chips{display:flex;flex-wrap:wrap;gap:6px}.ab-chips button{border:1px solid var(--line-2);background:var(--surface);border-radius:20px;padding:5px 11px;font-size:12.5px;cursor:pointer;color:var(--txt)}
+.ab-chips button.on{background:var(--gold-soft);border-color:#B8965A;color:#7a5c22;font-weight:600}
+.ab-tabs{display:flex;gap:6px;flex-wrap:wrap;position:sticky;top:calc(var(--top,0px) + 6px);z-index:5;background:var(--bg);padding:6px 0}
+.ab-tabs button{border:1px solid var(--line-2);background:var(--surface);border-radius:20px;padding:8px 14px;font-weight:600;cursor:pointer;color:var(--txt);font-size:13px}
+.ab-tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ab-ol{margin:6px 0 0;padding-left:20px}.ab-ol li{margin:6px 0;line-height:1.45}.ab-ol li small{display:block;color:var(--mut)}
+.ab-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--info-soft);color:var(--info);margin-right:6px;vertical-align:1px}
+.ab-tag.urg{background:var(--bad-soft);color:var(--bad)}.ab-tag.ok{background:var(--ok-soft);color:var(--ok)}
+.ab-alerta{border-left:4px solid var(--bad);background:var(--bad-soft);border-radius:10px;padding:10px 14px;margin:6px 0;font-size:13.5px}
+.ab-kpi{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}.ab-kpi div{font-size:12px;color:var(--mut)}.ab-kpi b{display:block;font-size:18px;color:var(--txt);font-family:var(--serif)}
+.ab-salvo{font-size:12px;color:var(--mut)}
+`;
+document.head.appendChild(css);
+
+// ---------- listas ----------
+const BANCOS = ['Banco do Brasil', 'Caixa Econômica Federal', 'Itaú', 'Bradesco', 'Santander', 'Banrisul', 'Sicredi', 'Sicoob', 'Cresol', 'BTG Pactual', 'Safra', 'Nubank', 'Inter', 'C6 Bank', 'Mercantil', 'BRB', 'Banco do Nordeste', 'BNDES (repasse)', 'Creditas', 'Financeira / fintech', 'Outro'];
+const MOD = [
+  ['giro', 'Capital de giro'], ['contagar', 'Conta garantida / cheque especial PJ'], ['antecip', 'Antecipação de recebíveis / desconto de duplicatas'], ['pronampe', 'Pronampe'], ['peac', 'PEAC-FGI / outro com garantia de fundo'],
+  ['bndes', 'BNDES / Finame / repasse'], ['leasing', 'Leasing / arrendamento'], ['cartao', 'Cartão de crédito'], ['chesp', 'Cheque especial PF'], ['pessoal', 'Crédito pessoal / CDC'], ['consig', 'Consignado'],
+  ['veiculo', 'Financiamento de veículo'], ['imob', 'Financiamento imobiliário'], ['homeeq', 'Empréstimo com garantia de imóvel (home equity)'], ['rural_c', 'Crédito rural de custeio'], ['rural_i', 'Crédito rural de investimento'],
+  ['cpr', 'CPR / cédula rural'], ['consorcio', 'Consórcio'], ['confissao', 'Confissão / renegociação de dívida'], ['outro', 'Outra']
+];
+const MODN = Object.fromEntries(MOD);
+const SIT = [['emdia', 'Em dia'], ['atraso', 'Atraso até 90 dias'], ['inad', 'Inadimplente (mais de 90 dias)'], ['negat', 'Negativado / protestado'], ['exec', 'Em execução / cobrança judicial'], ['busca', 'Busca e apreensão'], ['leilao', 'Imóvel em consolidação / leilão'], ['dau', 'Inscrito em dívida ativa (FGO/União)']];
+const SITN = Object.fromEntries(SIT);
+const GAR = [['sem', 'Sem garantia'], ['aval', 'Aval / fiança'], ['af_imovel', 'Alienação fiduciária de imóvel'], ['af_veiculo', 'Alienação fiduciária de veículo/máquina'], ['hipoteca', 'Hipoteca'], ['penhor', 'Penhor (safra, máquinas)'], ['fundo', 'Fundo garantidor (FGO/FGI)'], ['recebiveis', 'Cessão de recebíveis / aplicação']];
+const GARN = Object.fromEntries(GAR);
+const TIPOS = [['pf', 'Pessoa física'], ['pj', 'Pessoa jurídica'], ['rural_pf', 'Produtor rural (CPF)'], ['rural_pj', 'Produtor rural / agro (CNPJ)']];
+const FATOS = {
+  pf: ['Desemprego', 'Redução de renda', 'Doença na família', 'Divórcio / separação', 'Morte do provedor', 'Acúmulo de dívidas de consumo (superendividamento)', 'Golpe ou fraude', 'Outro'],
+  pj: ['Perda ou inadimplência de um grande cliente', 'Fim de contratos públicos', 'Alta da Selic sobre dívida pós-fixada', 'Obra, decreto ou interdição que parou a atividade', 'Sinistro sem cobertura', 'Ruptura na cadeia de fornecimento', 'Queda de vendas / crise do setor', 'Outro'],
+  rural: ['Frustração de safra (seca, chuva em excesso, geada)', 'Queda de preço do produto', 'Dificuldade de comercialização', 'Pragas e doenças', 'Perda de qualidade da produção', 'Outro']
+};
+const rural = (a) => /^rural/.test(a.tipo || ''), pj = (a) => a.tipo === 'pj' || a.tipo === 'rural_pj', pf = (a) => a.tipo === 'pf' || a.tipo === 'rural_pf';
+const dvs = (a) => (a.dividas || []).filter((d) => d && (d.banco || d.modalidade || d.saldo));
+const tem = (a, re) => dvs(a).some((d) => re.test(d.modalidade || ''));
+const temSit = (a, re) => dvs(a).some((d) => re.test(d.situacao || ''));
+const temGar = (a, g) => dvs(a).some((d) => (d.garantias || []).includes(g));
+const num = (v) => { const n = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+const brl = (n) => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const R = (a, k) => (a.r || {})[k];
+const sim = (a, k) => R(a, k) === 'sim';
+function totais(a) {
+  const l = dvs(a); const saldo = l.reduce((s, d) => s + num(d.saldo), 0), parc = l.reduce((s, d) => s + num(d.parcela), 0);
+  const consig = l.filter((d) => d.modalidade === 'consig').reduce((s, d) => s + num(d.parcela), 0);
+  const renda = num(R(a, 'renda')); return { saldo, parc, consig, renda, comp: renda ? parc / renda : null, compConsig: renda ? consig / renda : null, bancos: [...new Set(l.map((d) => d.banco === 'Outro' ? (d.banco_outro || 'Outro') : d.banco).filter(Boolean))] };
+}
+
+// ---------- perguntas (seção, texto, por que pergunta / prova que gera, tipo, quando aparece) ----------
+const Q = [
+  // 1. triagem
+  ['tri', 'vinculo', 'Qual é o vínculo de renda do cliente?', 'Define o caminho na árvore de qualificação do curso (servidor/CLT com consignado x empresário).', 'sel', (a) => pf(a), ['Servidor público', 'CLT', 'Aposentado / pensionista INSS', 'Autônomo / profissional liberal', 'Empresário (dívidas no CPF)', 'Outro']],
+  ['tri', 'renda', 'Renda líquida mensal (PF) ou faturamento médio mensal (PJ/rural), em R$', 'Base do comprometimento de renda, do mínimo existencial e do laudo de capacidade de pagamento.', 'num'],
+  ['tri', 'porte', 'Porte da empresa', 'Porte muda teses (ex.: TLA só para médio/grande porte) e o enquadramento em Pronampe.', 'sel', (a) => pj(a), ['MEI', 'ME', 'EPP', 'Médio porte', 'Grande porte']],
+  ['tri', 'ativa', 'A empresa/atividade continua funcionando?', 'Empresa ativa abre plano de fluxo e recuperação extrajudicial; parada muda a estratégia.', 'sn', (a) => !pf(a) || rural(a)],
+  ['tri', 'aval', 'Há avalista, fiador ou devedor solidário (sócio, cônjuge, parente)?', 'Avalista exposto aumenta a urgência e entra no quadro de partes do dossiê.', 'sn'],
+  ['tri', 'aval_quem', 'Quem são os avalistas/fiadores e em quais contratos?', '', 'txt', (a) => sim(a, 'aval')],
+  ['tri', 'acao', 'Já existe ação de cobrança, execução, monitória ou busca e apreensão?', 'Define prazo de defesa e se a luta já é judicial.', 'sn'],
+  ['tri', 'acao_det', 'Qual ação, número do processo e data da citação/intimação?', 'Prazos correm da juntada do mandado ou da citação — conferir no eproc.', 'txt', (a) => sim(a, 'acao')],
+  ['tri', 'prazo', 'Há leilão, audiência, vencimento ou prazo crítico nos próximos 30 dias? Qual data?', 'Urgência muda a ordem do trabalho.', 'txt'],
+  ['tri', 'bloqueio', 'Houve bloqueio de conta, retenção de salário ou débito das parcelas na conta onde entra a renda?', 'Indica o malote de cancelamento de débito automático (DDA).', 'sn'],
+  ['tri', 'golpe', 'Alguma dívida vem de golpe, fraude ou contratação que o cliente não reconhece?', 'Trilha própria de golpe e fraude (contestação, B.O., responsabilidade do banco).', 'sn'],
+  ['tri', 'outro_adv', 'Já teve outro advogado neste caso? Por que trocou?', 'Sinal de alerta na triagem (troca sucessiva de advogados).', 'txt'],
+  // 2. fato gerador
+  ['fato', 'fato_tipo', 'Qual foi o fato que gerou o endividamento?', 'Tópico circunstancial do dossiê: o banco tem o histórico de pagamentos, mas não a explicação.', 'fato'],
+  ['fato', 'fato_desc', 'Descreva o evento com nome e data (ex.: "a principal cliente pediu recuperação judicial em mar/2025")', 'Teste do curso: concreto, datado, externo e com relação clara com a queda do caixa.', 'txt'],
+  ['fato', 'quando', 'Quando o caixa começou a apertar? (mês/ano)', 'Cruzar depois com o extrato.', 'linha'],
+  ['fato', 'mudou', 'O que mudou naquele momento? (cliente, contrato, preço, clima, regra, pessoa)', '', 'txt'],
+  ['fato', 'impacto', 'Quanto isso representava da renda/faturamento? (mesmo aproximado)', 'Confirmar com o contador; vira número no tópico circunstancial.', 'linha'],
+  ['fato', 'reacao', 'O que o cliente fez para reagir? (corte de custos, venda de bem, renegociação com fornecedor)', 'Prova de gestão ativa.', 'txt'],
+  ['fato', 'pagando', 'O que ele continuou pagando? (folha, tributos correntes, fornecedores, contas da casa)', 'É a prova da boa-fé.', 'txt'],
+  ['fato', 'atraso1', 'Quando foi o primeiro atraso com o banco? (mês/ano)', 'Linha do tempo do crédito: liberação, renovações, inadimplência e default.', 'linha'],
+  ['fato', 'provas', 'Quais documentos provam cada resposta? (rescisão, laudo, decreto, fotos, e-mails, notas, extratos)', 'O cliente sai da reunião com essa lista.', 'txt'],
+  // 3. relação com o banco
+  ['banco', 'procurou', 'Quando e como procurou o banco? Com quem falou (gerente, agência, superintendência)?', 'Ajuda a descobrir a alçada de quem decide do outro lado.', 'txt'],
+  ['banco', 'reneg', 'Houve renegociação, confissão de dívida ou rolagem? Quantas e quando?', 'Cada renegociação que só rolou a dívida prova que o banco já conhecia a dificuldade; indica pedir o histórico de 10 anos.', 'sn'],
+  ['banco', 'reneg_det', 'Detalhe as renegociações (data, valor, o que mudou nas condições)', '', 'txt', (a) => sim(a, 'reneg')],
+  ['banco', 'propostas', 'Que propostas o banco já fez? (valor, parcelas, desconto, por escrito ou verbal)', 'Base para comparar com o valor recalculado e com a provisão.', 'txt'],
+  ['banco', 'tem_contratos', 'O cliente tem cópia de todos os contratos, aditivos e confissões?', 'Sem contrato, o primeiro malote é o pedido de contratos e fichas gráficas.', 'sn'],
+  ['banco', 'pediu_docs', 'Já pediu contratos ou extratos ao banco e não recebeu?', 'Recusa ou silêncio do banco vira prova e base para inverter o ônus.', 'sn'],
+  ['banco', 'seguro', 'Paga seguro prestamista ou outro seguro junto com o empréstimo?', 'Indica o malote de estorno de seguro (venda casada).', 'sn'],
+  ['banco', 'casada', 'Foram vendidos junto título de capitalização, consórcio, cesta de tarifas ou outro produto?', 'Possível venda casada.', 'sn'],
+  ['banco', 'deb_auto', 'As parcelas são debitadas automaticamente na conta onde entra o salário ou o faturamento?', 'Indica o cancelamento estratégico do débito automático (DDA).', 'sn'],
+  // 4. capacidade de pagamento
+  ['cap', 'despesas', 'Despesas essenciais mensais (moradia, alimentação, saúde, escola), em R$', 'Mínimo existencial (PF) e projeção de fluxo de caixa.', 'num', (a) => pf(a)],
+  ['cap', 'custos', 'Custos fixos mensais da operação (folha, aluguel, tributos, fornecedores), em R$', 'Projeção de fluxo de caixa com premissas.', 'num', (a) => !pf(a) || rural(a)],
+  ['cap', 'parcela_possivel', 'Quanto consegue pagar por mês sem faltar o essencial? (R$)', 'Parcela máxima e dívida sustentável do tópico de capacidade de pagamento.', 'num'],
+  ['cap', 'entrada', 'Teria valor para entrada ou quitação à vista? Quanto?', 'Muda a proposta e o deságio possível.', 'linha'],
+  ['cap', 'bens', 'Que bens possui (imóveis, veículos, máquinas, aplicações)? Algum está em garantia?', 'Risco de penhora e garantias a proteger.', 'txt'],
+  ['cap', 'outras', 'Tem dívidas fora dos bancos? (fornecedores, tributos, trabalhistas, agiotas)', 'Panorama completo do passivo.', 'txt'],
+  ['cap', 'contador', 'Tem contador que possa fornecer balanço, DRE, ECF e fluxo de caixa?', 'O laudo de capacidade é assinado por contador (CRC) ou agrônomo (CREA).', 'sn', (a) => !pf(a) || rural(a)],
+  ['cap', 'fiscal', 'Há débitos com a Receita ou PGFN?', 'Situação fiscal entra no tópico circunstancial e de capacidade.', 'sn', (a) => !pf(a) || rural(a)],
+  // 5. específicos
+  ['esp', 'pr_data', 'Pronampe: quando foi contratado? (mês/ano)', 'Marca a versão da lei aplicável e a taxa-teto vigente.', 'linha', (a) => tem(a, /pronampe|peac/)],
+  ['esp', 'pr_dau', 'Pronampe: já houve cobrança judicial ou inscrição em dívida ativa?', 'Define se a luta é com o banco, com a PGFN ou em execução.', 'sn', (a) => tem(a, /pronampe|peac/)],
+  ['esp', 'pr_fgo', 'Pronampe: o FGO já foi honrado?', 'Pergunta-chave do curso: define todo o resto da estratégia.', 'sel', (a) => tem(a, /pronampe|peac/), ['Sim', 'Não', 'Não sabe']],
+  ['esp', 'ru_cultura', 'Rural: atividade/cultura e safra afetada', 'Laudo agronômico e tópico circunstancial do produtor.', 'linha', (a) => rural(a) || tem(a, /rural|cpr/)],
+  ['esp', 'ru_seguro', 'Rural: acionou seguro rural ou Proagro? Com que resultado?', '', 'txt', (a) => rural(a) || tem(a, /rural|cpr/)],
+  ['esp', 'ru_prorrog', 'Rural: pediu por escrito a prorrogação da dívida ao banco antes do vencimento?', 'Prorrogação do crédito rural é tese específica; o pedido escrito é prova.', 'sn', (a) => rural(a) || tem(a, /rural|cpr/)],
+  ['esp', 've_pagas', 'Veículo: quantas parcelas já foram pagas e recebeu notificação de mora?', 'Busca e apreensão depende da comprovação da mora.', 'txt', (a) => tem(a, /veiculo/) || temGar(a, 'af_veiculo')],
+  ['esp', 'im_intim', 'Imóvel em garantia: recebeu intimação do cartório para pagar ou aviso de leilão? Quando?', 'Se sim, abrir também o Diagnóstico de alienação fiduciária do app (leilão).', 'txt', (a) => tem(a, /imob|homeeq/) || temGar(a, 'af_imovel')],
+  ['esp', 'se_consumo', 'Superendividamento: as dívidas são de consumo (pessoais), contraídas de boa-fé?', 'Requisito da Lei 14.181/2021 para o plano de pagamento.', 'sn', (a) => pf(a)],
+  ['esp', 'go_det', 'Golpe/fraude: o que aconteceu, quando, valores, e já contestou no banco ou fez B.O.?', '', 'txt', (a) => sim(a, 'golpe')],
+  // 6. decisão
+  ['dec', 'decisor', 'Quem decide sobre a contratação? (sozinho, sócio, cônjuge)', 'Se houver outro decisor, marcar a reunião de proposta com os dois.', 'linha'],
+  ['dec', 'expect', 'O que o cliente espera como resultado? (em palavras dele)', 'Alinhar sem prometer resultado (Provimento 205/2021).', 'txt'],
+  ['dec', 'obs', 'Observações gerais do atendimento', '', 'txt']
+];
+const SECOES = [['cli', '1 · Cliente'], ['div', '2 · Dívidas'], ['tri', '3 · Triagem'], ['fato', '4 · Fato gerador'], ['banco', '5 · Banco'], ['cap', '6 · Capacidade'], ['esp', '7 · Específicas'], ['dec', '8 · Decisão'], ['res', 'Resultado']];
+const SECN = { tri: 'Triagem e qualificação', fato: 'Fato gerador (tópico circunstancial do dossiê)', banco: 'Relação com o banco', cap: 'Capacidade de pagamento', esp: 'Perguntas específicas do caso', dec: 'Decisão e expectativa' };
+
+// ---------- resultado: qualificação, documentos, malote, passos ----------
+function qualificar(a) {
+  const t = totais(a), s = []; const al = [];
+  if (sim(a, 'acao') || temSit(a, /exec/)) al.push('Há ação judicial: conferir prazo de defesa (embargos à execução, contestação ou impugnação) no eproc antes de qualquer outra coisa.');
+  if (temSit(a, /busca/)) al.push('Busca e apreensão: prazo curto para pagar a integralidade da dívida após a liminar ser cumprida (Decreto-Lei 911/69). Tratar como urgente.');
+  if (temSit(a, /leilao/) || (R(a, 'im_intim') || '').trim()) al.push('Imóvel em garantia com intimação/leilão: abrir o Diagnóstico de alienação fiduciária do app (purgação da mora, leilões).');
+  if ((R(a, 'prazo') || '').trim()) al.push('Prazo crítico informado: ' + R(a, 'prazo'));
+  if (pf(a) && !rural(a)) {
+    if (t.compConsig != null && t.compConsig > 0.6) s.push(['Readequação de margem do consignado + revisional sancionatória (art. 54-D CDC)', 'Consignado acima de 60% da renda.']);
+    if (sim(a, 'se_consumo') && t.comp != null && t.comp > 0.3) s.push(['Superendividamento (Lei 14.181/2021): plano de pagamento', 'Dívidas de consumo de boa-fé comprometendo ' + Math.round(t.comp * 100) + '% da renda.']);
+  }
+  if (sim(a, 'deb_auto') || sim(a, 'bloqueio')) s.push(['Cancelamento estratégico do débito automático (DDA)', 'Parcelas debitadas na conta de renda/faturamento.']);
+  if (sim(a, 'golpe')) s.push(['Golpe e fraude bancária', 'Contratação não reconhecida pelo cliente.']);
+  if (tem(a, /pronampe|peac/)) s.push(['Estratégia Pronampe', 'FGO honrado: ' + (R(a, 'pr_fgo') || 'a confirmar') + '.']);
+  if (rural(a) || tem(a, /rural|cpr/)) s.push(['Dívida rural: prorrogação e renegociação rural', 'Crédito rural identificado.']);
+  if (temSit(a, /exec/) || sim(a, 'acao')) s.push(['Defesa do executado', 'Cobrança judicial em curso.']);
+  const inad = temSit(a, /inad|negat|exec|busca|leilao|dau/);
+  if (inad) s.push(['Reestruturação de passivo bancário (REPB): malote, dossiê e mesa negocial', 'Dívida inadimplente: a provisão do banco já cresce e é a alavanca da negociação.']);
+  else if (dvs(a).length) s.push(['Revisional estratégica / análise de contrato', 'Dívidas em dia: verificar viabilidade jurídica antes de qualquer atraso.']);
+  return { t, servicos: s, alertas: al, inad };
+}
+function documentos(a) {
+  const d = [];
+  const add = (g, x, p) => d.push([g, x, p || '']);
+  add('Todos', 'Documento de identidade e CPF; comprovante de residência');
+  add('Todos', 'Todos os contratos, aditivos, confissões e renegociações que tiver (CCB, cédulas, termos)');
+  add('Todos', 'Extratos da conta e das operações dos últimos 12 meses');
+  add('Todos', 'Registrato (SCR do Banco Central), tirado pelo gov.br — mostra todas as dívidas bancárias');
+  add('Todos', 'Cartas, e-mails, mensagens e notificações de cobrança recebidas; propostas do banco por escrito');
+  add('Todos', 'Prova do fato que gerou a dívida' + ((R(a, 'provas') || '').trim() ? ': ' + R(a, 'provas') : ' (rescisão, laudo, decreto, fotos, notas, e-mails)'));
+  if (pf(a)) {
+    add('Renda e despesas', 'Comprovantes de renda: 3 últimos holerites, extrato do INSS ou declaração de IR');
+    add('Renda e despesas', 'Comprovantes das despesas essenciais (aluguel, escola, saúde, contas da casa) — base do mínimo existencial');
+    const f = (R(a, 'fato_tipo') || '');
+    if (/Doença/.test(f)) add('Renda e despesas', 'Laudos e atestados médicos, comprovantes de gastos com saúde');
+    if (/Desemprego/.test(f)) add('Renda e despesas', 'Termo de rescisão e comprovante do seguro-desemprego');
+    if (/Divórcio|Morte/.test(f)) add('Renda e despesas', 'Certidão de divórcio ou de óbito');
+  }
+  if (pj(a)) {
+    add('Empresa', 'Contrato social e alterações, cartão CNPJ');
+    add('Empresa', 'Balanço patrimonial e DRE do último exercício, ECF');
+    add('Empresa', 'Fluxo de caixa dos últimos 6 a 12 meses e faturamento mês a mês');
+    add('Empresa', 'Relatório de situação fiscal (Receita e PGFN) e guias dos tributos correntes pagos');
+    add('Empresa', 'Certidões fiscais, trabalhistas e do FGTS');
+  }
+  if (sim(a, 'aval')) add('Avalistas', 'Documentos pessoais dos avalistas/fiadores e Registrato de cada um');
+  if (rural(a) || tem(a, /rural|cpr/)) {
+    add('Rural', 'Cédulas rurais (CCR, CPR, CCB) e aditivos');
+    add('Rural', 'Livro-caixa, notas de venda da produção e projeto técnico do financiamento');
+    add('Rural', 'Laudo agronômico de perda (se houve frustração de safra) e apólice de seguro rural/Proagro');
+    add('Rural', 'Cópia do pedido de prorrogação feito ao banco, se houver');
+  }
+  if (tem(a, /pronampe|peac/)) {
+    add('Pronampe', 'Contrato do Pronampe/PEAC (cópia integral) e extrato atualizado discriminado (saldo, juros, encargos, parcelas pagas)');
+    add('Pronampe', 'Comprovante de honra do FGO, se houver, ou prova de que a operação ainda está com o banco');
+  }
+  if (tem(a, /veiculo/) || temGar(a, 'af_veiculo')) add('Veículo', 'Contrato do financiamento, comprovantes das parcelas pagas e notificação de mora recebida');
+  if (tem(a, /imob|homeeq/) || temGar(a, 'af_imovel')) add('Imóvel', 'Matrícula atualizada do imóvel e intimações do cartório/avisos de leilão');
+  if (sim(a, 'acao') || temSit(a, /exec|busca/)) add('Processo', 'Cópia da ação, mandado de citação e decisões já proferidas');
+  if (sim(a, 'seguro')) add('Seguro', 'Apólice ou certificado do seguro prestamista e onde aparece a cobrança');
+  if (sim(a, 'deb_auto') || sim(a, 'bloqueio')) add('Débito automático', 'Extrato que mostre o débito das parcelas na conta de salário/faturamento');
+  if (sim(a, 'golpe')) add('Golpe/fraude', 'Boletim de ocorrência, contestação ao banco (protocolo), prints de mensagens e comprovantes das transferências');
+  add('Contratação', 'Procuração e contrato de honorários assinados');
+  return d;
+}
+function malote(a) {
+  const q = qualificar(a), b = totais(a).bancos; const m = [];
+  const bancos = b.length ? b.join(', ') : 'cada banco credor';
+  m.push(['Informacional', 'Modelo 1 — Solicitação de contratos atuais', 'Pedir a ' + bancos + ': contratos e aditivos, ficha gráfica de cada contrato, CET, evolução do saldo, garantias e a provisão contábil por operação (Res. CMN 4.966). A recusa ou o silêncio vira prova.', true]);
+  if (sim(a, 'reneg') || sim(a, 'pediu_docs')) m.push(['Informacional', 'Modelo 2 — Contratos dos últimos 10 anos', 'Houve renegociações/rolagens: pedir o histórico completo para reconstruir a cadeia de contratos.', true]);
+  if (sim(a, 'deb_auto') || sim(a, 'bloqueio')) m.push(['Provocativo', 'Modelo 3 — Cancelamento de débito automático (DDA)', 'Cancelar o débito das parcelas na conta de renda/faturamento para recuperar o fôlego de caixa.', true]);
+  if (sim(a, 'seguro') || sim(a, 'casada')) m.push(['Provocativo', 'Modelo 5 — Estorno de seguro prestamista (venda casada)', 'Pedir o estorno do seguro/produto vendido junto com o empréstimo.', true]);
+  if (q.inad) m.push(['Provocativo', 'Modelo 4 — Solicitação de proposta de acordo', 'Forçar o banco a se manifestar e revelar a alçada, depois que os documentos chegarem.', false]);
+  m.push(['Propositivo', 'Proposta ancorada em provisão + capacidade', 'Com o dossiê pronto: valor exato, dentro da capacidade de pagamento, com blindagem (baixa no SCR/SPC/Serasa e vedação de arrasto).', false]);
+  m.push(['Reiteratório', 'Modelo 6 — Reiteração diante de negativa', 'Se o banco negar ou silenciar: reforçar o prazo e documentar a desídia.', false]);
+  m.push(['Pré-judicial', 'Modelo 7 — Notificação extrajudicial', 'Quando a mesa não andar: notificar a ação e fixar marcos; muitas vezes traz o banco para a mesa.', false]);
+  return { m, canais: ['Protocolo presencial na agência, com carimbo e foto', 'Carta com AR dos Correios (duas vias)', pf(a) ? 'Consumidor.gov.br (conta gov.br do cliente; o texto curto vai no relato, a versão do escritório em PDF anexo)' : 'Consumidor.gov.br ou e-mail formal ao gerente/superintendência, conforme o caso', 'Banco Central — RDR (registro de reclamação)', 'Ouvidoria do banco (complemento)'] };
+}
+function passos(a) {
+  const q = qualificar(a); const p = [];
+  q.alertas.forEach((x) => p.push(['URGENTE', x]));
+  p.push(['1', 'Onboarding e documentos: entregar a lista de documentos por escrito hoje, de uma vez só. O tópico circunstancial do dossiê começa ao fim desta reunião.']);
+  p.push(['', 'Lançar cada operação no Modelo de Mapeamento de Endividamento (score de risco e cronograma de parcelas).']);
+  p.push(['2', 'Conselho jurídico: desenhar a estratégia (' + (q.servicos.map((s) => s[0]).join('; ') || 'a definir') + ').']);
+  p.push(['3', 'Apresentar a estratégia e o plano de ação ao cliente (proposta apresentada na 2ª reunião, nunca enviada).']);
+  p.push(['4', 'Malotes extrajudiciais pelos três canais, guardando a prova de cada envio (prazo de 15 dias úteis).']);
+  p.push(['5', 'Recebimento dos contratos. Em paralelo: (a) monitorar o provisionamento de cada contrato na planilha; (b) perícia dos contratos (juros, capitalização, tarifas, seguros); (c) laudo de capacidade de pagamento' + (rural(a) ? ' ou laudo de frustração de safra' : '') + '.']);
+  p.push(['6', 'Com as perícias: tópico jurídico-matemático (contábil) e tópico de capacidade de pagamento.']);
+  p.push(['7', 'Vícios encontrados? Teses com e sem judicialização. Sem vícios: negociação apoiada no provisionamento.']);
+  p.push(['8', 'Primeira versão do dossiê com os seis tópicos: circunstancial, capacidade, provisionamento, jurídico, contábil e conclusão.']);
+  p.push(['9', 'Três passadas de revisão e leitura por outra pessoa.']);
+  p.push(['10', 'Abertura da mesa negocial com quem tem alçada.']);
+  p.push(['11', 'Execução da mesa: comparar a proposta do banco com o valor recalculado, a provisão e a capacidade antes de aceitar.']);
+  p.push(['12', 'Acordo com cláusula de baixa no SCR/SPC/Serasa e vedação de arrasto (multicontrato).']);
+  p.push(['13', 'Finalização: prestação de contas e guarda do caso. Ciclo típico do onboarding ao acordo: cerca de 12 semanas.']);
+  return p;
+}
+
+// ---------- estado ----------
+let F = null, tSalvar = null; const NOMES = {};
+const novo = () => ({ id: null, caso_id: null, sec: 'cli', A: { tipo: '', nome: '', doc: '', dividas: [{}], r: {} }, salvoEm: '' });
+function marcarSujo() { F.sujo = true; clearTimeout(tSalvar); tSalvar = setTimeout(salvar, 1200); const s = $('#abSalvo'); if (s) s.textContent = 'salvando…'; }
+async function salvar() {
+  if (!F || !F.sujo) return; F.sujo = false; const meu = F;
+  try { const r = await api('ab_salvar', { id: meu.id || '', caso_id: meu.caso_id || '', nome: meu.A.nome || '', dados: meu.A }); if (r && r.id) meu.id = r.id; meu.salvoEm = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    delete S.cache.ablista; const s = $('#abSalvo'); if (s && F === meu) s.textContent = 'salvo às ' + meu.salvoEm;
+    if (meu.id && !/^#\/bancario\/[0-9a-f-]{36}$/.test(location.hash)) history.replaceState(null, '', '#/bancario/' + meu.id);
+  } catch (e) { const s = $('#abSalvo'); if (s) s.textContent = 'não salvou: ' + e.message; }
+}
+
+// ---------- telas ----------
+async function telaLista(forcar) {
+  titulo('Atendimento bancário', '<button class="btn pri sm" id="abNovo">' + ic('caneta', 's') + '<span class="so-desk"> Novo sem cadastro</span></button>');
+  if (!S.cache.ablista) carregando(3);
+  let d = { itens: [] }; try { d = (await dados('ablista', 'ab_lista', null, forcar)) || d; } catch (e) {}
+  let h = '<div class="ab"><div class="ab-c"><h3>Novo atendimento</h3><p class="sub">Escolha o cliente do cadastro. Roteiro de perguntas, documentos, malote e próximos passos do método do curso.</p>' +
+    '<label class="busca">' + ic('busca', 's') + '<input id="abBusca" placeholder="Buscar cliente por nome ou telefone" autocomplete="off"></label><div class="lista" id="abRes" style="margin-top:8px"></div></div>';
+  h += '<div class="ab-c"><h3>Atendimentos salvos</h3>' + ((d.itens || []).length ? '<div class="lista">' + d.itens.map((x) => '<a class="item" href="#/bancario/' + x.id + '"><div class="av">' + esc(iniciais(x.nome)) + '</div><div class="mid"><div class="t">' + esc(x.nome || 'Sem nome') + '</div><div class="d">' + esc([x.tipo ? (Object.fromEntries(TIPOS))[x.tipo] : '', x.bancos, x.saldo ? brl(x.saldo) : ''].filter(Boolean).join(' · ')) + ' · atualizado ' + esc(fmtD(x.updated_at, { dateStyle: 'short', timeStyle: 'short' })) + '</div></div>' + ic('seta', 's') + '</a>').join('') + '</div>' : '<p class="pp mut">Nenhum atendimento ainda.</p>') + '</div></div>';
+  $('#cont').innerHTML = h;
+  $('#abNovo').onclick = () => { F = novo(); location.hash = '#/bancario/novo'; };
+  let tm; $('#abBusca').oninput = (e) => { clearTimeout(tm); const q = e.target.value.trim(); tm = setTimeout(async () => {
+    if (q.length < 2) { $('#abRes').innerHTML = ''; return; }
+    try { const l = await api('casos', { q, etapa: '', perfil: '' }); (l || []).forEach((c) => { NOMES[c.id] = c.nome; }); $('#abRes').innerHTML = (l || []).slice(0, 12).map((c) => '<a class="item" href="#/bancario/c-' + c.id + '"><div class="av">' + esc(iniciais(c.nome)) + '</div><div class="mid"><div class="t">' + esc(c.nome) + '</div><div class="d">' + esc(ETAPA[c.etapa] || c.etapa || '') + '</div></div>' + ic('seta', 's') + '</a>').join('') || '<p class="pp mut">Nenhum cliente encontrado.</p>'; } catch (er) { $('#abRes').innerHTML = '<p class="pp mut">' + esc(er.message) + '</p>'; }
+  }, 300); };
+}
+async function abrir(arg) {
+  if (F && F.chave === arg) return;
+  if (F && F.sujo) await salvar();
+  if (arg === 'novo') { if (!F || F.chave !== 'novo') { F = novo(); } F.chave = 'novo'; return; }
+  carregando(3);
+  const casoId = arg.startsWith('c-') ? arg.slice(2) : null;
+  const r = await api('ab_abrir', casoId ? { caso_id: casoId } : { id: arg });
+  F = novo(); F.chave = arg;
+  if (r && r.id) { F.id = r.id; F.caso_id = r.caso_id || casoId; F.A = Object.assign(F.A, r.dados || {}); if (!F.A.r) F.A.r = {}; if (!(F.A.dividas || []).length) F.A.dividas = [{}]; }
+  else { F.caso_id = casoId; F.A.nome = NOMES[casoId] || ''; }
+  if (F.caso_id && !F.A.doc) { try { const c = await api('cadastro', { caso_id: F.caso_id }); const cl = (c && c.cliente) || {}; F.A.doc = cl.cpf || cl.cnpj || ''; if (!F.A.nome) F.A.nome = cl.nome || ''; } catch (e) {} }
+}
+function campoSN(k, v) { return '<span class="ab-sn" data-sn="' + k + '"><button type="button" data-v="sim" class="' + (v === 'sim' ? 'on' : '') + '">Sim</button><button type="button" data-v="nao" class="' + (v === 'nao' ? 'on' : '') + '">Não</button><button type="button" data-v="ns" class="' + (v === 'ns' ? 'on' : '') + '">Não sabe</button></span>'; }
+function htmlPergunta(a, q) {
+  const [, k, t, p, tipo, , opts] = q; const v = R(a, k) == null ? '' : R(a, k);
+  let c;
+  if (tipo === 'sn') c = campoSN(k, v);
+  else if (tipo === 'sel') c = '<select class="sel" data-r="' + k + '"><option value="">—</option>' + opts.map((o) => '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>';
+  else if (tipo === 'fato') { const l = rural(a) ? FATOS.rural : pf(a) ? FATOS.pf : FATOS.pj; c = '<div class="ab-chips" data-chip="' + k + '">' + l.map((o) => '<button type="button" class="' + (o === v ? 'on' : '') + '">' + esc(o) + '</button>').join('') + '</div>'; }
+  else if (tipo === 'num') c = '<input class="inp" inputmode="decimal" data-r="' + k + '" value="' + esc(v) + '" placeholder="0,00">';
+  else if (tipo === 'linha') c = '<input class="inp" data-r="' + k + '" value="' + esc(v) + '">';
+  else c = '<textarea class="inp" data-r="' + k + '">' + esc(v) + '</textarea>';
+  return '<div class="ab-q"><div class="t">' + esc(t) + '</div>' + (p ? '<div class="p">' + esc(p) + '</div>' : '') + c + '</div>';
+}
+function htmlDivida(d, i) {
+  const opt = (l, v) => '<option value="">—</option>' + l.map(([k, n]) => '<option value="' + k + '"' + (k === v ? ' selected' : '') + '>' + esc(n) + '</option>').join('');
+  return '<div class="ab-div" data-i="' + i + '"><div class="hd"><span>Dívida ' + (i + 1) + '</span><button type="button" class="btn fant sm" data-rm="' + i + '">Remover</button></div><div class="ab-grid">' +
+    '<label class="ab-f"><span>Banco / instituição</span><select class="sel" data-d="banco">' + '<option value="">—</option>' + BANCOS.map((b) => '<option' + (b === d.banco ? ' selected' : '') + '>' + esc(b) + '</option>').join('') + '</select></label>' +
+    (d.banco === 'Outro' ? '<label class="ab-f"><span>Qual instituição?</span><input class="inp" data-d="banco_outro" value="' + esc(d.banco_outro || '') + '"></label>' : '') +
+    '<label class="ab-f"><span>Tipo de dívida / natureza</span><select class="sel" data-d="modalidade">' + opt(MOD, d.modalidade) + '</select></label>' +
+    '<label class="ab-f"><span>Situação</span><select class="sel" data-d="situacao">' + opt(SIT, d.situacao) + '</select></label>' +
+    '<label class="ab-f"><span>Nº do contrato</span><input class="inp" data-d="contrato" value="' + esc(d.contrato || '') + '"></label>' +
+    '<label class="ab-f"><span>Data da contratação</span><input class="inp" type="date" data-d="data" value="' + esc(d.data || '') + '"></label>' +
+    '<label class="ab-f"><span>Valor contratado (R$)</span><input class="inp" inputmode="decimal" data-d="valor" value="' + esc(d.valor || '') + '"></label>' +
+    '<label class="ab-f"><span>Saldo devedor informado (R$)</span><input class="inp" inputmode="decimal" data-d="saldo" value="' + esc(d.saldo || '') + '"></label>' +
+    '<label class="ab-f"><span>Parcela mensal (R$)</span><input class="inp" inputmode="decimal" data-d="parcela" value="' + esc(d.parcela || '') + '"></label>' +
+    '<label class="ab-f"><span>Parcelas pagas / total</span><input class="inp" data-d="parcelas" value="' + esc(d.parcelas || '') + '" placeholder="ex.: 12/48"></label>' +
+    '<label class="ab-f"><span>Taxa de juros (se souber)</span><input class="inp" data-d="taxa" value="' + esc(d.taxa || '') + '" placeholder="ex.: 2,9% a.m."></label>' +
+    '</div><div class="ab-f" style="margin-top:10px"><span>Garantias</span><div class="ab-chips" data-gar="' + i + '">' + GAR.map(([k, n]) => '<button type="button" data-g="' + k + '" class="' + ((d.garantias || []).includes(k) ? 'on' : '') + '">' + esc(n) + '</button>').join('') + '</div></div></div>';
+}
+function htmlResultado(a) {
+  const q = qualificar(a), t = q.t, docs = documentos(a), ml = malote(a), ps = passos(a);
+  let h = '<div class="ab-c"><h3>Resumo</h3><div class="ab-kpi"><div><b>' + brl(t.saldo) + '</b>saldo informado</div><div><b>' + brl(t.parc) + '</b>parcelas por mês</div><div><b>' + (t.comp != null ? Math.round(t.comp * 100) + '%' : '—') + '</b>da renda/faturamento em parcelas</div><div><b>' + (t.bancos.length || 0) + '</b>banco(s): ' + esc(t.bancos.join(', ') || '—') + '</div></div>' +
+    q.alertas.map((x) => '<div class="ab-alerta">' + esc(x) + '</div>').join('') +
+    '<h3 style="margin-top:14px">Caminhos indicados</h3><ol class="ab-ol">' + (q.servicos.length ? q.servicos.map((s) => '<li><b>' + esc(s[0]) + '</b><small>' + esc(s[1]) + '</small></li>').join('') : '<li>Preencha as dívidas e a triagem.</li>') + '</ol></div>';
+  const grupos = {}; docs.forEach(([g, x]) => (grupos[g] = grupos[g] || []).push(x));
+  h += '<div class="ab-c"><h3>Documentos para pedir ao cliente</h3><p class="sub">Entregue a lista inteira de uma vez, por escrito (pedido fracionado prolonga a etapa).</p>' + Object.entries(grupos).map(([g, l]) => '<div style="margin-top:8px"><b>' + esc(g) + '</b><ul class="ab-ol">' + l.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul></div>').join('') +
+    '<div style="margin-top:10px"><button class="btn" type="button" id="abCopiar">' + ic('zap', 's') + ' Copiar lista para o WhatsApp</button></div></div>';
+  h += '<div class="ab-c"><h3>Plano do malote</h3><p class="sub">Os três primeiros abrem e sondam; os três últimos convergem e fecham. Modelos do Caderno de Malotes do curso (versão do cliente para o Consumidor.gov/BACEN e versão do escritório em PDF anexo).</p><ol class="ab-ol">' +
+    ml.m.map(([tp, n, x, agora]) => '<li><span class="ab-tag' + (agora ? ' ok' : '') + '">' + esc(tp) + (agora ? ' · enviar já' : ' · depois') + '</span><b>' + esc(n) + '</b><small>' + esc(x) + '</small></li>').join('') + '</ol>' +
+    '<div style="margin-top:10px"><b>Canais (sempre pelo menos três, ao mesmo tempo)</b><ul class="ab-ol">' + ml.canais.map((c) => '<li>' + esc(c) + '</li>').join('') + '</ul><p class="sub" style="margin-top:6px">Silêncio vira desídia documentada; resposta genérica reforça a inversão do ônus; resposta técnica leva direto à mesa. Guarde a prova de cada canal.</p></div></div>';
+  h += '<div class="ab-c"><h3>Próximos passos (método do curso)</h3><ol class="ab-ol" style="list-style:none;padding-left:0">' + ps.map(([n, x]) => '<li>' + (n === 'URGENTE' ? '<span class="ab-tag urg">urgente</span>' : n ? '<span class="ab-tag">' + esc(n) + '</span>' : '<span class="ab-tag" style="opacity:.5">+</span>') + esc(x) + '</li>').join('') + '</ol>' +
+    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="button" id="abDocx">' + ic('baixar', 's') + ' Baixar relatório .docx</button>' + (F.caso_id ? '<a class="btn" href="#/caso/' + F.caso_id + '">' + ic('voltar', 's') + ' Abrir o caso</a>' : '') + '</div></div>';
+  return h;
+}
+function render() {
+  const a = F.A, sec = F.sec;
+  titulo('Atendimento bancário' + (a.nome ? ' · ' + a.nome.split(' ')[0] : ''), '<span class="ab-salvo" id="abSalvo">' + (F.salvoEm ? 'salvo às ' + F.salvoEm : '') + '</span><a class="btn fant sm" href="#/bancario">' + ic('voltar', 's') + '<span class="so-desk"> Atendimentos</span></a>');
+  let h = '<div class="ab"><div class="ab-tabs">' + SECOES.map(([k, n]) => '<button type="button" data-sec="' + k + '" class="' + (k === sec ? 'on' : '') + '">' + n + '</button>').join('') + '</div>';
+  if (sec === 'cli') h += '<div class="ab-c"><h3>Cliente</h3><p class="sub">' + (F.caso_id ? 'Ligado ao caso do cadastro.' : 'Atendimento sem cadastro: preencha o nome.') + '</p><div class="ab-grid">' +
+    '<label class="ab-f"><span>Nome / razão social</span><input class="inp" data-a="nome" value="' + esc(a.nome || '') + '"></label>' +
+    '<label class="ab-f"><span>CPF / CNPJ</span><input class="inp" data-a="doc" value="' + esc(a.doc || '') + '"></label>' +
+    '<label class="ab-f"><span>Atividade / profissão</span><input class="inp" data-a="atividade" value="' + esc(a.atividade || '') + '"></label>' +
+    '<label class="ab-f"><span>Cidade / UF</span><input class="inp" data-a="cidade" value="' + esc(a.cidade || '') + '"></label></div>' +
+    '<div class="ab-f" style="margin-top:12px"><span>Tipo de cliente</span><div class="pills" data-tipo>' + TIPOS.map(([k, n]) => '<button type="button" data-v="' + k + '" class="' + (a.tipo === k ? 'on' : '') + '">' + n + '</button>').join('') + '</div></div></div>';
+  else if (sec === 'div') { const t = totais(a); h += '<div class="ab-c"><h3>Dívidas bancárias</h3><p class="sub">Uma linha por contrato. Total informado: <b>' + brl(t.saldo) + '</b> · parcelas: <b>' + brl(t.parc) + '</b>/mês.</p>' + (a.dividas || []).map(htmlDivida).join('') + '<div style="margin-top:10px"><button class="btn" type="button" id="abAddDiv">+ Adicionar dívida</button></div></div>'; }
+  else if (sec === 'res') h += htmlResultado(a);
+  else { const l = Q.filter((q) => q[0] === sec && (!q[5] || q[5](a))); h += '<div class="ab-c"><h3>' + esc(SECN[sec]) + '</h3>' + (!a.tipo ? '<p class="sub">Escolha o tipo de cliente na aba 1 para ver todas as perguntas.</p>' : '') + (l.length ? l.map((q) => htmlPergunta(a, q)).join('') : '<p class="pp mut">Nenhuma pergunta específica para este caso.</p>') + '</div>'; }
+  const i = SECOES.findIndex((s) => s[0] === sec);
+  h += '<div style="display:flex;justify-content:space-between;gap:8px">' + (i > 0 ? '<button class="btn" type="button" data-sec="' + SECOES[i - 1][0] + '">' + ic('voltar', 's') + ' ' + SECOES[i - 1][1] + '</button>' : '<span></span>') + (i < SECOES.length - 1 ? '<button class="btn pri" type="button" data-sec="' + SECOES[i + 1][0] + '">' + SECOES[i + 1][1] + ' ' + ic('seta', 's') + '</button>' : '') + '</div></div>';
+  $('#cont').innerHTML = h;
+  ligar();
+}
+function ligar() {
+  const c = $('#cont'), a = F.A;
+  c.querySelectorAll('[data-sec]').forEach((b) => b.onclick = () => { F.sec = b.dataset.sec; render(); window.scrollTo(0, 0); });
+  c.querySelectorAll('[data-a]').forEach((i) => i.oninput = () => { a[i.dataset.a] = i.value; marcarSujo(); });
+  c.querySelectorAll('[data-tipo] button').forEach((b) => b.onclick = () => { a.tipo = b.dataset.v; marcarSujo(); render(); });
+  c.querySelectorAll('[data-r]').forEach((i) => { const ev = i.tagName === 'SELECT' ? 'onchange' : 'oninput'; i[ev] = () => { a.r[i.dataset.r] = i.value; marcarSujo(); }; });
+  c.querySelectorAll('[data-sn]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.onclick = () => { const k = g.dataset.sn; a.r[k] = a.r[k] === b.dataset.v ? '' : b.dataset.v; marcarSujo(); render(); }));
+  c.querySelectorAll('[data-chip]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.onclick = () => { const k = g.dataset.chip; a.r[k] = a.r[k] === b.textContent ? '' : b.textContent; marcarSujo(); render(); }));
+  c.querySelectorAll('.ab-div').forEach((box) => { const i = Number(box.dataset.i); const d = a.dividas[i];
+    box.querySelectorAll('[data-d]').forEach((el) => { const ev = el.tagName === 'SELECT' ? 'onchange' : 'oninput'; el[ev] = () => { d[el.dataset.d] = el.value; marcarSujo(); if (el.dataset.d === 'banco') render(); }; });
+    box.querySelectorAll('[data-g]').forEach((b) => b.onclick = () => { const g = b.dataset.g; d.garantias = d.garantias || []; d.garantias = d.garantias.includes(g) ? d.garantias.filter((x) => x !== g) : d.garantias.concat(g); marcarSujo(); render(); });
+  });
+  c.querySelectorAll('[data-rm]').forEach((b) => b.onclick = () => { a.dividas.splice(Number(b.dataset.rm), 1); if (!a.dividas.length) a.dividas.push({}); marcarSujo(); render(); });
+  const ad = $('#abAddDiv'); if (ad) ad.onclick = () => { a.dividas.push({}); marcarSujo(); render(); };
+  const cp = $('#abCopiar'); if (cp) cp.onclick = async () => { const nome = (a.nome || '').split(' ')[0]; const txt = (nome ? 'Olá, ' + nome + '! ' : '') + 'Para darmos sequência à análise das suas dívidas bancárias, por favor nos envie:\n\n' + documentos(a).map(([, x]) => '• ' + x).join('\n') + '\n\nPode mandar por aqui mesmo, em foto ou PDF. Qualquer dúvida, estamos à disposição.\nFCE Advogados';
+    try { await navigator.clipboard.writeText(txt); toast('Lista copiada. Cole no WhatsApp do cliente.'); } catch (e) { toast('Não foi possível copiar.', true); } };
+  const dx = $('#abDocx'); if (dx) dx.onclick = async () => { dx.disabled = true; try { await gerarDocx(); toast('Relatório .docx baixado.'); } catch (e) { toast(e.message || 'Não foi possível gerar o .docx.', true); } finally { dx.disabled = false; } };
+}
+
+// ---------- .docx ----------
+let lib = null;
+function carregarDocx() { if (window.docx) return Promise.resolve(window.docx); if (lib) return lib; lib = new Promise((ok, er) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js'; s.onload = () => ok(window.docx); s.onerror = () => { lib = null; er(new Error('Não foi possível carregar o gerador de .docx.')); }; document.head.appendChild(s); }); return lib; }
+async function gerarDocx() {
+  const X = await carregarDocx(); const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, ShadingType } = X;
+  const a = F.A, q = qualificar(a), t = q.t; const NAVY = '1B263B', GOLD = 'B0882E', GREY = '667082';
+  const run = (x, o) => new TextRun(Object.assign({ text: String(x == null ? '' : x), size: 20, font: 'Calibri' }, o || {}));
+  const par = (k, o) => new Paragraph(Object.assign({ children: Array.isArray(k) ? k : [k], spacing: { after: 80 } }, o || {}));
+  const h1 = (x) => par(run(x, { bold: true, size: 26, color: NAVY }), { spacing: { before: 280, after: 80 }, border: { bottom: { style: BorderStyle.SINGLE, size: 12, space: 3, color: GOLD } } });
+  const li = (x, b) => par([run('• ' + (b ? b + ': ' : ''), { bold: !!b }), run(x)]);
+  const bd = { style: BorderStyle.SINGLE, size: 4, color: 'C8CDD3' };
+  const cel = (x, head) => new TableCell({ borders: { top: bd, bottom: bd, left: bd, right: bd }, shading: head ? { type: ShadingType.CLEAR, color: 'auto', fill: NAVY } : undefined, children: [par(run(x, { size: 17, bold: !!head, color: head ? 'FFFFFF' : '222A38' }))] });
+  const TN = Object.fromEntries(TIPOS);
+  const corpo = [
+    par(run('FCE ADVOGADOS · ATENDIMENTO BANCÁRIO', { bold: true, size: 16, color: GOLD })),
+    par(run(a.nome || 'Cliente', { bold: true, size: 40, color: NAVY })),
+    par(run([TN[a.tipo] || '', a.doc, a.atividade, a.cidade].filter(Boolean).join(' · '), { color: GREY })),
+    par(run('Gerado em ' + new Date().toLocaleString('pt-BR') + '. Material interno de trabalho; não substitui a análise do advogado responsável.', { size: 16, italics: true, color: GREY })),
+    h1('Resumo'), li(brl(t.saldo), 'Saldo informado'), li(brl(t.parc) + ' por mês' + (t.comp != null ? ' (' + Math.round(t.comp * 100) + '% da renda/faturamento)' : ''), 'Parcelas'), li(t.bancos.join(', ') || '—', 'Bancos')
+  ];
+  q.alertas.forEach((x) => corpo.push(par(run('ATENÇÃO: ' + x, { bold: true, color: 'B5470F' }))));
+  corpo.push(h1('Caminhos indicados')); q.servicos.forEach((s) => corpo.push(li(s[1], s[0])));
+  corpo.push(h1('Dívidas'));
+  const l = dvs(a);
+  if (l.length) corpo.push(new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [new TableRow({ tableHeader: true, children: ['Banco', 'Tipo', 'Situação', 'Contrato', 'Saldo', 'Parcela', 'Garantias'].map((x) => cel(x, true)) })]
+    .concat(l.map((d) => new TableRow({ children: [d.banco === 'Outro' ? (d.banco_outro || 'Outro') : d.banco, MODN[d.modalidade] || '', SITN[d.situacao] || '', d.contrato || '', d.saldo ? brl(num(d.saldo)) : '', d.parcela ? brl(num(d.parcela)) : '', (d.garantias || []).map((g) => GARN[g]).join(', ')].map((x) => cel(x || '—')) }))) }));
+  else corpo.push(par(run('Nenhuma dívida lançada.')));
+  Object.entries(SECN).forEach(([sec, nome]) => {
+    const qs = Q.filter((x) => x[0] === sec && (!x[5] || x[5](a)) && String(R(a, x[1]) || '').trim());
+    if (!qs.length) return; corpo.push(h1(nome));
+    qs.forEach((x) => { const v = R(a, x[1]); corpo.push(par(run(x[2], { bold: true, size: 19 }), { spacing: { after: 20 } }), par(run(v === 'sim' ? 'Sim' : v === 'nao' ? 'Não' : v === 'ns' ? 'Não sabe' : v))); });
+  });
+  corpo.push(h1('Documentos para pedir ao cliente')); documentos(a).forEach(([g, x]) => corpo.push(li(x, g)));
+  const ml = malote(a); corpo.push(h1('Plano do malote')); ml.m.forEach(([tp, n, x, ag]) => corpo.push(par([run(n + ' ', { bold: true }), run('(' + tp + (ag ? ', enviar já' : ', depois') + ') ', { color: GREY }), run(x)])));
+  corpo.push(par(run('Canais: ' + ml.canais.join('; ') + '.', { size: 18, color: GREY })));
+  corpo.push(h1('Próximos passos')); passos(a).forEach(([n, x]) => corpo.push(par([run((n === 'URGENTE' ? 'URGENTE' : n || '+') + '  ', { bold: true, color: n === 'URGENTE' ? 'B5470F' : GOLD }), run(x)])));
+  const doc = new Document({ creator: 'FCE Advogados', title: 'Atendimento bancário', sections: [{ properties: { page: { margin: { top: 1134, bottom: 1134, left: 1247, right: 1247 } } }, children: corpo }] });
+  const blob = await Packer.toBlob(doc); const el = document.createElement('a'); el.href = URL.createObjectURL(blob);
+  el.download = 'atendimento_bancario_' + String(a.nome || 'cliente').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '_').slice(0, 40) + '.docx';
+  document.body.appendChild(el); el.click(); setTimeout(() => { URL.revokeObjectURL(el.href); el.remove(); }, 1500);
+}
+
+VIEWS.bancario = async (arg, forcar) => {
+  if (!arg) { if (F && F.sujo) await salvar(); return telaLista(forcar); }
+  await abrir(arg); render();
+};
+window.addEventListener('beforeunload', () => { if (F && F.sujo) salvar(); });
+})();
