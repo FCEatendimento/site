@@ -1103,7 +1103,7 @@ async function rota(forcar) {
   // aba de um módulo que ainda está carregando (diagnostico.js, teses.js): espera a página terminar de carregar
   if (!VIEWS[nome] && nome && document.readyState !== 'complete') { window.addEventListener('load', () => { if (rotaAtual !== (location.hash.replace(/^#\/?/, '') || 'inicio')) rota(forcar); }, { once: true }); return; }
   const k = VIEWS[nome] ? nome : 'inicio';
-  const MAIS_NAV = [], MAIS_TAB = ['casos', 'diagnostico', 'teses', 'cursos', 'noticias'].concat(['aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
+  const MAIS_NAV = [], MAIS_TAB = ['casos', 'diagnostico', 'teses', 'cursos', 'noticias', 'radar'].concat(['aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
   const GRUPO = { despesas: 'financeiro', redes: 'marketing', conteudo: 'marketing', processo: 'processos', whatsapp: 'atendimentos', analise: 'atendimentos', clientes: 'atendimentos' };
   $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || GRUPO[k] === a.dataset.k || (a.dataset.k === 'mais' && (a.closest('.tabbar') ? MAIS_TAB : MAIS_NAV).includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
@@ -2256,6 +2256,7 @@ VIEWS.mais = async () => {
     '<a class="item" href="#/aprovacoes"><div class="ic-circ warn">' + ic('checks', 's') + '</div><div class="mid"><div class="t">Aprovações</div><div class="d">Decisões de caso, anúncios e posts</div></div><span class="bdg" data-bdg hidden></span>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/cursos"><div class="ic-circ ouro">' + ic('estrela', 's') + '</div><div class="mid"><div class="t">Cursos</div><div class="d">Kiwify e Hotmart</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/noticias"><div class="ic-circ rd">' + ic('jornal', 's') + '</div><div class="mid"><div class="t">Notícias</div><div class="d">Bancário, imobiliário, agro, economia e tribunais</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/radar"><div class="ic-circ nav">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Radar bancário</div><div class="d">Grandes bancos: BACEN (SGS, IF.data) e CVM, com .docx</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/redes"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Anúncios e posts para aprovar, Google Ads e calendário de conteúdo</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/casos"><div class="ic-circ nav">' + ic('casos', 's') + '</div><div class="mid"><div class="t">Todos os casos</div><div class="d">Lista e quadro por etapa, inclusive encerrados</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/processos"><div class="ic-circ nav">' + ic('martelo', 's') + '</div><div class="mid"><div class="t">Processos</div><div class="d">TJRS, TRF4, TJSP, TRF2, STJ e STF: a ajuizar e em andamento</div></div>' + ic('seta', 's') + '</a>' +
@@ -2877,7 +2878,7 @@ function cardNt(n, grande) {
     (n.n_sug ? '<a class="nt-sug" href="#/conteudo">' + ic('mega', 's') + ' Levar para o calendário de conteúdo</a>' : '') + '</div></article>';
 }
 VIEWS.noticias = async (_, forcar) => {
-  titulo('Notícias', '<a class="btn sm fant" href="#/conteudo">' + ic('cal', 's') + '<span class="so-desk"> Calendário de conteúdo</span></a>');
+  titulo('Notícias', '<a class="btn sm" href="#/radar">' + ic('grafico', 's') + '<span class="so-desk"> Radar bancário</span></a><a class="btn sm fant" href="#/conteudo">' + ic('cal', 's') + '<span class="so-desk"> Calendário de conteúdo</span></a>');
   if (!S.cache.noticias) carregando(4);
   const l = await dados('noticias', 'noticias', null, forcar);
   const filtro = (l || []).filter((n) => !S.nxTema || n.tema === S.nxTema);
@@ -3479,6 +3480,7 @@ async function calendarioPrazos(el, forcar) {
 </script>
 <script src="diagnostico.js?v=6"></script>
 <script src="teses.js?v=1"></script>
+<script src="radar.js?v=1"></script>
 <script>
 /* Efeito 3D: inclinação leve dos indicadores ao passar o mouse */
 (function(){if(matchMedia('(prefers-reduced-motion: reduce)').matches||!matchMedia('(hover:hover)').matches)return;
