@@ -1,7 +1,7 @@
 // Aba "Atendimento bancário" (#/bancario), 22/11/2026: formulário de atendimento do cliente com dívida bancária, montado a partir do
 // curso Advocacia Bancária Milionária (Dossiê Jurídico-Contábil, O Malote, Caderno de Modelos de Malotes, Pronampe, Imersão comercial,
 // Qualificação do Lead). Gera: lista de documentos do cliente, plano do malote, próximos passos do método e relatório .docx.
-// Salva por caso na tabela app_atend_bancario (ações ab_lista, ab_abrir, ab_salvar da App API). Material de trabalho interno.
+// Ao final: tempo estimado de execução e honorários indicados (tabela de precificação do curso). Salva por caso na tabela app_atend_bancario (ações ab_lista, ab_abrir, ab_salvar da App API). Material de trabalho interno.
 (function () {
 const css = document.createElement('style');
 css.textContent = `
@@ -226,6 +226,59 @@ function passos(a) {
   return p;
 }
 
+// ---------- prazo estimado e honorários (curso: O Malote, Precificação, Trilha 100k e Mapeamento de ICP) ----------
+function mesesDesde(txt) { const m = String(txt || '').match(/(\d{1,2})\s*\/\s*(\d{4})/); if (!m) return null; const d = new Date(Number(m[2]), Number(m[1]) - 1, 1); const n = new Date(); return (n.getFullYear() - d.getFullYear()) * 12 + n.getMonth() - d.getMonth(); }
+function prazo(a) {
+  const q = qualificar(a), l = [];
+  const atraso = mesesDesde(R(a, 'atraso1'));
+  if (q.alertas.length) l.push(['Imediato', 'Medidas urgentes (prazos judiciais, leilão, busca e apreensão) correm antes do restante, em dias.']);
+  if (sim(a, 'deb_auto') || sim(a, 'bloqueio')) l.push(['15 dias úteis', 'Cancelamento do débito automático: prazo de resposta do malote.']);
+  if (q.inad || dvs(a).length) {
+    l.push(['Semanas 1–2', 'Onboarding, documentos do cliente e mapeamento das dívidas.']);
+    l.push(['Semanas 3–4', 'Malotes ao banco e auditoria (prazo de resposta de 15 dias úteis).']);
+    l.push(['Semanas 5–6', 'Perícia, recálculo e montagem do dossiê.']);
+    l.push(['Semanas 7–8', 'Negociação e mesa com quem tem alçada.']);
+    l.push(['Semanas 9–12', 'Acordo, baixa nos cadastros e acompanhamento.']);
+  }
+  const se = q.servicos.some((s) => /Superendividamento/.test(s[0])), jud = q.servicos.some((s) => /Defesa do executado|Golpe/.test(s[0]));
+  let total = 'Cerca de 12 semanas na via extrajudicial, se o banco responder e houver acordo.';
+  if (atraso != null && atraso >= 12) total += ' Cliente inadimplente há ' + atraso + ' meses: a operação já tende ao provisionamento integral, o que costuma encurtar a negociação.';
+  const hz = [];
+  hz.push('Horizonte do contrato de reestruturação: até 24 meses (horizonte de trabalho usado pelo curso na precificação).');
+  if (se) hz.push('Superendividamento judicial: cerca de 12 meses (tempo médio de tramitação de 368 dias, segundo o CNJ, citado no curso).');
+  if (jud) hz.push('Fase judicial (execução, revisional, golpe): depende da tramitação; sem estimativa fixa no curso.');
+  if (!q.inad && dvs(a).length) hz.push('Dívidas em dia: primeiro a análise de viabilidade (2 a 4 semanas) antes de qualquer estratégia de atraso.');
+  return { fases: l, total, hz };
+}
+const FAIXAS = [ // [até, %min, %max, entrada min, entrada max, obs] — tabela de precificação REPB do curso
+  [50000, null, null, 5000, null, 'Abaixo da faixa do curso: o exemplo do curso para R$ 50 mil cobra o mínimo de R$ 5 mil. Avaliar se o caso cabe no perfil do escritório.'],
+  [100000, 0.10, 0.20, 1997, 9999, 'Quanto menor a dívida, maior o percentual.'],
+  [200000, 0.10, 0.15, 11000, 30000, 'Análise de risco.'],
+  [500000, 0.10, 0.13, 21000, 65000, 'Personalizado.'],
+  [1000000, 0.10, 0.10, 50000, 100000, 'Escala equilibrada.'],
+  [10000000, 0.05, 0.10, null, null, 'Dívidas de R$ 1 a 10 milhões (Mapeamento de ICP).'],
+  [Infinity, 0.03, 0.08, null, null, 'Acima de R$ 10 milhões (Mapeamento de ICP).']
+];
+function honorarios(a) {
+  const q = qualificar(a), saldo = q.t.saldo, f = FAIXAS.find((x) => saldo <= x[0]) || FAIXAS[FAIXAS.length - 1];
+  const nContr = dvs(a).length, exec = sim(a, 'acao') || temSit(a, /exec|busca|leilao/);
+  const r = { saldo, linhas: [], obs: [] };
+  if (!saldo) { r.obs.push('Informe o saldo das dívidas na aba 2 para calcular a faixa de honorários.'); return r; }
+  let ini = f[1] != null ? [saldo * f[1], saldo * f[2]] : [f[3], f[3]];
+  if (f[3] != null && f[1] != null) ini = [Math.max(ini[0], f[3]), f[4] != null ? Math.min(Math.max(ini[1], f[3]), f[4]) : ini[1]];
+  const pct = f[1] != null ? Math.round(f[1] * 100) + (f[2] !== f[1] ? '–' + Math.round(f[2] * 100) : '') + '%' : 'mínimo';
+  r.linhas.push(['Pró-labore (na assinatura)', brl(ini[0]) + (ini[1] !== ini[0] ? ' a ' + brl(ini[1]) : ''), pct + ' do saldo de ' + brl(saldo) + '. ' + f[5] + (nContr > 1 ? ' Com ' + nContr + ' contratos, puxe para o alto da faixa (no exemplo do curso, R$ 100 mil em 1 contrato = R$ 10 mil; em 4 contratos = R$ 12 a 15 mil).' : '')]);
+  if (exec) r.linhas.push(['Adicional de urgência', '+10% na entrada', 'Execução, busca e apreensão ou leilão em andamento.']);
+  r.linhas.push(['Taxa mensal (TMP)', 'R$ 1.000 a R$ 3.000/mês', 'Durante a condução do caso. No exemplo do curso para dívida de R$ 100 mil: entrada parcelada (R$ 2 mil + 10× R$ 800) e, a partir da 11ª parcela, R$ 200/mês até o fim.']);
+  r.linhas.push(['Êxito', (f[1] != null ? pct : '10–20%') + ' da redução obtida', 'Sobre o proveito econômico (diferença entre o saldo cobrado e o valor do acordo ou da decisão). Nenhum cliente paga só êxito.']);
+  if (exec || q.servicos.some((s) => /Defesa|Golpe/.test(s[0]))) r.linhas.push(['Liminar / medida urgente', '10% do valor bloqueado ou liberado', 'Bônus eventual quando a medida judicial libera ou protege valores.']);
+  if (q.servicos.some((s) => /Superendividamento/.test(s[0]))) r.obs.push('Superendividamento: entrada de 8% a 15% (tabela do curso), com múltiplos credores.');
+  if (q.servicos.some((s) => /Defesa do executado/.test(s[0]))) r.obs.push('Defesa do executado: entrada de 10% a 15% + 10% de urgência (tabela do curso).');
+  r.obs.push('Fale do custo de não agir antes de falar em valor; apresente a proposta na 2ª reunião e não ofereça desconto espontâneo.');
+  r.obs.push('Valores indicativos do curso: confira com a tabela da OAB/RS e a política do escritório antes de propor.');
+  return r;
+}
+
 // ---------- estado ----------
 let F = null, tSalvar = null; const NOMES = {};
 const novo = () => ({ id: null, caso_id: null, sec: 'cli', A: { tipo: '', nome: '', doc: '', dividas: [{}], r: {} }, salvoEm: '' });
@@ -304,8 +357,15 @@ function htmlResultado(a) {
   h += '<div class="ab-c"><h3>Plano do malote</h3><p class="sub">Os três primeiros abrem e sondam; os três últimos convergem e fecham. Modelos do Caderno de Malotes do curso (versão do cliente para o Consumidor.gov/BACEN e versão do escritório em PDF anexo).</p><ol class="ab-ol">' +
     ml.m.map(([tp, n, x, agora]) => '<li><span class="ab-tag' + (agora ? ' ok' : '') + '">' + esc(tp) + (agora ? ' · enviar já' : ' · depois') + '</span><b>' + esc(n) + '</b><small>' + esc(x) + '</small></li>').join('') + '</ol>' +
     '<div style="margin-top:10px"><b>Canais (sempre pelo menos três, ao mesmo tempo)</b><ul class="ab-ol">' + ml.canais.map((c) => '<li>' + esc(c) + '</li>').join('') + '</ul><p class="sub" style="margin-top:6px">Silêncio vira desídia documentada; resposta genérica reforça a inversão do ônus; resposta técnica leva direto à mesa. Guarde a prova de cada canal.</p></div></div>';
-  h += '<div class="ab-c"><h3>Próximos passos (método do curso)</h3><ol class="ab-ol" style="list-style:none;padding-left:0">' + ps.map(([n, x]) => '<li>' + (n === 'URGENTE' ? '<span class="ab-tag urg">urgente</span>' : n ? '<span class="ab-tag">' + esc(n) + '</span>' : '<span class="ab-tag" style="opacity:.5">+</span>') + esc(x) + '</li>').join('') + '</ol>' +
-    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="button" id="abDocx">' + ic('baixar', 's') + ' Baixar relatório .docx</button>' + (F.caso_id ? '<a class="btn" href="#/caso/' + F.caso_id + '">' + ic('voltar', 's') + ' Abrir o caso</a>' : '') + '</div></div>';
+  h += '<div class="ab-c"><h3>Próximos passos (método do curso)</h3><ol class="ab-ol" style="list-style:none;padding-left:0">' + ps.map(([n, x]) => '<li>' + (n === 'URGENTE' ? '<span class="ab-tag urg">urgente</span>' : n ? '<span class="ab-tag">' + esc(n) + '</span>' : '<span class="ab-tag" style="opacity:.5">+</span>') + esc(x) + '</li>').join('') + '</ol></div>';
+  const pz = prazo(a), hn = honorarios(a), H = a.hon || {};
+  h += '<div class="ab-c"><h3>Tempo estimado de execução</h3><p class="sub">' + esc(pz.total) + '</p><ol class="ab-ol" style="list-style:none;padding-left:0">' + pz.fases.map(([n, x]) => '<li><span class="ab-tag' + (n === 'Imediato' ? ' urg' : '') + '">' + esc(n) + '</span>' + esc(x) + '</li>').join('') + '</ol><ul class="ab-ol">' + pz.hz.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
+  h += '<div class="ab-c"><h3>Honorários indicados</h3><p class="sub">Pela tabela de precificação e pelos quatro momentos de cobrança do curso (pró-labore, taxa mensal, liminar e êxito).</p>' +
+    (hn.linhas.length ? '<div class="tab-wrap"><table class="tb"><thead><tr><th style="text-align:left">Momento</th><th style="text-align:left">Indicação</th><th style="text-align:left">Como chegar ao valor</th></tr></thead><tbody>' + hn.linhas.map(([m, v, o]) => '<tr><td style="text-align:left"><b>' + esc(m) + '</b></td><td style="text-align:left;white-space:nowrap"><b>' + esc(v) + '</b></td><td style="text-align:left;white-space:normal">' + esc(o) + '</td></tr>').join('') + '</tbody></table></div>' : '') +
+    '<ul class="ab-ol">' + hn.obs.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>' +
+    '<h3 style="margin-top:14px">Proposta registrada</h3><p class="sub">O que foi efetivamente proposto ao cliente (inicial e êxito separados, como pede o CRM do curso).</p><div class="ab-grid">' +
+    [['inicial', 'Honorário inicial (R$)'], ['forma', 'Forma de pagamento da entrada'], ['tmp', 'Taxa mensal (R$/mês)'], ['exito', 'Êxito (% da redução)'], ['status', 'Situação da proposta']].map(([k, n]) => '<label class="ab-f"><span>' + n + '</span>' + (k === 'status' ? '<select class="sel" data-h="status"><option value="">—</option>' + ['Apresentada', 'Em negociação', 'Aceita (contrato assinado)', 'Recusada'].map((o) => '<option' + (H.status === o ? ' selected' : '') + '>' + o + '</option>').join('') + '</select>' : '<input class="inp" data-h="' + k + '" value="' + esc(H[k] || '') + '">') + '</label>').join('') + '</div></div>';
+  h += '<div class="ab-c"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="button" id="abDocx">' + ic('baixar', 's') + ' Baixar relatório .docx</button>' + (F.caso_id ? '<a class="btn" href="#/caso/' + F.caso_id + '">' + ic('voltar', 's') + ' Abrir o caso</a>' : '') + '</div></div>';
   return h;
 }
 function render() {
@@ -342,6 +402,7 @@ function ligar() {
   const ad = $('#abAddDiv'); if (ad) ad.onclick = () => { a.dividas.push({}); marcarSujo(); render(); };
   const cp = $('#abCopiar'); if (cp) cp.onclick = async () => { const nome = (a.nome || '').split(' ')[0]; const txt = (nome ? 'Olá, ' + nome + '! ' : '') + 'Para darmos sequência à análise das suas dívidas bancárias, por favor nos envie:\n\n' + documentos(a).map(([, x]) => '• ' + x).join('\n') + '\n\nPode mandar por aqui mesmo, em foto ou PDF. Qualquer dúvida, estamos à disposição.\nFCE Advogados';
     try { await navigator.clipboard.writeText(txt); toast('Lista copiada. Cole no WhatsApp do cliente.'); } catch (e) { toast('Não foi possível copiar.', true); } };
+  c.querySelectorAll('[data-h]').forEach((i) => { const ev = i.tagName === 'SELECT' ? 'onchange' : 'oninput'; i[ev] = () => { a.hon = a.hon || {}; a.hon[i.dataset.h] = i.value; marcarSujo(); }; });
   const dx = $('#abDocx'); if (dx) dx.onclick = async () => { dx.disabled = true; try { await gerarDocx(); toast('Relatório .docx baixado.'); } catch (e) { toast(e.message || 'Não foi possível gerar o .docx.', true); } finally { dx.disabled = false; } };
 }
 
@@ -381,6 +442,15 @@ async function gerarDocx() {
   const ml = malote(a); corpo.push(h1('Plano do malote')); ml.m.forEach(([tp, n, x, ag]) => corpo.push(par([run(n + ' ', { bold: true }), run('(' + tp + (ag ? ', enviar já' : ', depois') + ') ', { color: GREY }), run(x)])));
   corpo.push(par(run('Canais: ' + ml.canais.join('; ') + '.', { size: 18, color: GREY })));
   corpo.push(h1('Próximos passos')); passos(a).forEach(([n, x]) => corpo.push(par([run((n === 'URGENTE' ? 'URGENTE' : n || '+') + '  ', { bold: true, color: n === 'URGENTE' ? 'B5470F' : GOLD }), run(x)])));
+  const pz = prazo(a), hn = honorarios(a), H = a.hon || {};
+  corpo.push(h1('Tempo estimado de execução'), par(run(pz.total)));
+  pz.fases.forEach(([n, x]) => corpo.push(par([run(n + '  ', { bold: true, color: n === 'Imediato' ? 'B5470F' : GOLD }), run(x)])));
+  pz.hz.forEach((x) => corpo.push(li(x)));
+  corpo.push(h1('Honorários indicados'));
+  hn.linhas.forEach(([m, v, o]) => corpo.push(par([run(m + ': ', { bold: true }), run(v + '. ', { bold: true, color: NAVY }), run(o)])));
+  hn.obs.forEach((x) => corpo.push(li(x)));
+  if (Object.values(H).some((v) => String(v || '').trim())) { corpo.push(par(run('Proposta registrada', { bold: true, size: 22, color: NAVY }), { spacing: { before: 160, after: 60 } }));
+    [['inicial', 'Honorário inicial'], ['forma', 'Forma de pagamento'], ['tmp', 'Taxa mensal'], ['exito', 'Êxito'], ['status', 'Situação']].forEach(([k, n]) => { if (String(H[k] || '').trim()) corpo.push(li(H[k], n)); }); }
   const doc = new Document({ creator: 'FCE Advogados', title: 'Atendimento bancário', sections: [{ properties: { page: { margin: { top: 1134, bottom: 1134, left: 1247, right: 1247 } } }, children: corpo }] });
   const blob = await Packer.toBlob(doc); const el = document.createElement('a'); el.href = URL.createObjectURL(blob);
   el.download = 'atendimento_bancario_' + String(a.nome || 'cliente').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '_').slice(0, 40) + '.docx';
