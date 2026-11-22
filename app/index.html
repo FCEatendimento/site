@@ -723,7 +723,7 @@ body[data-fundo=predio]{--fundo-img:url(fundos/predio.jpg)}body[data-fundo=sagua
 .cad-c em{font-style:normal;font-size:10.5px;font-weight:700;color:#9A6B12;background:#FFF1CC;border-radius:6px;padding:0 5px;margin-left:4px}
 .cad-c .inp{width:100%}.cad-c select.inp{height:40px;padding:0 10px}
 @media (min-width:901px) and (max-width:1600px){.nav a{padding:7px 7px;gap:5px;font-size:12.8px}}
-@media (min-width:901px) and (max-width:1600px){.nav a svg{display:none}}.inp.sug{background:#FFF8E1;border-color:#EBCB7A}
+@media (min-width:901px) and (max-width:1600px){.nav a svg{display:none}}@media (min-width:901px) and (max-width:1380px){.nav a{padding:7px 5px;font-size:12.2px}}.inp.sug{background:#FFF8E1;border-color:#EBCB7A}
 :root[data-tema="escuro"] .inp.sug{background:#3a3220;border-color:#7a6430}:root[data-tema="escuro"] .cad-c em{background:#4a3a14;color:#F0D9A8}
 .cad-acoes{display:flex;justify-content:flex-end;margin-top:18px}
 .cab-mini{display:flex;align-items:center;gap:8px;padding:12px 14px;font-weight:700;border-bottom:1px solid var(--line)}
@@ -1073,7 +1073,7 @@ function sair(expirou) {
 }
 // ---------- estrutura ----------
 const MENU = [
-  ['inicio', 'Início', 'home'], ['atendimentos', 'Atendimentos', 'zap'], ['cadastros', 'Cadastros', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['marketing', 'Marketing', 'mega'], ['indicadores', 'Indicadores', 'grafico'], ['radar', 'Radar', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['diagnostico', 'Diagnóstico', 'lista'], ['teses', 'Teses', 'balanca'], ['cursos', 'Cursos', 'estrela']
+  ['inicio', 'Início', 'home'], ['atendimentos', 'Atendimentos', 'zap'], ['cadastros', 'Cadastros', 'pessoa'], ['agenda', 'Agenda', 'cal'], ['aprovacoes', 'Aprovações', 'checks'], ['processos', 'Processos', 'martelo'], ['marketing', 'Marketing', 'mega'], ['indicadores', 'Indicadores', 'grafico'], ['radar', 'Radar', 'grafico'], ['financeiro', 'Financeiro', 'din'], ['diagnostico', 'Diagnóstico', 'lista'], ['bancario', 'Bancário', 'din'], ['teses', 'Teses', 'balanca'], ['cursos', 'Cursos', 'estrela']
 ];
 function montar() {
   const eu = S.eu || {};
@@ -1103,7 +1103,7 @@ async function rota(forcar) {
   // aba de um módulo que ainda está carregando (diagnostico.js, teses.js): espera a página terminar de carregar
   if (!VIEWS[nome] && nome && document.readyState !== 'complete') { window.addEventListener('load', () => { if (rotaAtual !== (location.hash.replace(/^#\/?/, '') || 'inicio')) rota(forcar); }, { once: true }); return; }
   const k = VIEWS[nome] ? nome : 'inicio';
-  const MAIS_NAV = [], MAIS_TAB = ['casos', 'diagnostico', 'teses', 'cursos', 'noticias', 'radar'].concat(['aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
+  const MAIS_NAV = [], MAIS_TAB = ['casos', 'diagnostico', 'teses', 'cursos', 'noticias', 'radar', 'bancario'].concat(['aprovacoes', 'processos', 'processo', 'indicadores', 'financeiro', 'despesas', 'marketing', 'redes', 'conteudo']);
   const GRUPO = { despesas: 'financeiro', redes: 'marketing', conteudo: 'marketing', processo: 'processos', whatsapp: 'atendimentos', analise: 'atendimentos', clientes: 'atendimentos' };
   $$('.nav a,.tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.k === k || GRUPO[k] === a.dataset.k || (a.dataset.k === 'mais' && (a.closest('.tabbar') ? MAIS_TAB : MAIS_NAV).includes(k))));
   if (rotaAtual !== h) window.scrollTo(0, 0);
@@ -2256,6 +2256,7 @@ VIEWS.mais = async () => {
     '<a class="item" href="#/aprovacoes"><div class="ic-circ warn">' + ic('checks', 's') + '</div><div class="mid"><div class="t">Aprovações</div><div class="d">Decisões de caso, anúncios e posts</div></div><span class="bdg" data-bdg hidden></span>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/cursos"><div class="ic-circ ouro">' + ic('estrela', 's') + '</div><div class="mid"><div class="t">Cursos</div><div class="d">Kiwify e Hotmart</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/noticias"><div class="ic-circ rd">' + ic('jornal', 's') + '</div><div class="mid"><div class="t">Notícias</div><div class="d">Bancário, imobiliário, agro, economia e tribunais</div></div>' + ic('seta', 's') + '</a>' +
+    '<a class="item" href="#/bancario"><div class="ic-circ ouro">' + ic('din', 's') + '</div><div class="mid"><div class="t">Atendimento bancário</div><div class="d">Roteiro do cliente com dívida bancária: documentos, malote e próximos passos</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/radar"><div class="ic-circ nav">' + ic('grafico', 's') + '</div><div class="mid"><div class="t">Radar bancário</div><div class="d">Grandes bancos: BACEN (SGS, IF.data) e CVM, com .docx</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/redes"><div class="ic-circ info">' + ic('mega', 's') + '</div><div class="mid"><div class="t">Marketing</div><div class="d">Anúncios e posts para aprovar, Google Ads e calendário de conteúdo</div></div>' + ic('seta', 's') + '</a>' +
     '<a class="item" href="#/casos"><div class="ic-circ nav">' + ic('casos', 's') + '</div><div class="mid"><div class="t">Todos os casos</div><div class="d">Lista e quadro por etapa, inclusive encerrados</div></div>' + ic('seta', 's') + '</a>' +
@@ -3481,6 +3482,7 @@ async function calendarioPrazos(el, forcar) {
 <script src="diagnostico.js?v=6"></script>
 <script src="teses.js?v=1"></script>
 <script src="radar.js?v=1"></script>
+<script src="bancario.js?v=1"></script>
 <script>
 /* Efeito 3D: inclinação leve dos indicadores ao passar o mouse */
 (function(){if(matchMedia('(prefers-reduced-motion: reduce)').matches||!matchMedia('(hover:hover)').matches)return;
