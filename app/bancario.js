@@ -1,6 +1,7 @@
 // Aba "Atendimento bancário" (#/bancario), 22/11/2026: formulário de atendimento do cliente com dívida bancária, montado a partir do
 // curso Advocacia Bancária Milionária (Dossiê Jurídico-Contábil, O Malote, Caderno de Modelos de Malotes, Pronampe, Imersão comercial,
 // Qualificação do Lead). Gera: lista de documentos do cliente, plano do malote, próximos passos do método e relatório .docx.
+// Aba 9: análise do contrato com IA (ilegalidades e estratégia; base do curso + anotações do Dr. Fábio).
 // Ao final: tempo estimado de execução e honorários indicados (tabela de precificação do curso). Salva por caso na tabela app_atend_bancario (ações ab_lista, ab_abrir, ab_salvar da App API). Material de trabalho interno.
 (function () {
 const css = document.createElement('style');
@@ -125,7 +126,7 @@ const Q = [
   ['dec', 'expect', 'O que o cliente espera como resultado? (em palavras dele)', 'Alinhar sem prometer resultado (Provimento 205/2021).', 'txt'],
   ['dec', 'obs', 'Observações gerais do atendimento', '', 'txt']
 ];
-const SECOES = [['cli', '1 · Cliente'], ['div', '2 · Dívidas'], ['tri', '3 · Triagem'], ['fato', '4 · Fato gerador'], ['banco', '5 · Banco'], ['cap', '6 · Capacidade'], ['esp', '7 · Específicas'], ['dec', '8 · Decisão'], ['res', 'Resultado']];
+const SECOES = [['cli', '1 · Cliente'], ['div', '2 · Dívidas'], ['tri', '3 · Triagem'], ['fato', '4 · Fato gerador'], ['banco', '5 · Banco'], ['cap', '6 · Capacidade'], ['esp', '7 · Específicas'], ['dec', '8 · Decisão'], ['ctr', '9 · Contrato (IA)'], ['res', 'Resultado']];
 const SECN = { tri: 'Triagem e qualificação', fato: 'Fato gerador (tópico circunstancial do dossiê)', banco: 'Relação com o banco', cap: 'Capacidade de pagamento', esp: 'Perguntas específicas do caso', dec: 'Decisão e expectativa' };
 
 // ---------- resultado: qualificação, documentos, malote, passos ----------
@@ -365,6 +366,8 @@ function htmlResultado(a) {
     '<ul class="ab-ol">' + hn.obs.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>' +
     '<h3 style="margin-top:14px">Proposta registrada</h3><p class="sub">O que foi efetivamente proposto ao cliente (inicial e êxito separados, como pede o CRM do curso).</p><div class="ab-grid">' +
     [['inicial', 'Honorário inicial (R$)'], ['forma', 'Forma de pagamento da entrada'], ['tmp', 'Taxa mensal (R$/mês)'], ['exito', 'Êxito (% da redução)'], ['status', 'Situação da proposta']].map(([k, n]) => '<label class="ab-f"><span>' + n + '</span>' + (k === 'status' ? '<select class="sel" data-h="status"><option value="">—</option>' + ['Apresentada', 'Em negociação', 'Aceita (contrato assinado)', 'Recusada'].map((o) => '<option' + (H.status === o ? ' selected' : '') + '>' + o + '</option>').join('') + '</select>' : '<input class="inp" data-h="' + k + '" value="' + esc(H[k] || '') + '">') + '</label>').join('') + '</div></div>';
+  const ans = (a.analises || []).filter((x) => x.r);
+  if (ans.length) h += '<div class="ab-c"><h3>Ilegalidades apontadas nos contratos (IA)</h3><p class="sub">Detalhe, fundamentos e estratégia na aba 9 · Contrato (IA).</p><ol class="ab-ol">' + ans.map((x) => lista(x.r.ilegalidades).map((y) => '<li><span class="ab-tag ' + (FORCA[y.forca] || FORCA.media)[1] + '">' + (FORCA[y.forca] || FORCA.media)[0] + '</span>' + esc(y.titulo) + '<small>' + esc([((x.r.contrato || {}).instituicao), y.fundamento].filter((z) => !vz(z)).join(' · ')) + '</small></li>').join('')).join('') + '</ol><button class="btn sm" type="button" data-sec="ctr">Abrir as análises</button></div>';
   h += '<div class="ab-c"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="button" id="abDocx">' + ic('baixar', 's') + ' Baixar relatório .docx</button>' + (F.caso_id ? '<a class="btn" href="#/caso/' + F.caso_id + '">' + ic('voltar', 's') + ' Abrir o caso</a>' : '') + '</div></div>';
   return h;
 }
@@ -380,6 +383,7 @@ function render() {
     '<div class="ab-f" style="margin-top:12px"><span>Tipo de cliente</span><div class="pills" data-tipo>' + TIPOS.map(([k, n]) => '<button type="button" data-v="' + k + '" class="' + (a.tipo === k ? 'on' : '') + '">' + n + '</button>').join('') + '</div></div></div>';
   else if (sec === 'div') { const t = totais(a); h += '<div class="ab-c"><h3>Dívidas bancárias</h3><p class="sub">Uma linha por contrato. Total informado: <b>' + brl(t.saldo) + '</b> · parcelas: <b>' + brl(t.parc) + '</b>/mês.</p>' + (a.dividas || []).map(htmlDivida).join('') + '<div style="margin-top:10px"><button class="btn" type="button" id="abAddDiv">+ Adicionar dívida</button></div></div>'; }
   else if (sec === 'res') h += htmlResultado(a);
+  else if (sec === 'ctr') h += htmlContrato(a);
   else { const l = Q.filter((q) => q[0] === sec && (!q[5] || q[5](a))); h += '<div class="ab-c"><h3>' + esc(SECN[sec]) + '</h3>' + (!a.tipo ? '<p class="sub">Escolha o tipo de cliente na aba 1 para ver todas as perguntas.</p>' : '') + (l.length ? l.map((q) => htmlPergunta(a, q)).join('') : '<p class="pp mut">Nenhuma pergunta específica para este caso.</p>') + '</div>'; }
   const i = SECOES.findIndex((s) => s[0] === sec);
   h += '<div style="display:flex;justify-content:space-between;gap:8px">' + (i > 0 ? '<button class="btn" type="button" data-sec="' + SECOES[i - 1][0] + '">' + ic('voltar', 's') + ' ' + SECOES[i - 1][1] + '</button>' : '<span></span>') + (i < SECOES.length - 1 ? '<button class="btn pri" type="button" data-sec="' + SECOES[i + 1][0] + '">' + SECOES[i + 1][1] + ' ' + ic('seta', 's') + '</button>' : '') + '</div></div>';
@@ -403,7 +407,158 @@ function ligar() {
   const cp = $('#abCopiar'); if (cp) cp.onclick = async () => { const nome = (a.nome || '').split(' ')[0]; const txt = (nome ? 'Olá, ' + nome + '! ' : '') + 'Para darmos sequência à análise das suas dívidas bancárias, por favor nos envie:\n\n' + documentos(a).map(([, x]) => '• ' + x).join('\n') + '\n\nPode mandar por aqui mesmo, em foto ou PDF. Qualquer dúvida, estamos à disposição.\nFCE Advogados';
     try { await navigator.clipboard.writeText(txt); toast('Lista copiada. Cole no WhatsApp do cliente.'); } catch (e) { toast('Não foi possível copiar.', true); } };
   c.querySelectorAll('[data-h]').forEach((i) => { const ev = i.tagName === 'SELECT' ? 'onchange' : 'oninput'; i[ev] = () => { a.hon = a.hon || {}; a.hon[i.dataset.h] = i.value; marcarSujo(); }; });
+  ligarContrato();
   const dx = $('#abDocx'); if (dx) dx.onclick = async () => { dx.disabled = true; try { await gerarDocx(); toast('Relatório .docx baixado.'); } catch (e) { toast(e.message || 'Não foi possível gerar o .docx.', true); } finally { dx.disabled = false; } };
+}
+
+// ---------- contrato (IA) ----------
+// 22/11/2026: o advogado envia o contrato (PDF/foto ou texto colado); o workflow "Diagnóstico IA" (tipo 'contrato') analisa com a base do curso
+// e as anotações do Dr. Fábio (doc claude/abm-anotacoes-fabio.md) e devolve JSON: dados do contrato, testes, ilegalidades com estratégia.
+// Os arquivos não são guardados; só o resultado vai para A.analises.
+const IA_URL = 'https://emerim.app.n8n.cloud/webhook/fce-app-diag-ia';
+const FORCA = { forte: ['Forte', 'urg'], media: ['Média', ''], fraca: ['Fraca', 'fr'] };
+let CT = { arqs: [], texto: '', div: '', rodando: false, msg: '' };
+css.textContent += `
+.ab-drop{border:2px dashed var(--line-2);border-radius:14px;padding:18px;text-align:center;cursor:pointer;color:var(--mut);font-size:13.5px}
+.ab-drop.on{border-color:var(--navy);background:color-mix(in srgb,var(--navy) 5%,transparent)}
+.ab-arq{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ab-arq span{background:var(--info-soft);color:var(--info);border-radius:14px;padding:4px 10px;font-size:12px;font-weight:600}
+.ab-arq button{border:0;background:none;color:inherit;cursor:pointer;font-weight:700;margin-left:4px}
+.ab-il{border:1px solid var(--line);border-left:4px solid var(--info);border-radius:12px;padding:12px 14px;margin-top:10px}
+.ab-il.forte{border-left-color:var(--bad)}.ab-il.fraca{border-left-color:var(--line-2)}
+.ab-il h4{margin:0 0 6px;font-size:15px}.ab-il dl{margin:0;display:grid;grid-template-columns:150px 1fr;gap:4px 12px;font-size:13px}
+.ab-il dt{color:var(--mut);font-weight:600}.ab-il dd{margin:0;line-height:1.45}
+.ab-il q{font-style:italic;color:var(--txt)}
+.ab-tag.fr{background:color-mix(in srgb,var(--txt) 8%,transparent);color:var(--mut)}
+.ab-kv{width:100%;border-collapse:collapse;font-size:13px}.ab-kv td{padding:5px 8px;border-top:1px solid var(--line);vertical-align:top}.ab-kv td:first-child{color:var(--mut);font-weight:600;width:190px}
+@media (max-width:640px){.ab-il dl{grid-template-columns:1fr}.ab-il dt{margin-top:6px}.ab-kv td:first-child{width:auto}}
+`;
+const vz = (x) => x == null || (typeof x === 'string' && !x.trim()) || (Array.isArray(x) && !x.filter((y) => vz(y) === false).length);
+const lista = (l) => (Array.isArray(l) ? l : []).filter((x) => !vz(x));
+function nomeDiv(d, i) { return 'Dívida ' + (i + 1) + ': ' + [d.banco === 'Outro' ? (d.banco_outro || 'Outro') : d.banco, MODN[d.modalidade], d.contrato ? 'nº ' + d.contrato : ''].filter(Boolean).join(' · '); }
+function contextoIA(a) {
+  const t = totais(a), TN = Object.fromEntries(TIPOS); const l = [];
+  l.push('CONTEXTO DO ATENDIMENTO (informado pelo cliente; use só como contexto, o que vale é o documento):');
+  l.push('- Cliente: ' + (TN[a.tipo] || 'tipo não informado') + (a.atividade ? ', ' + a.atividade : '') + (a.cidade ? ', ' + a.cidade : '') + '.');
+  if (t.renda) l.push('- Renda/faturamento mensal informado: ' + brl(t.renda) + (t.comp != null ? '; parcelas comprometem ' + Math.round(t.comp * 100) + '%.' : '.'));
+  const d = CT.div !== '' ? (a.dividas || [])[Number(CT.div)] : null;
+  if (d) { l.push('- Dívida deste contrato: ' + nomeDiv(d, Number(CT.div)) + '; situação: ' + (SITN[d.situacao] || 'não informada') + '; contratado em ' + (d.data || '?') + '; valor ' + (d.valor || '?') + '; saldo ' + (d.saldo || '?') + '; parcela ' + (d.parcela || '?') + '; parcelas ' + (d.parcelas || '?') + '; taxa informada ' + (d.taxa || '?') + '; garantias: ' + ((d.garantias || []).map((g) => GARN[g]).join(', ') || 'não informadas') + '.'); }
+  else if (t.bancos.length) l.push('- Bancos do cliente: ' + t.bancos.join(', ') + '.');
+  [['vinculo', 'Vínculo de renda'], ['seguro', 'Paga seguro junto com o empréstimo'], ['casada', 'Produtos vendidos junto'], ['reneg', 'Houve renegociação/confissão'], ['reneg_det', 'Renegociações'], ['tem_contratos', 'Tem cópia dos contratos'], ['deb_auto', 'Débito automático na conta de renda'], ['acao', 'Ação judicial em curso'], ['fato_tipo', 'Fato gerador']].forEach(([k, n]) => { const v = R(a, k); if (v) l.push('- ' + n + ': ' + (v === 'sim' ? 'sim' : v === 'nao' ? 'não' : v === 'ns' ? 'não sabe' : v) + '.'); });
+  l.push('Data de hoje: ' + new Date().toLocaleDateString('pt-BR') + '.');
+  return l.join('\n');
+}
+function lerArquivo(f) {
+  return new Promise((ok, er) => {
+    if (/^image\//.test(f.type) && f.size > 1500000) {
+      const img = new Image(), u = URL.createObjectURL(f);
+      img.onload = () => { const m = 2200, k = Math.min(1, m / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); ok({ nome: f.name, mime: 'image/jpeg', b64: c.toDataURL('image/jpeg', 0.85).split(',')[1] }); };
+      img.onerror = () => er(new Error('Não consegui ler a imagem ' + f.name)); img.src = u; return;
+    }
+    const r = new FileReader(); r.onload = () => ok({ nome: f.name, mime: f.type || (/\.pdf$/i.test(f.name) ? 'application/pdf' : ''), b64: String(r.result).split(',')[1] || '' }); r.onerror = () => er(new Error('Não consegui ler ' + f.name)); r.readAsDataURL(f);
+  });
+}
+async function addArquivos(files) {
+  for (const f of files) {
+    if (!(/pdf$/i.test(f.type) || /\.pdf$/i.test(f.name) || /^image\/(png|jpeg|gif|webp)$/.test(f.type))) { toast('Use PDF ou foto (JPG, PNG). ' + f.name + ' ficou de fora.', true); continue; }
+    try { const x = await lerArquivo(f); CT.arqs.push(x); } catch (e) { toast(e.message, true); }
+  }
+  const tam = CT.arqs.reduce((s, x) => s + x.b64.length, 0) * 0.75;
+  if (tam > 20e6) toast('Os arquivos somam ' + Math.round(tam / 1e6) + ' MB; o limite é ~20 MB. Envie só as páginas do contrato.', true);
+}
+function extrairJSON(t) { const s = String(t || ''); const i = s.indexOf('{'), j = s.lastIndexOf('}'); if (i < 0 || j <= i) return null; try { return JSON.parse(s.slice(i, j + 1)); } catch (e) { return null; } }
+async function analisar() {
+  const meu = F, a = F.A;
+  if (!CT.arqs.length && CT.texto.trim().length < 200) { toast('Anexe o contrato (PDF ou foto) ou cole o texto completo.', true); return; }
+  CT.rodando = true; CT.msg = 'A IA está lendo o contrato e aplicando o método do curso. Leva de 1 a 4 minutos; não feche esta tela.'; render();
+  try {
+    const r = await fetch(IA_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-fce-token': S.token || '' }, body: JSON.stringify({ tipo: 'contrato', token: S.token, prompt: contextoIA(a), texto: CT.texto, arquivos: CT.arqs }) });
+    let j = null; try { j = await r.json(); } catch (e) {}
+    if (!r.ok || !j || !j.ok) throw new Error(j && j.erro === 'sessao' ? 'Sua sessão expirou. Entre de novo.' : (j && j.erro) || ('A IA não respondeu (' + r.status + '). Tente de novo.'));
+    let out = j.dados || {};
+    if (out.job) { // a análise roda em segundo plano no n8n; consulta a cada 8 s por até 10 min
+      const t0 = Date.now(); let st = { status: 'rodando' };
+      while (st.status === 'rodando') {
+        if (Date.now() - t0 > 600000) throw new Error('A análise está demorando mais que o normal. Tente de novo em alguns minutos.');
+        await new Promise((ok) => setTimeout(ok, 8000));
+        try { st = (await api('ab_job', { job: out.job })) || st; } catch (e) {}
+        const seg = Math.round((Date.now() - t0) / 1000); const m = $('#ctMsg'); if (m) m.textContent = 'A IA está lendo o contrato e aplicando o método do curso (' + seg + ' s). Pode levar até 4 minutos; não feche esta tela.';
+      }
+      if (st.status !== 'pronto') throw new Error(st.erro || 'A IA não conseguiu concluir a análise.');
+      out = { texto: st.texto, cortado: st.cortado };
+    }
+    const txt = out.texto || '', res = extrairJSON(txt); j.dados = out;
+    a.analises = a.analises || [];
+    a.analises.unshift({ id: Date.now().toString(36), em: new Date().toISOString(), arquivos: CT.arqs.map((x) => x.nome).concat(CT.texto.trim() ? ['texto colado'] : []), div: CT.div, r: res, bruto: res ? '' : txt, cortado: !!(j.dados || {}).cortado });
+    CT = { arqs: [], texto: '', div: CT.div, rodando: false, msg: '' };
+    if (F === meu) marcarSujo(); else api('ab_salvar', { id: meu.id || '', caso_id: meu.caso_id || '', nome: a.nome || '', dados: a }).catch(() => {}); toast(res ? 'Análise pronta.' : 'A IA respondeu fora do formato; o texto ficou salvo.', !res);
+  } catch (e) { CT.rodando = false; CT.msg = ''; toast(e.message || 'Falhou.', true); }
+  if (F === meu && /^#\/bancario\//.test(location.hash)) render();
+}
+function htmlAnalise(x, i) {
+  const r = x.r || {}, c = r.contrato || {}, est = r.estrategia_recomendada || {}, tm = r.taxa_media_bacen || {};
+  let h = '<div class="ab-c" data-an="' + i + '"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap"><div><h3>' + esc([c.tipo, c.instituicao, c.numero ? 'nº ' + c.numero : ''].filter((y) => !vz(y)).join(' · ') || 'Análise do contrato') + '</h3><p class="sub">Analisado em ' + esc(fmtD(x.em, { dateStyle: 'short', timeStyle: 'short' })) + ' · ' + esc((x.arquivos || []).join(', ')) + (x.div !== '' && x.div != null && (F.A.dividas || [])[Number(x.div)] ? ' · ' + esc(nomeDiv(F.A.dividas[Number(x.div)], Number(x.div))) : '') + '</p></div><button class="btn fant sm" type="button" data-rman="' + i + '">Excluir análise</button></div>';
+  if (x.cortado) h += '<div class="ab-alerta">A resposta foi cortada por tamanho; a análise pode estar incompleta. Tente enviar só as páginas do contrato.</div>';
+  if (!x.r) return h + '<p class="sub">A IA respondeu fora do formato esperado. Texto recebido:</p><pre style="white-space:pre-wrap;font-size:12.5px">' + esc(x.bruto || '') + '</pre></div>';
+  if (r.resumo_para_cliente) h += '<div class="ab-alerta" style="border-left-color:var(--navy);background:color-mix(in srgb,var(--navy) 6%,transparent)"><b>Em linguagem simples:</b> ' + esc(r.resumo_para_cliente) + '</div>';
+  const CAMPOS = [['data', 'Data'], ['devedor', 'Devedor'], ['valor_liberado', 'Valor liberado'], ['valor_financiado', 'Valor financiado'], ['prazo', 'Prazo'], ['parcela', 'Parcela'], ['sistema_amortizacao', 'Amortização'], ['taxa_mensal', 'Taxa mensal'], ['taxa_anual', 'Taxa anual'], ['taxa_diaria', 'Taxa diária'], ['cet_mensal', 'CET mensal'], ['cet_anual', 'CET anual'], ['indexador', 'Indexador'], ['iof', 'IOF'], ['garantias', 'Garantias'], ['encargos_mora', 'Encargos de mora'], ['observacoes', 'Observações']];
+  const tar = lista(c.tarifas).map((t) => [t.nome, t.valor].filter(Boolean).join(': ')).join('; '), seg = lista(c.seguros).map((t) => [t.nome, t.valor, t.seguradora].filter(Boolean).join(' · ')).join('; ');
+  h += '<h3 style="margin-top:12px;font-size:16px">Dados do contrato</h3><table class="ab-kv">' + CAMPOS.filter(([k]) => !vz(c[k])).map(([k, n]) => '<tr><td>' + n + '</td><td>' + esc(c[k]) + '</td></tr>').join('') + (tar ? '<tr><td>Tarifas</td><td>' + esc(tar) + '</td></tr>' : '') + (seg ? '<tr><td>Seguros</td><td>' + esc(seg) + '</td></tr>' : '') + '</table>';
+  const ts = lista(r.testes); if (ts.length) h += '<h3 style="margin-top:14px;font-size:16px">Contas e testes</h3><ol class="ab-ol">' + ts.map((t) => '<li><b>' + esc(t.teste) + ':</b> ' + esc(t.resultado || '') + (t.conta ? '<small>' + esc(t.conta) + '</small>' : '') + (t.leitura ? '<small>' + esc(t.leitura) + '</small>' : '') + '</li>').join('') + '</ol>';
+  const il = lista(r.ilegalidades);
+  h += '<h3 style="margin-top:14px;font-size:16px">Ilegalidades apontadas (' + il.length + ')</h3>' + (il.length ? '' : '<p class="pp mut">Nenhuma ilegalidade identificada no documento enviado.</p>');
+  const ord = { forte: 0, media: 1, fraca: 2 };
+  il.slice().sort((p, q) => (ord[p.forca] ?? 1) - (ord[q.forca] ?? 1)).forEach((y) => { const f = FORCA[y.forca] || FORCA.media;
+    h += '<div class="ab-il ' + esc(y.forca || '') + '"><h4><span class="ab-tag ' + f[1] + '">' + f[0] + '</span>' + esc(y.titulo) + '</h4><dl>' +
+      [['onde', 'Onde'], ['trecho', 'Trecho'], ['fundamento', 'Fundamento'], ['efeito', 'Efeito'], ['estrategia_extrajudicial', 'Estratégia extrajudicial'], ['estrategia_judicial', 'Estratégia judicial'], ['prova', 'Prova'], ['cautela', 'Cautela']].filter(([k]) => !vz(y[k])).map(([k, n]) => '<dt>' + n + '</dt><dd>' + (k === 'trecho' ? '<q>' + esc(y[k]) + '</q>' : esc(y[k])) + '</dd>').join('') + '</dl></div>'; });
+  const ns = lista(r.nao_sao_ilegalidades); if (ns.length) h += '<h3 style="margin-top:14px;font-size:16px">O que parece abuso mas não é</h3><ul class="ab-ol">' + ns.map((y) => '<li><b>' + esc(y.ponto) + '</b><small>' + esc(y.porque || '') + '</small></li>').join('') + '</ul>';
+  if (!vz(tm.modalidade_sgs)) h += '<h3 style="margin-top:14px;font-size:16px">Taxa média do BACEN (terceira taxa)</h3><p class="pp">Modalidade: <b>' + esc(tm.modalidade_sgs) + '</b>' + (tm.mes_referencia ? ' · mês da contratação: <b>' + esc(tm.mes_referencia) + '</b>' : '') + (tm.observacao ? '<br><small class="mut">' + esc(tm.observacao) + '</small>' : '') + '</p><p class="pp"><a class="btn sm" href="https://www.bcb.gov.br/estatisticas/txjuros" target="_blank" rel="noopener">Consultar taxas médias no BACEN</a> <a class="btn sm" href="https://www3.bcb.gov.br/sgspub/" target="_blank" rel="noopener">Séries históricas (SGS)</a></p>';
+  if (!vz(est.resumo) || lista(est.passos).length) h += '<h3 style="margin-top:14px;font-size:16px">Estratégia recomendada</h3>' + (est.resumo ? '<p class="pp">' + esc(est.resumo) + '</p>' : '') + (lista(est.passos).length ? '<ol class="ab-ol">' + lista(est.passos).map((p) => '<li>' + esc(p) + '</li>').join('') + '</ol>' : '') +
+    (lista(est.malotes).length ? '<p class="pp" style="margin-top:8px"><b>Malotes:</b> ' + esc(lista(est.malotes).join('; ')) + '</p>' : '') + (lista(est.acoes_judiciais).length ? '<p class="pp"><b>Medidas judiciais:</b> ' + esc(lista(est.acoes_judiciais).join('; ')) + '</p>' : '') + (est.efeito_na_negociacao ? '<p class="pp"><b>Na mesa de negociação:</b> ' + esc(est.efeito_na_negociacao) + '</p>' : '');
+  const df = lista(r.documentos_faltantes), rs = lista(r.riscos_ao_cliente);
+  if (df.length) h += '<h3 style="margin-top:14px;font-size:16px">Documentos e dados que faltam</h3><ul class="ab-ol">' + df.map((y) => '<li>' + esc(y) + '</li>').join('') + '</ul>';
+  if (rs.length) h += '<h3 style="margin-top:14px;font-size:16px">Riscos ao cliente</h3><ul class="ab-ol">' + rs.map((y) => '<li>' + esc(y) + '</li>').join('') + '</ul>';
+  return h + '<p class="sub" style="margin-top:12px">Análise automática de apoio. Confira cada fundamento na fonte oficial e o cálculo na perícia antes de levar à peça ou ao banco.</p></div>';
+}
+function htmlContrato(a) {
+  const l = (a.dividas || []).map((d, i) => [i, d]).filter(([, d]) => d && (d.banco || d.modalidade || d.saldo));
+  let h = '<div class="ab-c"><h3>Análise do contrato com IA</h3><p class="sub">Envie o contrato do cliente (PDF ou fotos legíveis de todas as páginas) ou cole o texto. A IA aponta as ilegalidades e a estratégia pelo método do curso e pelas suas anotações (três taxas, capitalização, Tema 28, tarifas, seguro, provisionamento). Os arquivos não ficam guardados; só a análise.</p>' +
+    '<label class="ab-f" style="max-width:520px"><span>Este contrato é de qual dívida?</span><select class="sel" id="ctDiv"><option value="">Contrato avulso / não lançado</option>' + l.map(([i, d]) => '<option value="' + i + '"' + (String(i) === String(CT.div) ? ' selected' : '') + '>' + esc(nomeDiv(d, i)) + '</option>').join('') + '</select></label>' +
+    '<div class="ab-drop" id="ctDrop" style="margin-top:12px">' + ic('baixar', 's') + ' <b>Arraste o PDF ou as fotos aqui</b> ou clique para escolher<input type="file" id="ctArq" accept="application/pdf,image/png,image/jpeg,image/webp" multiple hidden></div>' +
+    (CT.arqs.length ? '<div class="ab-arq">' + CT.arqs.map((x, i) => '<span>' + esc(x.nome) + ' · ' + Math.max(1, Math.round(x.b64.length * 0.75 / 1024)) + ' KB<button type="button" data-rmarq="' + i + '" title="Tirar">×</button></span>').join('') + '</div>' : '') +
+    '<label class="ab-f" style="margin-top:12px"><span>Ou cole o texto do contrato</span><textarea class="inp" id="ctTxt" style="min-height:90px;max-width:none" placeholder="Cole aqui as cláusulas, se tiver o texto">' + esc(CT.texto) + '</textarea></label>' +
+    '<div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn pri" type="button" id="ctIr"' + (CT.rodando ? ' disabled' : '') + '>' + ic('zap', 's') + (CT.rodando ? ' Analisando…' : ' Analisar contrato') + '</button>' + (CT.msg ? '<span class="sub" id="ctMsg" style="margin:0">' + esc(CT.msg) + '</span>' : '') + '</div></div>';
+  (a.analises || []).forEach((x, i) => { h += htmlAnalise(x, i); });
+  return h;
+}
+function ligarContrato() {
+  const a = F.A, dz = $('#ctDrop'), inp = $('#ctArq');
+  if (!dz) return;
+  const sel = $('#ctDiv'); if (sel) sel.onchange = () => { CT.div = sel.value; };
+  const tx = $('#ctTxt'); if (tx) tx.oninput = () => { CT.texto = tx.value; };
+  dz.onclick = () => inp.click();
+  inp.onchange = async () => { await addArquivos([...inp.files]); render(); };
+  dz.ondragover = (e) => { e.preventDefault(); dz.classList.add('on'); }; dz.ondragleave = () => dz.classList.remove('on');
+  dz.ondrop = async (e) => { e.preventDefault(); dz.classList.remove('on'); await addArquivos([...e.dataTransfer.files]); render(); };
+  document.querySelectorAll('[data-rmarq]').forEach((b) => b.onclick = () => { CT.arqs.splice(Number(b.dataset.rmarq), 1); render(); });
+  const ir = $('#ctIr'); if (ir) ir.onclick = analisar;
+  document.querySelectorAll('[data-rman]').forEach((b) => b.onclick = () => { if (!confirm('Excluir esta análise?')) return; a.analises.splice(Number(b.dataset.rman), 1); marcarSujo(); render(); });
+}
+function docxAnalises(a, corpo, run, par, h1, li) {
+  const an = (a.analises || []).filter((x) => x.r); if (!an.length) return;
+  corpo.push(h1('Análise dos contratos (IA)'));
+  corpo.push(par(run('Análise automática de apoio, feita pelo método do curso e pelas anotações do escritório. Conferir fundamentos na fonte oficial e cálculos na perícia.', { size: 16, italics: true, color: '667082' })));
+  an.forEach((x) => { const r = x.r, c = r.contrato || {}, est = r.estrategia_recomendada || {};
+    corpo.push(par(run([c.tipo, c.instituicao, c.numero ? 'nº ' + c.numero : ''].filter((y) => !vz(y)).join(' · ') || 'Contrato', { bold: true, size: 22, color: '1B263B' }), { spacing: { before: 200, after: 60 } }));
+    [['data', 'Data'], ['valor_liberado', 'Valor liberado'], ['valor_financiado', 'Valor financiado'], ['taxa_mensal', 'Taxa mensal'], ['taxa_anual', 'Taxa anual'], ['cet_anual', 'CET anual'], ['garantias', 'Garantias']].forEach(([k, n]) => { if (!vz(c[k])) corpo.push(li(c[k], n)); });
+    lista(r.testes).forEach((t) => corpo.push(li((t.resultado || '') + (t.leitura ? ' — ' + t.leitura : ''), t.teste)));
+    lista(r.ilegalidades).forEach((y) => { corpo.push(par([run((FORCA[y.forca] || FORCA.media)[0].toUpperCase() + '  ', { bold: true, color: y.forca === 'forte' ? 'B5470F' : 'B0882E' }), run(y.titulo, { bold: true })], { spacing: { before: 100, after: 40 } }));
+      [['onde', 'Onde'], ['trecho', 'Trecho'], ['fundamento', 'Fundamento'], ['efeito', 'Efeito'], ['estrategia_extrajudicial', 'Extrajudicial'], ['estrategia_judicial', 'Judicial'], ['prova', 'Prova'], ['cautela', 'Cautela']].forEach(([k, n]) => { if (!vz(y[k])) corpo.push(li(y[k], n)); }); });
+    lista(r.nao_sao_ilegalidades).forEach((y) => corpo.push(li((y.porque || ''), 'Não é ilegalidade: ' + y.ponto)));
+    if (!vz(est.resumo)) corpo.push(li(est.resumo, 'Estratégia'));
+    lista(est.passos).forEach((p, i) => corpo.push(li(p, 'Passo ' + (i + 1))));
+    lista(r.documentos_faltantes).forEach((y) => corpo.push(li(y, 'Falta')));
+    lista(r.riscos_ao_cliente).forEach((y) => corpo.push(li(y, 'Risco')));
+  });
 }
 
 // ---------- .docx ----------
@@ -451,6 +606,7 @@ async function gerarDocx() {
   hn.obs.forEach((x) => corpo.push(li(x)));
   if (Object.values(H).some((v) => String(v || '').trim())) { corpo.push(par(run('Proposta registrada', { bold: true, size: 22, color: NAVY }), { spacing: { before: 160, after: 60 } }));
     [['inicial', 'Honorário inicial'], ['forma', 'Forma de pagamento'], ['tmp', 'Taxa mensal'], ['exito', 'Êxito'], ['status', 'Situação']].forEach(([k, n]) => { if (String(H[k] || '').trim()) corpo.push(li(H[k], n)); }); }
+  docxAnalises(a, corpo, run, par, h1, li);
   const doc = new Document({ creator: 'FCE Advogados', title: 'Atendimento bancário', sections: [{ properties: { page: { margin: { top: 1134, bottom: 1134, left: 1247, right: 1247 } } }, children: corpo }] });
   const blob = await Packer.toBlob(doc); const el = document.createElement('a'); el.href = URL.createObjectURL(blob);
   el.download = 'atendimento_bancario_' + String(a.nome || 'cliente').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '_').slice(0, 40) + '.docx';
