@@ -447,6 +447,29 @@ function contextoIA(a) {
   l.push('Data de hoje: ' + new Date().toLocaleDateString('pt-BR') + '.');
   return l.join('\n');
 }
+// PDFs grandes (acima de ~6 MB, em geral escaneados) não passam pelo limite de envio: são convertidos aqui no navegador com o pdf.js.
+// Página com texto vira texto; página só com imagem vira JPEG reduzido. Assim um contrato de 17 MB cai para 2–6 MB.
+let pdfLib = null;
+function carregarPdf() { if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib); if (pdfLib) return pdfLib; pdfLib = new Promise((ok, er) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; ok(window.pdfjsLib); }; s.onerror = () => { pdfLib = null; er(new Error('Não foi possível carregar o leitor de PDF.')); }; document.head.appendChild(s); }); return pdfLib; }
+async function pdfReduzido(f, aviso) {
+  const L = await carregarPdf(); const doc = await L.getDocument({ data: await f.arrayBuffer() }).promise;
+  const out = [], textos = []; let imgs = 0; const MAXP = 80, MAXI = 40;
+  for (let n = 1; n <= Math.min(doc.numPages, MAXP); n++) {
+    if (aviso) aviso('Preparando ' + f.name + ': página ' + n + ' de ' + doc.numPages + '…');
+    const pg = await doc.getPage(n); const tc = await pg.getTextContent(); const tx = tc.items.map((i) => i.str).join(' ').replace(/\s+/g, ' ').trim();
+    if (tx.length >= 150) { textos.push('[Página ' + n + ']\n' + tx); continue; }
+    if (imgs >= MAXI) { textos.push('[Página ' + n + ': imagem não enviada — limite de ' + MAXI + ' páginas escaneadas]'); continue; }
+    const v1 = pg.getViewport({ scale: 1 }); const k = Math.min(2.5, 1600 / Math.max(v1.width, v1.height)); const vp = pg.getViewport({ scale: k });
+    const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, c.width, c.height);
+    await pg.render({ canvasContext: cx, viewport: vp }).promise;
+    out.push({ nome: f.name + ' · p. ' + n, mime: 'image/jpeg', b64: c.toDataURL('image/jpeg', 0.72).split(',')[1], pdf: f.name }); imgs++;
+    textos.push('[Página ' + n + ': enviada como imagem ' + imgs + ']');
+  }
+  if (doc.numPages > MAXP) textos.push('[O PDF tem ' + doc.numPages + ' páginas; só as ' + MAXP + ' primeiras foram enviadas]');
+  out.unshift({ nome: f.name, mime: 'text/plain', texto: 'ARQUIVO ' + f.name + ' (' + doc.numPages + ' páginas; convertido no navegador):\n' + textos.join('\n\n'), b64: '', resumo: true, paginas: doc.numPages, imgs });
+  return out;
+}
 function lerArquivo(f) {
   return new Promise((ok, er) => {
     if (/^image\//.test(f.type) && f.size > 1500000) {
@@ -460,19 +483,28 @@ function lerArquivo(f) {
 async function addArquivos(files) {
   for (const f of files) {
     if (!(/pdf$/i.test(f.type) || /\.pdf$/i.test(f.name) || /^image\/(png|jpeg|gif|webp)$/.test(f.type))) { toast('Use PDF ou foto (JPG, PNG). ' + f.name + ' ficou de fora.', true); continue; }
-    try { const x = await lerArquivo(f); CT.arqs.push(x); } catch (e) { toast(e.message, true); }
+    try {
+      const ePdf = /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name);
+      if (ePdf && f.size > 6e6) { const m = $('#ctMsg2'); const av = (t) => { const x = $('#ctMsg2'); if (x) x.textContent = t; }; av('Preparando ' + f.name + '…');
+        const l = await pdfReduzido(f, av); CT.arqs.push(...l); av(''); toast(f.name + ': ' + l[0].paginas + ' páginas preparadas (' + l[0].imgs + ' como imagem).'); }
+      else { const x = await lerArquivo(f); CT.arqs.push(x); }
+    } catch (e) { toast((e && e.message) || 'Não consegui ler ' + f.name, true); }
   }
-  const tam = CT.arqs.reduce((s, x) => s + x.b64.length, 0) * 0.75;
-  if (tam > 20e6) toast('Os arquivos somam ' + Math.round(tam / 1e6) + ' MB; o limite é ~20 MB. Envie só as páginas do contrato.', true);
+  const tam = tamEnvio();
+  if (tam > LIMITE) toast('Os arquivos somam ' + Math.round(tam * 0.75 / 1e6) + ' MB; o limite de envio é ~9 MB. Tire páginas que não são do contrato.', true);
 }
+const LIMITE = 12e6; // caracteres em base64 (~9 MB de arquivo), abaixo do limite de 16 MB do webhook do n8n
+const tamEnvio = () => CT.arqs.reduce((s, x) => s + (x.b64 || '').length + (x.texto || '').length, 0);
 function extrairJSON(t) { const s = String(t || ''); const i = s.indexOf('{'), j = s.lastIndexOf('}'); if (i < 0 || j <= i) return null; try { return JSON.parse(s.slice(i, j + 1)); } catch (e) { return null; } }
 async function analisar() {
   const meu = F, a = F.A;
   if (!CT.arqs.length && CT.texto.trim().length < 200) { toast('Anexe o contrato (PDF ou foto) ou cole o texto completo.', true); return; }
+  if (tamEnvio() > LIMITE) { toast('Os arquivos passam do limite de envio (~9 MB). Tire páginas que não são do contrato ou envie fotos menores.', true); return; }
   CT.rodando = true; CT.msg = 'A IA está lendo o contrato e aplicando o método do curso. Leva de 1 a 4 minutos; não feche esta tela.'; render();
   try {
-    const r = await fetch(IA_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-fce-token': S.token || '' }, body: JSON.stringify({ tipo: 'contrato', token: S.token, prompt: contextoIA(a), texto: CT.texto, arquivos: CT.arqs }) });
+    const r = await fetch(IA_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-fce-token': S.token || '' }, body: JSON.stringify({ tipo: 'contrato', token: S.token, prompt: contextoIA(a), texto: [CT.texto].concat(CT.arqs.filter((x) => x.texto).map((x) => x.texto)).filter((x) => String(x || '').trim()).join('\n\n'), arquivos: CT.arqs.filter((x) => x.b64).map((x) => ({ nome: x.nome, mime: x.mime, b64: x.b64 })) }) });
     let j = null; try { j = await r.json(); } catch (e) {}
+    if (!j && (r.status === 413 || r.status >= 500)) throw new Error('O envio foi recusado (' + r.status + '), provavelmente pelo tamanho. Tire páginas que não são do contrato e tente de novo.');
     if (!r.ok || !j || !j.ok) throw new Error(j && j.erro === 'sessao' ? 'Sua sessão expirou. Entre de novo.' : (j && j.erro) || ('A IA não respondeu (' + r.status + '). Tente de novo.'));
     let out = j.dados || {};
     if (out.job) { // a análise roda em segundo plano no n8n; consulta a cada 8 s por até 10 min
@@ -488,7 +520,7 @@ async function analisar() {
     }
     const txt = out.texto || '', res = extrairJSON(txt); j.dados = out;
     a.analises = a.analises || [];
-    a.analises.unshift({ id: Date.now().toString(36), em: new Date().toISOString(), arquivos: CT.arqs.map((x) => x.nome).concat(CT.texto.trim() ? ['texto colado'] : []), div: CT.div, r: res, bruto: res ? '' : txt, cortado: !!(j.dados || {}).cortado });
+    a.analises.unshift({ id: Date.now().toString(36), em: new Date().toISOString(), arquivos: [...new Set(CT.arqs.map((x) => x.pdf || x.nome))].concat(CT.texto.trim() ? ['texto colado'] : []), div: CT.div, r: res, bruto: res ? '' : txt, cortado: !!(j.dados || {}).cortado });
     CT = { arqs: [], texto: '', div: CT.div, rodando: false, msg: '' };
     if (F === meu) marcarSujo(); else api('ab_salvar', { id: meu.id || '', caso_id: meu.caso_id || '', nome: a.nome || '', dados: a }).catch(() => {}); toast(res ? 'Análise pronta.' : 'A IA respondeu fora do formato; o texto ficou salvo.', !res);
   } catch (e) { CT.rodando = false; CT.msg = ''; toast(e.message || 'Falhou.', true); }
@@ -524,7 +556,8 @@ function htmlContrato(a) {
   let h = '<div class="ab-c"><h3>Análise do contrato com IA</h3><p class="sub">Envie o contrato do cliente (PDF ou fotos legíveis de todas as páginas) ou cole o texto. A IA aponta as ilegalidades e a estratégia pelo método do curso e pelas suas anotações (três taxas, capitalização, Tema 28, tarifas, seguro, provisionamento). Os arquivos não ficam guardados; só a análise.</p>' +
     '<label class="ab-f" style="max-width:520px"><span>Este contrato é de qual dívida?</span><select class="sel" id="ctDiv"><option value="">Contrato avulso / não lançado</option>' + l.map(([i, d]) => '<option value="' + i + '"' + (String(i) === String(CT.div) ? ' selected' : '') + '>' + esc(nomeDiv(d, i)) + '</option>').join('') + '</select></label>' +
     '<div class="ab-drop" id="ctDrop" style="margin-top:12px">' + ic('baixar', 's') + ' <b>Arraste o PDF ou as fotos aqui</b> ou clique para escolher<input type="file" id="ctArq" accept="application/pdf,image/png,image/jpeg,image/webp" multiple hidden></div>' +
-    (CT.arqs.length ? '<div class="ab-arq">' + CT.arqs.map((x, i) => '<span>' + esc(x.nome) + ' · ' + Math.max(1, Math.round(x.b64.length * 0.75 / 1024)) + ' KB<button type="button" data-rmarq="' + i + '" title="Tirar">×</button></span>').join('') + '</div>' : '') +
+    (CT.arqs.length ? '<div class="ab-arq">' + CT.arqs.map((x, i) => x.pdf ? '' : '<span>' + esc(x.nome) + (x.resumo ? ' · ' + x.paginas + ' págs. (' + x.imgs + ' em imagem) · ' + Math.max(1, Math.round(CT.arqs.filter((y) => y.pdf === x.nome).reduce((s, y) => s + y.b64.length, x.texto.length) * 0.75 / 1024)) + ' KB' : ' · ' + Math.max(1, Math.round(x.b64.length * 0.75 / 1024)) + ' KB') + '<button type="button" data-rmarq="' + i + '" title="Tirar">×</button></span>').join('') + '</div>' : '') +
+    '<div class="sub" id="ctMsg2" style="margin:6px 0 0"></div>' +
     '<label class="ab-f" style="margin-top:12px"><span>Ou cole o texto do contrato</span><textarea class="inp" id="ctTxt" style="min-height:90px;max-width:none" placeholder="Cole aqui as cláusulas, se tiver o texto">' + esc(CT.texto) + '</textarea></label>' +
     '<div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn pri" type="button" id="ctIr"' + (CT.rodando ? ' disabled' : '') + '>' + ic('zap', 's') + (CT.rodando ? ' Analisando…' : ' Analisar contrato') + '</button>' + (CT.msg ? '<span class="sub" id="ctMsg" style="margin:0">' + esc(CT.msg) + '</span>' : '') + '</div></div>';
   (a.analises || []).forEach((x, i) => { h += htmlAnalise(x, i); });
@@ -539,7 +572,7 @@ function ligarContrato() {
   inp.onchange = async () => { await addArquivos([...inp.files]); render(); };
   dz.ondragover = (e) => { e.preventDefault(); dz.classList.add('on'); }; dz.ondragleave = () => dz.classList.remove('on');
   dz.ondrop = async (e) => { e.preventDefault(); dz.classList.remove('on'); await addArquivos([...e.dataTransfer.files]); render(); };
-  document.querySelectorAll('[data-rmarq]').forEach((b) => b.onclick = () => { CT.arqs.splice(Number(b.dataset.rmarq), 1); render(); });
+  document.querySelectorAll('[data-rmarq]').forEach((b) => b.onclick = () => { const x = CT.arqs[Number(b.dataset.rmarq)]; CT.arqs = CT.arqs.filter((y) => y !== x && !(x.resumo && y.pdf === x.nome)); render(); });
   const ir = $('#ctIr'); if (ir) ir.onclick = analisar;
   document.querySelectorAll('[data-rman]').forEach((b) => b.onclick = () => { if (!confirm('Excluir esta análise?')) return; a.analises.splice(Number(b.dataset.rman), 1); marcarSujo(); render(); });
 }
