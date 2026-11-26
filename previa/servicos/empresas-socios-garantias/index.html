@@ -109,6 +109,11 @@ html[data-tema=escuro] .painel [style*="0 0 0 8px #FFFFFF"]{box-shadow:0 0 0 1px
 .s-intervalo p{margin:0;font-size:38px;line-height:1.22;font-weight:300;font-style:italic;text-shadow:0 2px 24px rgba(0,0,0,.45)}
 .pq{display:flex;flex-direction:column;gap:18px;padding:30px 30px 32px;border-left:2px solid #B8965A;background:rgba(184,150,90,.07)}
 @media (max-width:900px){.pq{padding:24px 20px 26px}.pq h2{font-size:23px!important}.pq .btn{align-self:stretch!important;padding:0 16px;text-align:center}}
+.cta-ouro{min-height:58px;padding:0 34px;gap:12px;font-size:15px;letter-spacing:.05em;color:#16191D!important;border:0;background:linear-gradient(135deg,#F3DFB6 0%,#D1AE6C 45%,#B8965A 100%);box-shadow:0 14px 34px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.55)}
+.cta-ouro span{transition:transform .25s ease}
+.cta-ouro:hover{color:#16191D!important;box-shadow:0 18px 40px rgba(0,0,0,.42),0 0 0 4px rgba(209,174,108,.25)}
+.cta-ouro:hover span{transform:translateX(4px)}
+@media (max-width:900px){.cta-ouro{width:100%;justify-content:center}}
 .lista-s{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .lista-s li{display:flex;gap:16px;align-items:baseline;padding:18px 0;border-top:1px solid #E2E4E7;font-size:16.5px;line-height:1.65}
 .lista-s li b{flex:none;width:8px;height:8px;transform:rotate(45deg) translateY(-2px);border:1px solid #B8965A}
@@ -145,10 +150,10 @@ html[data-tema=escuro] .faq p{color:#C7CBD0}
 </header>
 <section class="s-hero" id="topo">
 <div class="larga" style="display:flex;flex-direction:column;gap:22px;max-width:1120px;width:100%">
-<a href="../../#atuacao" style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:600;color:#E3C48C;text-decoration:none">Áreas de atuação · 03</a>
+<a href="../../#atuacao" style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:600;color:#F3DFB6;text-decoration:none;text-shadow:0 1px 12px rgba(0,0,0,.6)">Áreas de atuação · 03</a>
 <h1 class="serif" style="margin:0;font-size:58px;line-height:1.08;font-weight:300;max-width:820px;text-shadow:0 2px 30px rgba(0,0,0,.35)">Empresas, sócios e garantias</h1>
 <p class="serif" style="margin:0;font-size:22px;line-height:1.5;font-style:italic;color:#F3DFB6;max-width:680px">Você deu aval, fiança ou o seu imóvel para a dívida da empresa.</p>
-<div><a class="btn aco" href="#contato">Conversar sobre o meu caso</a></div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;margin-top:6px"><a class="btn cta-ouro" href="#contato">Conversar sobre o meu caso <span aria-hidden="true">→</span></a><span style="font-size:13px;color:#E6E8EB;letter-spacing:.02em">Atendimento reservado, presencial ou por vídeo.</span></div>
 </div>
 </section>
 <div class="painel">
