@@ -105,6 +105,8 @@ html[data-tema=escuro] .painel [style*="0 0 0 8px #FFFFFF"]{box-shadow:0 0 0 1px
 .s-hero{min-height:460px;display:flex;align-items:flex-end;color:#FFFFFF;padding:132px 0 72px}
 .s-bloco{padding:88px 0;border-top:1px solid #E2E4E7}
 .s-bloco:first-child{border-top:0}
+.s-intervalo{height:340px;display:flex;align-items:center;justify-content:center;text-align:center;color:#FFFFFF}
+.s-intervalo p{margin:0;font-size:38px;line-height:1.22;font-weight:300;font-style:italic;text-shadow:0 2px 24px rgba(0,0,0,.45)}
 .lista-s{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .lista-s li{display:flex;gap:16px;align-items:baseline;padding:18px 0;border-top:1px solid #E2E4E7;font-size:16.5px;line-height:1.65}
 .lista-s li:last-child{border-bottom:1px solid #E2E4E7}
@@ -121,12 +123,13 @@ html[data-tema=escuro] .painel [style*="0 0 0 8px #FFFFFF"]{box-shadow:0 0 0 1px
 .outras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}
 .outras a{display:flex;gap:14px;align-items:baseline;padding:16px 0;border-top:1px solid #E2E4E7;text-decoration:none;color:#16191D;font-size:17px}
 .outras a:hover{color:#8A6A2E}
-@media (max-width:900px){.s-hero{min-height:0;padding:116px 0 56px}.passos,.outras{grid-template-columns:minmax(0,1fr)}.s-bloco{padding:64px 0}.s-hero h1{font-size:36px!important}}
+@media (max-width:900px){.s-intervalo{height:260px}.s-intervalo p{font-size:28px}.s-hero{min-height:0;padding:116px 0 56px}.passos,.outras{grid-template-columns:minmax(0,1fr)}.s-bloco{padding:64px 0}.s-hero h1{font-size:36px!important}}
 html[data-tema=escuro] .s-bloco,html[data-tema=escuro] .passos>div,html[data-tema=escuro] .outras a{border-color:rgba(255,255,255,.12)!important}
 html[data-tema=escuro] .outras a{color:#EEF0F2}
 html[data-tema=escuro] .faq p{color:#C7CBD0}
 </style>
-<div class="filme" aria-hidden="true"><div class="quadro" style="background-image:url(../../img/filme-catracas.jpg);opacity:1;transform:scale(1.06)"></div><div class="veu"></div></div>
+<div class="filme" aria-hidden="true"><div class="quadro" style="background-image:url(../../img/filme-catracas.jpg);opacity:1"></div><div class="quadro" style="background-image:url(../../img/saguao-fundo.jpg);opacity:0"></div><div class="quadro" style="background-image:url(../../img/recepcao-fundo.jpg);opacity:0"></div><div class="quadro" style="background-image:url(../../img/biblioteca-fundo.jpg);opacity:0"></div><div class="veu"></div></div>
+<div class="trilho" aria-hidden="true"><span id="trilho-barra" style="height:0%"></span></div>
 <div class="conteudo">
 <header style="position:absolute;top:0;left:0;right:0;z-index:10">
 <div class="larga topo-barra" style="height:96px;display:flex;align-items:center;justify-content:space-between;gap:16px">
@@ -161,6 +164,11 @@ html[data-tema=escuro] .faq p{color:#C7CBD0}
 <span class="eyebrow">O que está em jogo</span>
 <p style="margin:0;font-size:17px;line-height:1.85;color:#3B4148">Bloqueios judiciais são feitos pelo sistema que liga o Judiciário aos bancos. Depois do bloqueio, o devedor tem prazo curto (cinco dias, pelo Código de Processo Civil) para demonstrar que os valores são impenhoráveis ou que o bloqueio foi excessivo. Salários, proventos e quantias de poupança até certo limite têm proteção legal.</p>
 </section>
+</div>
+</div>
+<section class="s-intervalo"><div class="col"><p class="serif">“Para pedir a liberação, o prazo é de dias, não de semanas.”</p></div></section>
+<div class="painel">
+<div class="col">
 <section class="s-bloco" style="display:flex;flex-direction:column;gap:28px">
 <span class="eyebrow">Como atuamos</span>
 <div class="passos"><div><span class="serif" style="font-size:15px;color:#8A6A2E">01</span><h3 class="serif" style="margin:0;font-size:22px;line-height:1.3;font-weight:400">Encontrar a origem</h3><p style="margin:0;font-size:15.5px;line-height:1.75;color:#3B4148">Identificamos o processo, o juízo e o valor bloqueado.</p></div><div><span class="serif" style="font-size:15px;color:#8A6A2E">02</span><h3 class="serif" style="margin:0;font-size:22px;line-height:1.3;font-weight:400">Provar a natureza do dinheiro</h3><p style="margin:0;font-size:15.5px;line-height:1.75;color:#3B4148">Reunimos extratos e comprovantes que mostram que o valor é salário, aposentadoria, poupança ou capital essencial.</p></div><div><span class="serif" style="font-size:15px;color:#8A6A2E">03</span><h3 class="serif" style="margin:0;font-size:22px;line-height:1.3;font-weight:400">Pedido de liberação</h3><p style="margin:0;font-size:15.5px;line-height:1.75;color:#3B4148">Apresentamos o pedido no processo dentro do prazo.</p></div><div><span class="serif" style="font-size:15px;color:#8A6A2E">04</span><h3 class="serif" style="margin:0;font-size:22px;line-height:1.3;font-weight:400">Prevenir novos bloqueios</h3><p style="margin:0;font-size:15.5px;line-height:1.75;color:#3B4148">Avaliamos a dívida de origem e o caminho para resolvê-la, por defesa ou acordo.</p></div></div>
@@ -170,6 +178,11 @@ html[data-tema=escuro] .faq p{color:#C7CBD0}
 <ul class="lista-s"><li><b></b><span>Extrato mostrando o bloqueio</span></li><li><b></b><span>Comprovantes de que o valor é salário, aposentadoria ou poupança</span></li><li><b></b><span>Número do processo, se souber</span></li><li><b></b><span>Contrato da dívida que originou a cobrança</span></li></ul>
 <p style="margin:0;font-size:14.5px;color:#5B6168">Não tem tudo? Traga o que tiver. Parte do trabalho é reunir o que falta.</p>
 </section>
+</div>
+</div>
+<section class="s-intervalo"><div class="col"><p class="serif">“Salário e poupança têm proteção na lei.”</p></div></section>
+<div class="painel">
+<div class="col">
 <section class="s-bloco faq" style="display:flex;flex-direction:column;gap:22px">
 <span class="eyebrow">Perguntas frequentes</span>
 <div><details><summary class="serif">Quanto tempo tenho para pedir o desbloqueio?</summary><p>O prazo legal para alegar a impenhorabilidade é curto. Procure orientação no mesmo dia em que perceber o bloqueio.</p></details><details><summary class="serif">Podem bloquear o meu salário?</summary><p>Em regra, salário é protegido, com exceções previstas em lei e em decisões dos tribunais. A prova de que o dinheiro é salário é essencial.</p></details><details><summary class="serif">E se o bloqueio foi na conta da empresa?</summary><p>Também é possível discutir excessos e a preservação do capital necessário à atividade, conforme o caso.</p></details></div>
@@ -209,5 +222,12 @@ html[data-tema=escuro] .faq p{color:#C7CBD0}
 </div>
 <script>document.querySelectorAll(".nav a").forEach(function(a){a.addEventListener("click",function(){var t=document.getElementById("menu-t");if(t)t.checked=false;});});</script>
 <script>document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.tema-btn');if(!b)return;var r=document.documentElement,n=r.getAttribute('data-tema')==='escuro'?'claro':'escuro';r.setAttribute('data-tema',n);try{localStorage.setItem('fce-tema',n);}catch(x){}});</script>
+<script>(function(){var q=[].slice.call(document.querySelectorAll('.filme .quadro')),barra=document.getElementById('trilho-barra'),n=q.length,pend=false;if(n<2)return;
+var reduz=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function desenha(){pend=false;var el=document.scrollingElement||document.documentElement;var max=Math.max(1,el.scrollHeight-window.innerHeight);var p=Math.min(1,Math.max(0,(window.scrollY||el.scrollTop||0)/max));var t=p*(n-1);
+for(var i=0;i<n;i++){var d=t-i,op=Math.max(0,1-Math.abs(d)),av=Math.min(1,Math.max(0,(d+1)/2));q[i].style.opacity=op.toFixed(3);q[i].style.transform=reduz?'none':'scale('+(1.02+0.12*av).toFixed(4)+') translateY('+((av-0.5)*-2.5).toFixed(3)+'%)';}
+if(barra)barra.style.height=(p*100).toFixed(1)+'%';}
+function pede(){if(!pend){pend=true;requestAnimationFrame(desenha);}}
+window.addEventListener('scroll',pede,{passive:true});window.addEventListener('resize',pede);desenha();})();</script>
 </body>
 </html>
