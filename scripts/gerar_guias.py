@@ -2,7 +2,7 @@ import json, re, os, html
 import glob
 SITE=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 G=sorted([json.load(open(f,encoding='utf-8')) for f in glob.glob(SITE+'/content/guias/*.json')],key=lambda g:(g.get('ordem',999),g['slug']))
-IDX=open(SITE+'/index.html',encoding='utf-8').read()
+IDX=open(SITE+'/content/layout-antigo-base.html',encoding='utf-8').read()
 style=IDX[IDX.index('<style>'):IDX.index('</style>')+8]
 header=IDX[IDX.index('<header class="top">'):IDX.index('</header>')+9]
 tail=IDX[IDX.index('<footer>'):]
@@ -619,7 +619,7 @@ page('/contato/index.html','Contato: explique a sua situação | FCE Advogados',
 CO=open(SITE+'/content/contato-obrigado.html',encoding='utf-8').read()
 page('/contato/obrigado/index.html','Contato recebido | FCE Advogados','Recebemos o seu relato. O escritório retorna pelo WhatsApp informado.','https://fceadvogados.com.br/contato/obrigado/',CO,{"@context":"https://schema.org","@type":"WebPage","name":"Contato recebido"},'contato-obrigado','<meta name="robots" content="noindex">')
 # sitemap
-urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/leilao/','https://fceadvogados.com.br/suspensao-de-leilao/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+[f'https://fceadvogados.com.br{x[0]}' for x in PAGINAS_B]+[f'https://fceadvogados.com.br{x[0]}' for x in FERRAMENTAS]+['https://fceadvogados.com.br/contato/']+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/leilao-de-imoveis/']+[f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/' for c in CID]+['https://fceadvogados.com.br/privacidade/']
+urls=['https://fceadvogados.com.br/','https://fceadvogados.com.br/leilao/','https://fceadvogados.com.br/suspensao-de-leilao/','https://fceadvogados.com.br/calculadora/','https://fceadvogados.com.br/sobre/','https://fceadvogados.com.br/ebook/','https://fceadvogados.com.br/blog/','https://fceadvogados.com.br/guia/']+[f'https://fceadvogados.com.br/guia/{g["slug"]}/' for g in G]+[f'https://fceadvogados.com.br/blog/{b["slug"]}/' for b in B]+[f'https://fceadvogados.com.br{x[0]}' for x in PAGINAS_B]+[f'https://fceadvogados.com.br{x[0]}' for x in FERRAMENTAS]+['https://fceadvogados.com.br/contato/']+['https://fceadvogados.com.br/veiculo/']+[f'https://fceadvogados.com.br/veiculo/{g["slug"]}/' for g in V]+['https://fceadvogados.com.br/empresario/','https://fceadvogados.com.br/investidor/','https://fceadvogados.com.br/investidor/guia/','https://fceadvogados.com.br/investidor/calculadora/','https://fceadvogados.com.br/leilao-de-imoveis/']+[f'https://fceadvogados.com.br/leilao-de-imoveis/{c["slug"]}/' for c in CID]+['https://fceadvogados.com.br/privacidade/']+['https://fceadvogados.com.br/servicos/']+[f'https://fceadvogados.com.br/servicos/{s}/' for s in ['alienacao-fiduciaria-leilao', 'credito-rural', 'desbloqueio-contas-ativos', 'empresas-socios-garantias', 'execucoes-penhoras', 'leilao-de-imovel-marcado', 'negociacao-dividas-bancarias', 'revisao-contratos-bancarios', 'superendividamento', 'veiculos-maquinas']]
 import subprocess as _sp
 _HOJE=_d.strftime('%Y-%m-%d')
 def _lastmod(u):
@@ -676,8 +676,8 @@ open(SITE+'/404.html','w',encoding='utf-8').write(_nf)
 print('ok')
 
 import re
-IDX2=open(SITE+'/index.html',encoding='utf-8').read()
+IDX2=open(SITE+'/content/layout-antigo-base.html',encoding='utf-8').read()
 DESTAQUE=['como-saber-se-meu-imovel-vai-a-leilao','intimacao-do-cartorio-parcelas-atrasadas','propriedade-consolidada-no-nome-do-banco','direito-de-preferencia-recomprar-imovel-antes-do-leilao','o-banco-pode-leiloar-minha-casa','saldo-do-leilao-como-receber']
 lis=''.join(f'<li><a href="/guia/{g["slug"]}/">{html.escape(g["titulo"])}</a></li>' for sl in DESTAQUE for g in G if g['slug']==sl)+''.join(f'<li><a href="{x[0]}">{html.escape(x[4])}</a></li>' for x in PAGINAS_B if x[0] in ('/imovel-em-garantia/bem-de-familia/','/imovel-em-garantia/fiador/','/penhora-de-imovel/','/penhora-de-imovel/divida-de-condominio/','/penhora-de-imovel/iptu/'))
 IDX2=re.sub(r'<ul class="guias-list">.*?</ul>','<ul class="guias-list">'+lis+'</ul>',IDX2,1,flags=re.S)
-open(SITE+'/index.html','w',encoding='utf-8').write(IDX2)
+open(SITE+'/content/layout-antigo-base.html','w',encoding='utf-8').write(IDX2)
