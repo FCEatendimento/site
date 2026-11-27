@@ -455,6 +455,53 @@ tr.clic{cursor:pointer}tr.clic:hover td{background:var(--surface-2)}
 :root[data-tema="escuro"] .prz-c b{background:#3a4c6b}
 @media (max-width:760px){.cal-d.prz{min-height:64px}.prz-c{gap:2px}.prz-c .tlogo.xs{width:16px;height:12px;padding:0 1px}.prz-c b{min-width:15px;height:15px;font-size:10px}.prz-tag{padding-right:6px}.prz-c em{font-size:9px}.prz-c:not(.trf) em{display:none}.prz-c.trf .tlogo{display:none}}
 .prz-c em{font-style:normal;font-weight:700;font-size:11px;color:var(--mut)}
+/* Processos > Prazos */
+.vt-n{min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--gold);color:#fff;font-size:11px;display:inline-grid;place-items:center}
+.pz-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+@media (max-width:760px){.pz-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.pz-tiles .pz-tile:last-child{grid-column:1/-1}}
+.pz-tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--sh);cursor:pointer;color:var(--txt);font:inherit;border-left:4px solid var(--line-2)}
+.pz-tile b{font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}.pz-tile span{font-size:13px;font-weight:600}.pz-tile i{font-style:normal;font-size:11.5px;color:var(--mut)}
+.pz-tile.bad{border-left-color:var(--bad)}.pz-tile.bad b{color:var(--bad)}.pz-tile.warn{border-left-color:var(--warn)}.pz-tile.warn b{color:var(--warn)}
+.pz-tile.info{border-left-color:var(--info)}.pz-tile.ok{border-left-color:var(--ok)}.pz-tile.ok b{color:var(--ok)}.pz-tile.zero{opacity:.6}.pz-tile:not([data-pz-ir]){cursor:default}
+.pz-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}.pz-bar .filtros{flex:1;min-width:0}.pz-bar .inp{width:280px;max-width:100%}
+.pz-acoes{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.pz-acoes .pp{flex:1;min-width:220px}
+.pz-sec .pz-dot,.pz-feitos .pz-dot{width:9px;height:9px;border-radius:99px;background:var(--line-2);flex:none}
+.pz-sec.bad .pz-dot{background:var(--bad)}.pz-sec.warn .pz-dot{background:var(--warn)}.pz-sec.ouro .pz-dot{background:var(--gold)}.pz-sec.info .pz-dot{background:var(--info)}.pz-feitos .pz-dot{background:var(--ok)}
+.pz-sec.bad{color:var(--bad)}
+.pz-lista{display:flex;flex-direction:column;gap:10px}
+.pz-feitos>summary{cursor:pointer;list-style:none}.pz-feitos>summary::-webkit-details-marker{display:none}
+.pz-card{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line-2);border-radius:12px;box-shadow:var(--sh)}
+.pz-card.f-vencido,.pz-card.f-hoje{border-left-color:var(--bad)}.pz-card.f-critico{border-left-color:var(--warn)}.pz-card.f-semana{border-left-color:var(--gold)}.pz-card.f-quinzena{border-left-color:var(--info)}
+.pz-card.feito{border-left-color:var(--ok);opacity:.7}
+.pz-data{width:48px;flex:none;text-align:center;border:1px solid var(--line-2);border-radius:10px;padding:4px 0;line-height:1.1}
+.pz-data b{display:block;font-size:19px}.pz-data span,.pz-data em{display:block;font-size:10.5px;text-transform:uppercase;color:var(--mut);font-weight:700;font-style:normal}
+.pz-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.pz-t{font-weight:700;font-size:14.5px;line-height:1.35;text-wrap:balance}.pz-cli{font-size:13.5px}
+.pz-meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12.5px}
+.pz-cnj{border:1px dashed var(--line-2);background:none;border-radius:6px;padding:1px 6px;font:inherit;font-variant-numeric:tabular-nums;color:var(--txt);cursor:copy}
+.pz-cnj:hover{border-color:var(--gold);color:var(--gold)}
+.pz-etapas{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.pz-etapas button{height:26px;padding:0 9px;border-radius:99px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--mut);font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.pz-etapas button svg.i{width:11px;height:11px}
+.pz-etapas button.antes{color:var(--ok);border-color:transparent;background:var(--ok-soft)}
+.pz-etapas button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.pz-etapas button:hover:not(.on){border-color:var(--gold)}
+.pz-obs{font-size:12.5px;color:var(--mut);margin-top:2px}.pz-obs summary{cursor:pointer;font-weight:600}.pz-obs p{margin:6px 0 0;white-space:pre-wrap;max-width:75ch}
+.pz-dir{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.pz-cont{text-align:right;line-height:1.15}.pz-cont b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.pz-cont span{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mut)}
+.pz-cont i{display:block;font-style:normal;font-size:11px;color:var(--mut)}
+.pz-cont.bad b,.pz-cont.bad span{color:var(--bad)}.pz-cont.warn b{color:var(--warn)}.pz-cont.ok b{color:var(--ok)}.pz-cont.ok b svg.i{width:20px;height:20px}
+.pz-acts{display:flex;gap:6px}
+@media (max-width:620px){.pz-card{flex-wrap:wrap;gap:10px 12px;padding:12px}.pz-mid{flex-basis:calc(100% - 64px)}.pz-dir{flex-direction:row;align-items:center;justify-content:space-between;width:100%;padding-top:8px;border-top:1px solid var(--line)}.pz-cont{text-align:left;display:flex;align-items:baseline;gap:6px}.pz-cont b{display:inline;font-size:18px}.pz-cont i{display:inline}}
+.pz-kanban{display:grid;grid-template-columns:repeat(5,minmax(280px,1fr));gap:12px;margin-top:16px;overflow-x:auto;padding-bottom:6px}
+.pz-col{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.pz-col-t{font:700 12.5px var(--sans);text-transform:uppercase;letter-spacing:.6px;color:var(--mut);display:flex;justify-content:space-between;padding:2px 4px}
+.pz-col-t span{background:var(--surface);border-radius:99px;padding:0 7px}
+.pz-col .pz-card{flex-wrap:wrap;padding:10px 12px;gap:8px 10px}.pz-col .pz-mid{flex-basis:calc(100% - 60px)}.pz-col .pz-dir{flex-direction:row;align-items:center;justify-content:space-between;width:100%}.pz-col .pz-cont{text-align:left;display:flex;gap:6px;align-items:baseline}.pz-col .pz-cont b{display:inline;font-size:17px}.pz-col .pz-cont i{display:inline}
+.pz-vazio{font-size:12.5px;color:var(--mut);text-align:center;padding:14px 0}
+.pz-col .pz-cnj{font-size:11px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}.pz-col .pz-data{width:40px}.pz-col .pz-data b{font-size:16px}.pz-col .pz-mid{flex-basis:calc(100% - 52px)}.pz-col .pz-t{font-size:13.5px}.pz-col .pz-cli{font-size:12.5px}
+.pz-sel{height:30px;font-size:12.5px;padding:0 8px;margin-top:4px;width:100%}
+@media (max-width:620px){.pz-bar .filtros{flex-basis:100%}.pz-bar .inp{width:100%}}
 
 /* Conteúdo: calendário por canal */
 .cc-meta{margin-top:12px}.cc-meta .corpo{display:grid;gap:8px}.cc-meta-l{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;align-items:baseline}.cc-meta-l b{font-size:15px}
@@ -3020,7 +3067,7 @@ function alvoProc(p) {
   if (p.status === 'A_AJUIZAR' && p.meta_ajuizamento) return { d: String(p.meta_ajuizamento).slice(0, 10), t: 'Meta para ajuizar' };
   return null;
 }
-S.procFiltro = S.procFiltro || { trib: '', grupo: 'todos', q: '', dec: '', vista: 'lista', mes: '' };
+S.procFiltro = S.procFiltro || { trib: '', grupo: 'todos', q: '', dec: '', vista: 'prazos', mes: '' };
 VIEWS.processos = async (_, forcar) => {
   titulo('Processos', '<button class="btn sm pri" id="bNovoProc">' + ic('mais2', 's') + '<span class="so-desk"> Novo processo</span></button>');
   if (!S.cache.proc) carregando(4);
@@ -3055,11 +3102,14 @@ VIEWS.processos = async (_, forcar) => {
     '<span class="fsep"></span>' + Object.entries(DEC_PROC).map(([k, t]) => '<button data-dec="' + k + '"' + (F.dec === k ? ' class="on"' : '') + '>' + (F.dec === k ? ic('check', 's') + ' ' : '') + t + '</button>').join('') +
     (F.trib ? '<button data-limpa class="on">' + esc(F.trib) + ' ' + ic('x', 's') + '</button>' : '') + '</div>' +
     '<input class="inp" id="procQ" type="search" placeholder="Buscar cliente, parte ou número" value="' + esc(F.q) + '"></div>';
-  h += '<div class="vista-tg"><button data-vista="lista"' + (F.vista !== 'cal' ? ' class="on"' : '') + '>' + ic('lista', 's') + ' Lista</button><button data-vista="cal"' + (F.vista === 'cal' ? ' class="on"' : '') + '>' + ic('cal', 's') + ' Calendário</button></div>';
+  const nPz = (d.compromissos || []).filter((c) => c.tipo === 'PRAZO' && !c.concluido && (!F.trib || c.tribunal === F.trib)).length;
+  h += '<div class="vista-tg"><button data-vista="prazos"' + (F.vista === 'prazos' ? ' class="on"' : '') + '>' + ic('relogio', 's') + ' Prazos' + (nPz ? ' <span class="vt-n">' + nPz + '</span>' : '') + '</button><button data-vista="lista"' + (F.vista === 'lista' ? ' class="on"' : '') + '>' + ic('lista', 's') + ' Processos</button><button data-vista="cal"' + (F.vista === 'cal' ? ' class="on"' : '') + '>' + ic('cal', 's') + ' Calendário</button></div>';
   h += '<div id="procLista"></div>';
   $('#cont').innerHTML = h;
   $$('[data-vista]').forEach((b) => b.onclick = () => { F.vista = b.dataset.vista; VIEWS.processos(); });
   if (F.vista === 'cal') { $('.proc-bar').style.display = 'none'; desenharCalendario(d, hoje); ligarRestoProcessos(d, F); return; }
+  if (F.vista === 'prazos' && window.desenharPrazos) { $('.proc-bar').style.display = 'none'; desenharPrazos(d, hoje); ligarRestoProcessos(d, F); return; }
+  if (F.vista === 'prazos') F.vista = 'lista';
   const desenhar = () => {
     const q = F.q.toLowerCase().trim(), qd = q.replace(/\D/g, '');
     const lista = itens.filter((p) => (!F.trib || p.tribunal === F.trib) && (F.grupo === 'todos' || grupoDe(p) === F.grupo) && (!F.dec || (F.dec === 'liminar' ? p.liminar === 'DEFERIDA' : procedente(p))) &&
@@ -3288,7 +3338,7 @@ async function revisarComunicado(c, depois) {
 const TIPO_COMP = { AUDIENCIA: ['Audiência', 'bad'], PERICIA: ['Perícia', 'warn'], PRAZO: ['Prazo', 'ouro'], JULGAMENTO: ['Julgamento', 'nav'], DILIGENCIA: ['Diligência', 'info'], REUNIAO: ['Reunião', 'info'], OUTRO: ['Outro', ''] };
 function itemCompromisso(c, comCliente) {
   const t = TIPO_COMP[c.tipo] || TIPO_COMP.OUTRO, f = faltam(String(c.data).slice(0, 10) + 'T12:00:00');
-  return '<div class="item clic" data-comp="' + c.id + '" style="' + (c.concluido ? 'opacity:.55' : '') + '"><div class="dt-box"><b>' + String(c.data).slice(8, 10) + '</b><span>' + esc(fmtD(String(c.data).slice(0, 10) + 'T12:00:00', { month: 'short' }).replace('.', '')) + '</span></div><div class="mid"><div class="t">' + esc(c.titulo) + (c.concluido ? ' <span class="chip ok">feito</span>' : '') + '</div>' +
+  return '<div class="item clic" data-comp="' + c.id + '" style="' + (c.concluido ? 'opacity:.55' : '') + '"><div class="dt-box"><b>' + String(c.data).slice(8, 10) + '</b><span>' + esc(fmtD(String(c.data).slice(0, 10) + 'T12:00:00', { month: 'short' }).replace('.', '')) + '</span></div><div class="mid"><div class="t">' + esc(c.titulo) + (c.concluido ? ' <span class="chip ok">feito</span>' : (c.tipo === 'PRAZO' && c.etapa && c.etapa !== 'A_FAZER' && window.ETAPA_PRAZO ? ' <span class="chip info">' + esc(ETAPA_PRAZO[c.etapa]) + '</span>' : '')) + '</div>' +
     '<div class="d">' + [c.hora ? c.hora : '', comCliente ? esc(c.cliente) + ' · ' + esc(c.tribunal) : '', c.local ? esc(c.local) : ''].filter(Boolean).join(' · ') + '</div></div>' +
     '<div class="dir"><span class="chip ' + t[1] + '">' + t[0] + '</span>' + (c.concluido ? '' : '<span class="pp" style="color:var(--' + (f.c || 'mut') + ')">' + esc(f.t) + '</span>') + '</div></div>';
 }
@@ -3481,6 +3531,7 @@ async function calendarioPrazos(el, forcar) {
 </script>
 <script src="diagnostico.js?v=6"></script>
 <script src="teses.js?v=1"></script>
+<script src="prazos.js?v=1"></script>
 <script src="radar.js?v=1"></script>
 <script src="bancario.js?v=4"></script>
 <script src="comercial.js?v=1"></script>
